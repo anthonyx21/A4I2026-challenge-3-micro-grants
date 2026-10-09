@@ -802,6 +802,7 @@ about whether you have done the same.
 
 ```
 notebooks/c3_01_load_explore.ipynb   The main artifact. Run this first.
+notebooks/c3_90_publish_snapshot.ipynb  ROI maintainers only. You do not need it.
 scripts/load.sh                      Headless fallback if Colab is unavailable.
 scripts/fetch_bea.py                 Maintainers only. Regenerates the BEA file.
 data/bea_direct_requirements.csv     The published purchase rates behind every
@@ -810,6 +811,10 @@ data/bea_direct_requirements.csv     The published purchase rates behind every
 data/bea_naics_concordance.csv       How BEA industry codes map to NAICS.
 agent/                               Empty. Your agent goes here.
 ```
+
+`c3_90_publish_snapshot.ipynb` is for ROI maintainers: it regenerates the Cloud Storage snapshot
+that `scripts/load.sh` reads from. If you run it you will get a permissions error, because you do not
+have write access to our bucket. That is expected, and you never need it.
 
 `agent/` is empty on purpose. We built the on-ramp—a real corridor, real businesses, one fully real
 relationship, two modeled ones with their sources named, and validation that tells you plainly
