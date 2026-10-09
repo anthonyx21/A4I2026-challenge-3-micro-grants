@@ -39,7 +39,7 @@ what each of you needs in the first fifteen minutes.
 
 | If you are… | Read now | Come back for |
 |---|---|---|
-| **Everyone, together** | [The five things](#the-five-things-youre-working-with) · [Three tracks](#three-tracks-one-architecture) · [Pick your corridor](#now-pick-your-corridor) | — |
+| **Everyone, together** | [The five things](#the-five-things-youre-working-with) · [Three tracks](#three-tracks-one-architecture) · [What you're building](#what-youre-building) · [Pick your corridor](#now-pick-your-corridor) | — decide these before anyone opens a keyboard |
 | **Team lead** | [Step 0](#step-0organize-your-team) · [How you'll be judged](#how-youll-be-judged) | [What will set yours apart](#what-will-set-yours-apart)—read it *before* you write code |
 | **Data lane** | [Step 4, load the data](#step-4load-the-data) · [What you'll have](#what-youll-have) | [The data, and why we chose it](#the-data-and-why-we-chose-it) · Section 13 of the notebook |
 | **Agent lane** | [What you're building](#what-youre-building) · [The technology](#the-technology-youll-use) | [`agent/README.md`](agent/) · [Reference](#reference) |
