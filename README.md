@@ -823,6 +823,12 @@ whether any of it is wrong. We didn't build the vehicle.
 hours—that's the design, not a failure. A team that gets three quarters of the way with clear
 reasoning and honest limitations will beat a team that demos something polished and hollow.
 
+**You are judged against the track you chose**, not against a fixed idea of the right answer. A
+Main Street team is expected to rank a queue of applicants and defend the order; an anchor-closure
+team is expected to find businesses that have not applied for anything and show the backward leg of
+the traversal that reaches them. Neither is marked down for not looking like the other. Say which
+track you took, early.
+
 | Dimension | Weight | The question judges are asking |
 |---|---:|---|
 | **Impact & insight** | 30 | Would a grant officer actually use this? Is the recommendation specific enough to act on? |
