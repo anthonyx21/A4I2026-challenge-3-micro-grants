@@ -37,11 +37,10 @@ of table ids and says so explicitly, so any literal id you find in a blog post i
 discovery fails it prints every table BEA offers, with full raw records, and stops rather than
 picking one.
 
-**Note what it fetches and why.** BEA's API does **not** expose a Direct Requirements table —
-only Total Requirements, Domestic Supply, and Use (verified against a live key, 2026-08-09).
+**Note what it fetches and why.** BEA's API does **not** expose a Direct Requirements table—only Total Requirements, Domestic Supply, and Use (verified against a live key, 2026-08-09).
 Total requirements already contains every indirect round of the multiplier, so using it as an
 edge weight *and* traversing the graph multi-hop would double-count. This script therefore pulls
-the **Use** table and normalises each column by that industry's total output, which is the
+the **Use** table and normalizes each column by that industry's total output, which is the
 standard technical-coefficients calculation and gives genuine direct requirements. Edges carry
 the direct effect; the graph supplies the indirect one.
 

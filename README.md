@@ -83,7 +83,7 @@ worker count, not a company. Bayside Roasters roasts coffee; Kearny Kitchen is a
 
 | Term | In the picture |
 |---|---|
-| **Node** | Every box. Two kinds: a **Business** (blue and grey) and an **Employer** block (pink). Employers are census blocks with a real worker count, not companies |
+| **Node** | Every box. Two kinds: a **Business** (blue and gray) and an **Employer** block (pink). Employers are census blocks with a real worker count, not companies |
 | **Edge** | Every arrow, and it has a direction. **`Supplies`** runs supplier → buyer. **`DrawsFootfall`** runs employer → the businesses those workers spend at |
 | **Property** | What an edge or node carries. `Supplies` has `intensity`, how much of a buyer's input budget that industry represents. `DrawsFootfall` has `worker_share` |
 | **Cascade** | What is exposed when a node fails. Bayside Roasters closing reaches the café, the deli, the caterer—**and then Larkin Event Hall, which never bought a bean from them** |
@@ -435,7 +435,7 @@ The Gemini Enterprise trade-off is worth thinking about rather than working arou
 internal—a grant officer at a city agency, not a member of the public. **Say that on purpose.**
 
 - **Do not wait for a working agent.** Mock the response, build against it, swap later.
-- **If you show the graph, show a small piece of it.** The visualisation caps at 2 MB in a
+- **If you show the graph, show a small piece of it.** The visualization caps at 2 MB in a
   notebook, and a wide traversal renders as an unreadable hairball. One cascade from one business
   is legible and makes the point. The whole corridor does not.
 - **Whatever you build, the demo runs on it.** Test it on the machine you will present from.
@@ -806,7 +806,7 @@ notebooks/c3_90_publish_snapshot.ipynb  ROI maintainers only. You do not need it
 scripts/load.sh                      Headless fallback if Colab is unavailable.
 scripts/fetch_bea.py                 Maintainers only. Regenerates the BEA file.
 data/bea_direct_requirements.csv     The published purchase rates behind every
-                                     supply edge. Read it - you should be able to
+                                     supply edge. Read it—you should be able to
                                      inspect generated data.
 data/bea_naics_concordance.csv       How BEA industry codes map to NAICS.
 agent/                               Empty. Your agent goes here.
@@ -842,7 +842,7 @@ track you took, early.
 | **Craft & communication** | 15 | Does the short pitch land, does the quick demo work, can you justify your interface? |
 | **Bonus—range** | **+10** | Technology breadth and ambition that *serves* the solution |
 
-Bonus sits **on top** of the 100, so ambition can't cannibalise the core. Nail the fundamentals and
+Bonus sits **on top** of the 100, so ambition can't cannibalize the core. Nail the fundamentals and
 add nothing, and you can still win. Wire up five services with no coherent recommendation, and you
 can't win on breadth alone.
 

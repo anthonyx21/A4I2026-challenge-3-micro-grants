@@ -9,7 +9,7 @@ WHY THIS EXISTS
 ---------------
 The notebook needs to know, for each pair of industries, how much industry A buys
 from industry B per dollar of A's output. That is the "direct requirements"
-(technical coefficients) matrix, and it is what makes our supply edges a modelling
+(technical coefficients) matrix, and it is what makes our supply edges a modeling
 choice built on a published statistic rather than an invention.
 
 BEA's API does NOT publish Direct Requirements. Verified against a live key on
@@ -393,8 +393,8 @@ def main():
     print(out.head(12).to_string(index=False))
     print()
     print(f"Source: BEA Input-Output Accounts, Use table {table_id}, year {year},")
-    print("normalised by total industry output to give direct requirements.")
-    print("Licence: public domain (https://bea.gov/help/faq/145). Commit both files.")
+    print("normalized by total industry output to give direct requirements.")
+    print("License: public domain (https://bea.gov/help/faq/145). Commit both files.")
 
 
 if __name__ == "__main__":

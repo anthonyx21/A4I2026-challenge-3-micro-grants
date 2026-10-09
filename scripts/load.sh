@@ -13,7 +13,7 @@
 #     bash scripts/load.sh --list          # show available corridors
 #
 # You still want the notebook if you can run it. It explains which of the
-# connections in your graph are measured and which are modelled, and you will be
+# connections in your graph are measured and which are modeled, and you will be
 # asked about that. This script gets you the same tables without the teaching.
 
 set -euo pipefail
@@ -229,7 +229,7 @@ echo "  Your tables are in ${PROJECT_ID}.${DATASET}"
 echo "  Safe to re-run at any time - each load replaces the whole table."
 echo
 echo "  IMPORTANT: the businesses are real and so are the loan relationships."
-echo "  The supply and footfall edges are MODELLED from published federal rates -"
+echo "  The supply and footfall edges are MODELED from published federal rates -"
 echo "  the notebook explains exactly how, and judges will ask you."
 echo
 echo "  Next: CREATE PROPERTY GRAPH over businesses + supplies, then traverse it."
