@@ -520,9 +520,9 @@ Antigravity CLI already installed. Nothing to set up on your laptop, no admin ri
    ```
 
 New to any of this?
-[Using Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell)
+[Using Cloud Shell](https://docs.cloud.google.com/shell/docs/using-cloud-shell)
 ·
-[Cloud Shell Editor overview](https://cloud.google.com/shell/docs/editor-overview)
+[Cloud Shell Editor overview](https://docs.cloud.google.com/shell/docs/editor-overview)
 
 One thing worth knowing: your `$HOME` directory persists between sessions. Anything outside it
 does not—so keep your work in the cloned repo.
@@ -886,12 +886,12 @@ whether you made the choice on purpose and can say why.
 Bookmark the first two; they are the ones you will need today.
 
 **Your differentiator**
-- [Introduction to BigQuery Graph](https://cloud.google.com/bigquery/docs/graph-overview)—start here
-- [Create and query a graph](https://cloud.google.com/bigquery/docs/graph-create)—the DDL, worked
-- [Graph query overview](https://cloud.google.com/bigquery/docs/graph-query-overview)—`MATCH`, quantifiers, `NEXT`
-- [Graph schema best practices](https://cloud.google.com/bigquery/docs/graph-schema-best-practices)—element keys, labels, properties
-- [Visualize graphs](https://cloud.google.com/bigquery/docs/graph-visualization)—the `TO_JSON` rule
-- [GQL functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/graph-gql-functions)
+- [Introduction to BigQuery Graph](https://docs.cloud.google.com/bigquery/docs/graph-overview)—start here
+- [Create and query a graph](https://docs.cloud.google.com/bigquery/docs/graph-create)—the DDL, worked
+- [Graph query overview](https://docs.cloud.google.com/bigquery/docs/graph-query-overview)—`MATCH`, quantifiers, `NEXT`
+- [Graph schema overview](https://docs.cloud.google.com/bigquery/docs/graph-schema-overview)—element keys, labels, properties
+- [Visualize graphs](https://docs.cloud.google.com/bigquery/docs/graph-visualization)—the `TO_JSON` rule
+- [GQL functions](https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/graph-gql-functions)
 - [Fraud detection codelab](https://codelabs.developers.google.com/codelabs/fraud-bigquery-graph)—a full worked example on other data
 
 > ⚠️ **Check the URL says `/bigquery/`.** Spanner Graph uses nearly identical GQL, looks identical,
@@ -899,13 +899,13 @@ Bookmark the first two; they are the ones you will need today.
 > highly and will waste your afternoon.
 
 **The rest of the stack**
-- [Agent Development Kit](https://google.github.io/adk-docs/)
+- [Agent Development Kit](https://adk.dev/)
 - [MCP Toolbox for Databases](https://github.com/googleapis/mcp-toolbox)
-- [Cloud Run quickstart](https://cloud.google.com/run/docs/quickstarts)
+- [Cloud Run quickstart](https://docs.cloud.google.com/run/docs/quickstarts)
 - [Antigravity](https://antigravity.google/docs/getting-started) · [IDE](https://antigravity.google/docs/ide/overview/) · [CLI](https://antigravity.google/docs/cli/install) · [codelab](https://codelabs.developers.google.com/antigravity-cli-hands-on)
 
 **Our data sources, if you want to check our work**
-- [SF Registered Business Locations](https://data.sfgov.org/resource/g8m3-pdis.json) (PDDL)
+- [SF Registered Business Locations](https://data.sf.gov/resource/g8m3-pdis.json) (PDDL)
 - [SBA 7(a) and 504 FOIA data](https://data.sba.gov/dataset/7a-504-foia)
 - [BEA Input-Output Accounts](https://www.bea.gov/industry/input-output-accounts-data)
 - [Census LEHD LODES](https://lehd.ces.census.gov/data/)
