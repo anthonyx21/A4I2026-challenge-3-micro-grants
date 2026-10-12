@@ -349,7 +349,9 @@ belongs here.
 > *"BigQuery Graph queries require a reservation with Enterprise or Enterprise Plus edition."*
 > Section 1b of the notebook (and `scripts/load.sh`) creates one in your project: zero baseline slots,
 > autoscaling to 50, so it costs nothing while idle. Run that before your first graph query, and if a
-> teammate hits the error in their own tool, that is the cause.
+> teammate hits the error in their own tool, that is the cause. The assignment takes about a minute to
+> propagate, so if a graph query fails with that error right after the reservation was made, wait a
+> minute and run it again before you go looking for anything else.
 
 **Your agent must genuinely traverse.** A single-hop `MATCH`, or a `JOIN` with the word graph in
 the variable name, does not count—and it is the most common way a team misses the point while
