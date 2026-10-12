@@ -343,6 +343,14 @@ MATCH p = (seed:Business)-[:Supplies]->{1,3}(exposed:Business)
 parameter instead of a rewrite. That is the actual technical difference, and it is why this
 belongs here.
 
+> **One thing your project needs that the other four challenges do not.** Since October 2026,
+> BigQuery Graph queries run only under a reservation with the **Enterprise or Enterprise Plus
+> edition**. A fresh project is on-demand and has none, so the first `GRAPH_TABLE` query fails with
+> *"BigQuery Graph queries require a reservation with Enterprise or Enterprise Plus edition."*
+> Section 1b of the notebook (and `scripts/load.sh`) creates one in your project: zero baseline slots,
+> autoscaling to 50, so it costs nothing while idle. Run that before your first graph query, and if a
+> teammate hits the error in their own tool, that is the cause.
+
 **Your agent must genuinely traverse.** A single-hop `MATCH`, or a `JOIN` with the word graph in
 the variable name, does not count—and it is the most common way a team misses the point while
 appearing to hit it.
@@ -583,6 +591,9 @@ own. Review before you accept.
    ```
 
 4. Click **Import**, open the notebook, set `CORRIDOR` at the top, and run the cells top to bottom.
+   Section 1b creates the Enterprise-edition reservation that BigQuery Graph queries need (see
+   [the differentiator](#and-one-required-differentiator-bigquery-property-graphs)); it waits about
+   ninety seconds the first time, and that is normal.
 
 **Read the text between the cells.** Several explanations will save you time later, and one of
 them—which of your edges are measured and which are modeled—is something judges will ask you

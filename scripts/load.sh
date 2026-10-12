@@ -99,6 +99,37 @@ if ! gcloud storage ls "${SRC}/" >/dev/null 2>&1; then
 fi
 
 # --------------------------------------------------------------------------
+# A graph-capable reservation
+# --------------------------------------------------------------------------
+# BigQuery Graph queries (GQL / GRAPH_TABLE) run only under an Enterprise or
+# Enterprise Plus edition reservation (since October 2026). A fresh project is
+# on-demand and has none. Zero baseline slots plus autoscaling costs nothing idle.
+# Both commands are idempotent: "already exists" is success.
+bold "0/3  Graph-capable reservation"
+RESERVATION="a4i-graph"
+gcloud services enable bigqueryreservation.googleapis.com --project="${PROJECT_ID}" --quiet >/dev/null 2>&1 \
+  || info "could not enable bigqueryreservation.googleapis.com (may already be on)"
+if bq --project_id="${PROJECT_ID}" --location="${LOCATION}" show --reservation "${RESERVATION}" >/dev/null 2>&1; then
+  info "reservation ${RESERVATION} already exists - reusing it"
+else
+  bq --project_id="${PROJECT_ID}" --location="${LOCATION}" mk --reservation \
+     --edition=ENTERPRISE --slots=0 --autoscale_max_slots=50 --ignore_idle_slots=true "${RESERVATION}" \
+     && info "created reservation ${RESERVATION} (Enterprise, 0 baseline, autoscale to 50)" \
+     || fail "could not create the reservation. Graph queries will fail until one exists; tell a coach."
+fi
+if bq --project_id="${PROJECT_ID}" --location="${LOCATION}" ls --reservation_assignment 2>/dev/null \
+     | grep -q "${RESERVATION}"; then
+  info "this project is already assigned to ${RESERVATION}"
+else
+  bq --project_id="${PROJECT_ID}" --location="${LOCATION}" mk --reservation_assignment \
+     --reservation_id="${PROJECT_ID}:${LOCATION}.${RESERVATION}" \
+     --assignee_type=PROJECT --assignee_id="${PROJECT_ID}" --job_type=QUERY \
+     && info "assigned this project's queries to ${RESERVATION} (takes about a minute to apply)" \
+     || info "assignment not created (it may already exist) - if graph queries fail, tell a coach"
+fi
+echo
+
+# --------------------------------------------------------------------------
 # Create the dataset
 # --------------------------------------------------------------------------
 bold "1/3  Creating dataset"
