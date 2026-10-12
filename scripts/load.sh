@@ -8,7 +8,7 @@
 # unavailable, or when one of the upstream publishers is not cooperating.
 #
 # Run it from the repo root in Cloud Shell (no chmod needed - invoke with bash):
-#     bash scripts/load.sh                 # defaults to north-beach
+#     bash scripts/load.sh                 # defaults to central-market
 #     bash scripts/load.sh 24th-st
 #     bash scripts/load.sh --list          # show available corridors
 #
@@ -57,7 +57,7 @@ list_corridors() {
 # --------------------------------------------------------------------------
 # Arguments
 # --------------------------------------------------------------------------
-CORRIDOR="${1:-north-beach}"
+CORRIDOR="${1:-central-market}"
 
 if [[ "${CORRIDOR}" == "--list" || "${CORRIDOR}" == "-l" ]]; then
   list_corridors
@@ -233,5 +233,5 @@ echo "  The supply and footfall edges are MODELED from published federal rates -
 echo "  the notebook explains exactly how, and judges will ask you."
 echo
 echo "  Next: CREATE PROPERTY GRAPH over businesses + supplies, then traverse it."
-echo "  See the README for the DDL shape and the five traps."
+echo "  See Section 13 of the notebook for the DDL shape and the seven traps."
 echo

@@ -16,8 +16,9 @@ Accounts, built from survey and tax data. They are measured, not estimated by us
 | `coefficient` | Cents of input per dollar of buyer output |
 
 **Read it.** You should not trust generated edges you cannot inspect, and neither should a judge.
-Everything the supply-edge generator knows is in this file plus two constants in Section 7 of the
-notebook: a coefficient floor and a distance limit. There is no randomness and nothing hidden.
+Everything the supply-edge generator knows is in this file plus four constants at the top of
+Section 7 of the notebook: a coefficient floor, a distance limit, a generic-supplier cutoff and a
+cap on suppliers per buyer. There is no randomness and nothing hidden.
 
 **Be clear about what it does and does not say.** It says restaurants buy from food wholesalers
 at a measurable rate. It does **not** say that *this* restaurant buys from *that* wholesaler.

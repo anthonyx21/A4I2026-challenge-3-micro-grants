@@ -6,7 +6,7 @@ A headless fallback that reaches the same end state as `notebooks/c3_01_load_exp
 rebuilding every BigQuery table from a pre-staged snapshot in Cloud Storage.
 
 ```bash
-bash scripts/load.sh                    # defaults to san-francisco/north-beach
+bash scripts/load.sh                    # defaults to central-market
 bash scripts/load.sh 24th-st
 bash scripts/load.sh --list             # show available corridors
 ```

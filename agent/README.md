@@ -38,4 +38,4 @@ answer with extra steps. What you do *after* the traversal—deciding what expos
 what the money actually changes, and what you are assuming—is where this becomes useful instead
 of merely clever.
 
-See the README for the five syntax traps, and Section 13 of the notebook for the DDL shape.
+See Section 13 of the notebook for the DDL shape and the seven traps.

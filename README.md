@@ -158,7 +158,7 @@ something they could take into a meeting and defend.
 Your officer is not asking one question. Picture a single afternoon:
 
 > **Tuesday, 2pm.** You have $50,000 in emergency relief funds, eleven applications on your desk,
-> and a rumour that the light-industrial building at the end of the block has been sold. You have
+> and a rumor that the light-industrial building at the end of the block has been sold. You have
 > to decide by Friday.
 
 Over the next two hours the same officer asks all of these:
@@ -205,10 +205,10 @@ separates a team.
 which blocks is the first real decision your team makes.
 
 **You do not have to pick the city you are sitting in—but you do have to pick from this list.**
-This challenge runs on **San Francisco**, and on Los Angeles if you supply your own bounding box.
-Not Toronto, not New York, not the city outside the window. The reason is in
-[the data section](#the-data-and-why-we-chose-it): we need a business registry that publishes an
-industry code under a license we can actually use, and very few cities do both.
+This challenge runs on **San Francisco**. Not Toronto, not New York, not the city outside the
+window. The reason is in [the data section](#the-data-and-why-we-chose-it): we need a business
+registry that publishes an industry code under a license we can actually use, and very few cities
+do both.
 
 San Francisco does something unusually useful here: **the City assigns every registered business
 to a named commercial corridor**, so you are not drawing a boundary and defending it. These are
@@ -267,9 +267,8 @@ businesses across 40 industries produces a far richer network than 500 that are 
 **Appendix B of the notebook** works this out for any corridor and tells you plainly whether it
 is worth building on.
 
-**Los Angeles also works** and is the second tested city—it has no corridor column, so you give a
-bounding box instead. Any US city with an open, license-clean business registry will work in
-principle, but only these two are tested.
+**Los Angeles is scaffolded but not tested.** Stay on a San Francisco corridor. Any US city with
+an open, license-clean business registry would work in principle, but only San Francisco is tested.
 
 > **Why not Chicago or New York?** We checked both. Chicago's business license file has no NAICS
 > industry code, and every supply relationship in this challenge comes from an industry-to-industry
@@ -383,8 +382,9 @@ your demo looks like everyone else's, so read it before you write code rather th
 
 #### Data lane—2 to 3 people
 
-Running the notebook takes a few minutes, so that is emphatically *not* the job. This lane owns
-everything between raw tables and a cascade query the agent can call:
+Running the notebook takes about forty minutes end to end if you read it properly, so it is the
+on-ramp, not the job. This lane owns everything between raw tables and a cascade query the agent
+can call:
 
 - **Create the property graph.** `CREATE PROPERTY GRAPH` over the node and edge tables. **Do this
   first**—the agent lane is blocked until it exists. This is the equivalent of training a model in
@@ -588,7 +588,9 @@ own. Review before you accept.
 them—which of your edges are measured and which are modeled—is something judges will ask you
 about directly.
 
-**If the notebook won't run**, there's a headless fallback. From the repo root in Cloud Shell:
+**If the notebook won't run**, or a federal data server starts refusing the room (150 people hitting
+one endpoint in ten minutes looks like an attack to some of them), there's a headless fallback. The
+snapshot already has everything the notebook pulls. From the repo root in Cloud Shell:
 
 ```bash
 bash scripts/load.sh central-market
@@ -618,7 +620,7 @@ and that division is exactly what `CREATE PROPERTY GRAPH` expects:
 | `businesses` | **node** | Every business in your corridor that survived our filters—name, address, coordinates, NAICS industry |
 | `employer_blocks` | **node** | Workplace census blocks with real job counts. These are what "closes" in the anchor-closure track |
 | `supplies` | **edge** | Business buys from business, weighted by BEA purchase intensity |
-| `draws_footfall_from` | **edge** | Workers at a block spend at nearby businesses. `worker_share` is that business's share of the block's workers |
+| `draws_footfall_from` | **edge** | Workers at a block spend at nearby businesses. `worker_share` is the block's job count divided equally across the nearby businesses—an allocated headcount, not a fraction |
 | `borrowed_from` | **edge** | Business borrowed from a named bank—**including whether the loan was charged off** |
 | `tract_demographics` | attributes | Poverty, vehicle access and assistance rates by census tract |
 
@@ -635,10 +637,9 @@ Open Data Commons **Public Domain Dedication and License**. We do not invent bus
 **The corridor is real.** The City assigns each business to a named commercial corridor. We use
 that boundary rather than drawing our own.
 
-**Two of the connections are real.** Which bank lent to which business, and which brand a business
-is franchised to, come from the **SBA's 7(a) and 504 loan records**, published under FOIA as a work
-of the US government. So does something more valuable: **which of those loans were charged off**,
-meaning the business actually failed.
+**One of the connections is real.** Which bank lent to which business comes from the **SBA's 7(a)
+loan records**, published under FOIA as a work of the US government. So does something more
+valuable: **which of those loans were charged off**, meaning the business actually failed.
 
 **Expect this layer to be sparse—a handful of businesses per corridor, sometimes one.** SBA 7(a)
 lending is not common, and matching a loan record to a registry record depends on both files
@@ -657,12 +658,13 @@ The Bureau of Economic Analysis publishes, from survey and tax data, how much ev
 from every other. That a restaurant spends a measurable share of its input budget with food
 wholesalers is a **published federal statistic**. That *this* restaurant buys from *that*
 wholesaler is **ours**. Same for footfall: the Census LEHD program publishes how many people work
-in each city block, by industry sector—that number is real. Which shops those workers patronise is
+in each city block, by industry sector—that number is real. Which shops those workers patronize is
 our allocation.
 
-The generator is in `data/bea_direct_requirements.csv` and two constants in the notebook. **Read
-it.** There is no randomness and nothing hidden, which means you can inspect it, argue with it, and
-improve it—and improving it is one of the best add-ons available today.
+The generator is in `data/bea_direct_requirements.csv` and four constants at the top of Section 7
+in the notebook. **Read it.** There is no randomness and nothing hidden, which means you can
+inspect it, argue with it, and improve it—and improving it is one of the best add-ons available
+today.
 
 **The need signal is real.** American Community Survey, via BigQuery public datasets.
 
@@ -809,7 +811,7 @@ data/bea_direct_requirements.csv     The published purchase rates behind every
                                      supply edge. Read it—you should be able to
                                      inspect generated data.
 data/bea_naics_concordance.csv       How BEA industry codes map to NAICS.
-agent/                               Empty. Your agent goes here.
+agent/                               A README and nothing else. Your agent goes here.
 ```
 
 `c3_90_publish_snapshot.ipynb` is for ROI maintainers: it regenerates the Cloud Storage snapshot
@@ -867,7 +869,7 @@ are approximate to census tract. A grant changes a probability, not an outcome. 
 volunteers its limitations shows more skill than one that oversells—and judges are told to reward
 it.
 
-One warning worth internalising: **if your agent always recommends the most connected business, you
+One warning worth internalizing: **if your agent always recommends the most connected business, you
 have built a centrality calculator, not a grant advisor.** The hub is often the most robust node in
 the network. A judge who asks "when does your agent *not* fund the biggest hub?" should get an
 answer.
