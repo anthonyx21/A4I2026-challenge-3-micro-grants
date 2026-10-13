@@ -454,7 +454,20 @@ internal—a grant officer at a city agency, not a member of the public. **Say t
 
 Not "make slides at the end." This lane owns whether anyone understands what you built.
 
-**What you're preparing: a short pitch deck and a quick demo.** Presentation time at this event is
+**What you hand in.** Four things, uploaded to the submission portal at
+https://portal.angelhack.com/a4i-console before the deadline your facilitator gives you:
+
+1. your GitHub repo link
+2. your Google Skills project link (the Qwiklabs environment you built in)
+3. your pitch deck
+4. a **pitch video**: a screen-share walkthrough, one of you talking the judges through what you
+   built while running it
+
+**Judges score those four things after the event. Nobody comes to your table and there is no
+Q&A.** Every question in [How you'll be judged](#how-youll-be-judged) has to be answered in the
+deck or the video, or it counts as unanswered.
+
+**What you're preparing: a short pitch deck, a quick demo, and the recording of it.** Presentation time at this event is
 tight—your facilitator will give you the number, but plan for short. **A crisp pitch with one
 moment that lands beats a thorough walkthrough nobody has time to hear.**
 
@@ -462,6 +475,8 @@ moment that lands beats a thorough walkthrough nobody has time to hear.**
   what you'd do next. Front-load it—assume you get cut off before your last slide.
 - **The demo.** Pick one cascade that best shows what your agent can do, and **rehearse it.** Have
   a screenshot ready in case the live version misbehaves.
+  Once it works, **record it as your pitch video**: a screen-share with one of you narrating. That
+  recording, not the live demo, is what the judges watch.
 - **The Grant Memo**—your output artifact (see below). Something an officer would actually receive.
 - **The honest limitations.** Judges explicitly reward this. One line in the deck is enough.
 - **Know which of your edges are real and which are modeled.** You will be asked. The answer is
@@ -598,8 +613,7 @@ own. Review before you accept.
    ninety seconds the first time, and that is normal.
 
 **Read the text between the cells.** Several explanations will save you time later, and one of
-them—which of your edges are measured and which are modeled—is something judges will ask you
-about directly.
+them—which of your edges are measured and which are modeled—is something judges look for in your deck and video.
 
 **If the notebook won't run**, or a federal data server starts refusing the room (150 people hitting
 one endpoint in ten minutes looks like an attack to some of them), there's a headless fallback. The
@@ -849,6 +863,11 @@ team is expected to find businesses that have not applied for anything and show 
 the traversal that reaches them. Neither is marked down for not looking like the other. Say which
 track you took, early.
 
+**Judges score your submission, not a conversation.** They work from your repo, your Skills
+project, your deck and your pitch video, after the event, with no follow-up questions. The
+questions below are what they are looking for; put the answers in the deck or the video, in those
+words, rather than waiting to be asked.
+
 | Dimension | Weight | The question judges are asking |
 |---|---:|---|
 | **Impact & insight** | 30 | Would a grant officer actually use this? Is the recommendation specific enough to act on? |
@@ -929,8 +948,10 @@ Bookmark the first two; they are the ones you will need today.
 
 ## Getting help
 
-Ask a coach. That's what they're there for, and whatever you're stuck on has probably already been
-solved at another table.
+Ask your table captain first. Every table has one: not a judge, a consultant who sits with you for
+the day. Then the ROI facilitator on the floor, and the event's Discord channel, which the organizers
+use for direct questions during the day. Whatever you're stuck on has probably already been solved at
+another table.
 
 To report a problem with the data or the notebook, run the **diagnostic cell** at the bottom of the
 notebook and share what it prints. One block, everything a coach needs, beats a screenshot every
