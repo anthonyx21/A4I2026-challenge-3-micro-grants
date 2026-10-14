@@ -23,7 +23,7 @@ cap on suppliers per buyer. There is no randomness and nothing hidden.
 **Be clear about what it does and does not say.** It says restaurants buy from food wholesalers
 at a measurable rate. It does **not** say that *this* restaurant buys from *that* wholesaler.
 The notebook makes that assignment, using industry match plus walking distance, and that
-assignment is ours. If a judge asks which half is real, that sentence is the answer.
+assignment is ours. When judges check which half is real, that sentence is the answer.
 
 Improving the allocation rule is one of the best add-ons available in this challenge. The rule we
 ship is deliberately simple so that beating it is possible.

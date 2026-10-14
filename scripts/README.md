@@ -19,7 +19,7 @@ interrupting it breaks nothing.
 
 **Use the notebook if you can.** This script gets you the tables without the teaching, and one
 piece of that teaching—which of the connections in your graph are measured and which are
-modeled—is something judges will ask you about directly.
+modeled—is something judges look for directly.
 
 ## `fetch_bea.py`
 

@@ -44,11 +44,11 @@ what each of you needs in the first fifteen minutes.
 | **Data lane** | [Step 4, load the data](#step-4load-the-data) · [What you'll have](#what-youll-have) | [The data, and why we chose it](#the-data-and-why-we-chose-it) · Section 13 of the notebook |
 | **Agent lane** | [What you're building](#what-youre-building) · [The technology](#the-technology-youll-use) | [`agent/README.md`](agent/) · [Reference](#reference) |
 | **Front end lane** | [Front end lane](#front-end-lane2-people) | [Your output artifact](#your-output-artifact-the-grant-memo) |
-| **Story lane** | [Your output artifact](#your-output-artifact-the-grant-memo) | [The data](#the-data-and-why-we-chose-it)—which half is real, because you will be asked |
+| **Story lane** | [Your output artifact](#your-output-artifact-the-grant-memo) | [The data](#the-data-and-why-we-chose-it)—which half is real, because judges check |
 
 **Three things everybody should know by the end of hour one**, whatever lane you are in:
 
-1. **Which of your edges are real and which are modeled.** A judge will ask, and the honest answer
+1. **Which of your edges are real and which are modeled.** Judges look for it, and the honest answer
    is a good one. It is [here](#the-data-and-why-we-chose-it).
 2. **Your agent must genuinely traverse the graph**, multi-hop. A single `JOIN` with "graph" in the
    variable name is the most common way to miss the point while appearing to hit it.
@@ -479,8 +479,8 @@ moment that lands beats a thorough walkthrough nobody has time to hear.**
   recording, not the live demo, is what the judges watch.
 - **The Grant Memo**—your output artifact (see below). Something an officer would actually receive.
 - **The honest limitations.** Judges explicitly reward this. One line in the deck is enough.
-- **Know which of your edges are real and which are modeled.** You will be asked. The answer is
-  in the notebook and it is a good one—make sure whoever presents can give it.
+- **Know which of your edges are real and which are modeled.** Judges check. The answer is
+  in the notebook and it is a good one—make sure the deck or the video gives it.
 
 Time the whole thing out loud at least once. Teams almost always run long.
 

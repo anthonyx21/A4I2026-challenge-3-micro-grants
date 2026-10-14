@@ -261,7 +261,7 @@ echo "  Safe to re-run at any time - each load replaces the whole table."
 echo
 echo "  IMPORTANT: the businesses are real and so are the loan relationships."
 echo "  The supply and footfall edges are MODELED from published federal rates -"
-echo "  the notebook explains exactly how, and judges will ask you."
+echo "  the notebook explains exactly how, and judges look for it."
 echo
 echo "  Next: CREATE PROPERTY GRAPH over businesses + supplies, then traverse it."
 echo "  See Section 13 of the notebook for the DDL shape and the seven traps."
