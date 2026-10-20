@@ -28,7 +28,7 @@ Neither document generation nor review means a grant is approved.
 
 ## Data and provenance
 
-See the [data ERD](data-erd.md) and [public-data notes](public-data-integration.md).
+See the [data ERD](../../docs/data-erd.md) and [public-data notes](../../docs/public-data-integration.md).
 Registry identities and public source records are real; supply and footfall connections are modeled.
 Grant applications/cash gaps are supplied inputs, and demo financial scenarios are simulated.
 WARN notices are county context without verified corridor-business or employer-block links.

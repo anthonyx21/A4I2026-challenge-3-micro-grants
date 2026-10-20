@@ -1,0 +1,84 @@
+name: Deploy ReliefIQ release
+
+on:
+  push:
+    branches: [release]
+  workflow_dispatch:
+
+concurrency:
+  group: reliefiq-production-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test dependencies
+        run: python -m pip install -r frontend/requirements.txt -r agent/requirements.txt pytest openpyxl==3.1.5
+      - name: Test backend and agents
+        run: |
+          python -m pytest -q frontend/test_persistence.py frontend/test_chat.py
+          (cd agent && python -m pytest -q)
+      - name: Validate UI and shell scripts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s = Path('frontend/static/index.html').read_text()
+          start = s.index('<script>') + len('<script>')
+          Path('/tmp/reliefiq-ui.js').write_text(s[start:s.index('</script>', start)])
+          PY
+          node --check /tmp/reliefiq-ui.js
+          bash -n scripts/deploy_release.sh scripts/configure_release_identity.sh
+          git diff --check
+
+  deploy:
+    needs: validate
+    if: github.ref == 'refs/heads/release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GOOGLE_CLOUD_PROJECT: qwiklabs-gcp-04-029c15637557
+      DEPLOY_REGION: us-central1
+      IMAGE_REPOSITORY: reliefiq-release
+      WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate deployment identity configuration
+        run: |
+          test -n "$WORKLOAD_IDENTITY_PROVIDER"
+          test -n "$DEPLOY_SERVICE_ACCOUNT"
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Build, deploy candidates, verify and promote
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: bash scripts/deploy_release.sh
+      - name: Publish deployment summary
+        if: always()
+        run: |
+          {
+            echo '## ReliefIQ release'
+            echo "Commit: $GITHUB_SHA"
+            echo '- Dashboard: https://reliefiq-backend-89073885580.us-central1.run.app'
+            echo '- Agents: https://cascade-analyst-89073885580.us-central1.run.app'
+            echo '- Run details include candidate health checks and traffic promotion.'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -33,3 +33,6 @@ data/*.csv.gz
 data/*.csv
 !data/bea_direct_requirements.csv
 !data/bea_naics_concordance.csv
+
+# Ephemeral GitHub OIDC credential files
+gha-creds-*.json

@@ -133,7 +133,7 @@ footfall connections; it does not make these fictional links observations.
 
 ## Sources
 
-- [Loader notebook](../notebooks/c3_01_load_explore.ipynb): normalized business columns,
+- [Loader notebook](../archive/starter/notebooks/c3_01_load_explore.ipynb): normalized business columns,
   supply/footfall construction, SBA matching, ACS projection, load steps, and toy graph DDL.
 - [Implemented graph DDL](../agent/cascade_analyst/queries.py).
 - [Recorded deployment/data verification](../agent/VERIFICATION.md).
