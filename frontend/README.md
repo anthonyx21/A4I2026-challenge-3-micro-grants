@@ -31,6 +31,8 @@ Enable SQL Admin, Secret Manager and Cloud Tasks APIs. Create PostgreSQL 15 inst
 
 This first-time provisioning script creates the database/user, stores the database URL and reviewer password in Secret Manager, grants access, creates the queue and deploys. It is a first-time script; use `./frontend/deploy.sh` for later deployments. Do not rerun first-time credential creation against existing resources.
 
+The default deployed service is `reliefiq-backend`, serving both the dashboard and API at https://reliefiq-backend-89073885580.us-central1.run.app . This separates the complete backend build from concurrent deployments of the older `micro-grant-ui` service.
+
 Cloud Run connects to the Cloud SQL socket and receives secrets server-side. Cloud Tasks calls a protected internal worker route. Deployment currently uses the public challenge agent URL; if agent access is restricted, configure service-to-service identity authentication before changing that service's policy.
 
 ## Verification
