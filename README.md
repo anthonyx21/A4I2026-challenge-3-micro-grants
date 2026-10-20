@@ -113,7 +113,28 @@ The backend saves the exact application versions, budget, shortlist and inputs b
 Database **`reliefiq`** stores the workflow separately from BigQuery. The following is the implemented physical schema: financials, document metadata and notes are nested JSON fields, rather than separate relational tables. IDs are stored as strings; timestamps are ISO-8601 strings. Schema version **1** is recorded in `schema_versions`.
 
 ```mermaid
-%%{init: {'theme':'dark'}}%%
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "darkMode": true,
+    "background": "#0b0f14",
+    "primaryColor": "#172554",
+    "primaryTextColor": "#f8fafc",
+    "primaryBorderColor": "#38bdf8",
+    "mainBkg": "#172554",
+    "nodeBorder": "#38bdf8",
+    "nodeTextColor": "#f8fafc",
+    "textColor": "#f8fafc",
+    "lineColor": "#94a3b8",
+    "secondaryColor": "#1e293b",
+    "tertiaryColor": "#0f172a",
+    "edgeLabelBackground": "#0f172a",
+    "attributeBackgroundColorOdd": "#0f172a",
+    "attributeBackgroundColorEven": "#1e293b",
+    "rowOdd": "#0f172a",
+    "rowEven": "#1e293b"
+  }
+}}%%
 erDiagram
     applications ||--o{ analysis_runs : application_id
     applications ||--o{ memo_versions : application_id
@@ -189,7 +210,28 @@ The eight seeded cases are Steel + Lacquer, Orpheum Theatre, Sumfer Market Sf LL
 Dataset **`qwiklabs-gcp-04-029c15637557.a4i_econ`**. Row counts and fields below were read from BigQuery on October 20, 2026. Names in the diagram represent logical joins; they do not imply enforced BigQuery foreign keys.
 
 ```mermaid
-%%{init: {'theme':'dark'}}%%
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "darkMode": true,
+    "background": "#0b0f14",
+    "primaryColor": "#172554",
+    "primaryTextColor": "#f8fafc",
+    "primaryBorderColor": "#38bdf8",
+    "mainBkg": "#172554",
+    "nodeBorder": "#38bdf8",
+    "nodeTextColor": "#f8fafc",
+    "textColor": "#f8fafc",
+    "lineColor": "#94a3b8",
+    "secondaryColor": "#1e293b",
+    "tertiaryColor": "#0f172a",
+    "edgeLabelBackground": "#0f172a",
+    "attributeBackgroundColorOdd": "#0f172a",
+    "attributeBackgroundColorEven": "#1e293b",
+    "rowOdd": "#0f172a",
+    "rowEven": "#1e293b"
+  }
+}}%%
 erDiagram
     businesses ||--o{ supplies : supplier_id
     businesses ||--o{ supplies : buyer_id
@@ -323,6 +365,16 @@ Agent service discovery: [`/list-apps`](https://cascade-analyst-89073885580.us-c
 ## Automatic release deployment
 
 Push to **`release`** to run the GitHub Actions deployment pipeline. It tests the backend and agents, builds commit-tagged images, verifies candidate Cloud Run revisions, and promotes the two submission services. Authentication uses repository- and branch-restricted Google Workload Identity Federation. See [release pipeline details](docs/release-pipeline.md).
+
+## Submission documentation pack
+
+- [One-page submission summary](docs/submission/submission-summary.md)
+- [Two-minute presentation and demo script](docs/submission/two-minute-demo-script.md)
+- [Five-minute judge demo guide](docs/submission/demo-guide.md)
+- [Preserved example grant memo](docs/submission/example-grant-memo.md) · [Word download](docs/submission/ReliefIQ-Example-Grant-Memo.docx)
+- [Data provenance sheet](docs/submission/data-provenance.md)
+- [Validation report](docs/submission/validation-report.md)
+- [Limitations and next steps](docs/submission/limitations-and-next-steps.md)
 
 ## Submission validation and supporting files
 
