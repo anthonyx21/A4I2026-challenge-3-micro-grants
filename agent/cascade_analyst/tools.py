@@ -5,6 +5,7 @@ from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 from .config import CORRIDOR, DATASET, GRAPH, PROJECT, TOOLBOX_URL
 from .evidence import compare, summarize
+from .queries import cascade_sql
 
 
 def result_rows(result) -> list[dict]:
@@ -79,7 +80,8 @@ async def analyze_cascade(business_id: str, direction: str = "supply_disruption"
             return {"status": "incomplete", "message": "Result exceeds 500 endpoints. No complete exposure count claimed; narrow corridor or depth."}
         baseline, filtered = summarize(raw, business_id), summarize(filtered_raw, business_id)
         return {"status": "ok", "seed": seed, "direction": direction, "depth": depth,
-                "graph": f"{PROJECT}.{DATASET}.{GRAPH}", "baseline": baseline, "filtered": filtered,
+                "graph": f"{PROJECT}.{DATASET}.{GRAPH}", "gql_query": cascade_sql(depth, direction).strip(),
+                "baseline": baseline, "filtered": filtered,
                 "sensitivity": {"min_intensity": min_intensity, **compare(baseline, filtered)},
                 "warnings": ["Supply links are modeled from industry coefficients and proximity, not observed transactions.",
                              "Reachability is potential exposure, not predicted closures, business employment or jobs saved.",

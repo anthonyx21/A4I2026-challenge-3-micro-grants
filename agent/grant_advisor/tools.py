@@ -3,6 +3,8 @@ import asyncio
 import math
 from cascade_analyst.tools import analyze_cascade
 from cascade_analyst.config import CORRIDOR
+from cascade_analyst.queries import cascade_sql
+from neighborhood_context.tools import get_neighborhood_context
 from .decision import allocate, validate
 
 
@@ -33,21 +35,32 @@ async def compare_applicants(budget: float, applicants: list[dict], horizon_days
                 if evidence['status'] != 'ok':
                     return {'status': 'incomplete', 'business_id': applicant['business_id'], 'cause': evidence,
                             'message': 'Cannot compare the complete shortlist. No funding recommendation issued.'}
-                results.append({**applicant, 'name': evidence['seed']['name'], 'cascade': evidence,
+                results.append({**applicant, 'name': evidence['seed']['name'],
+                                'address': evidence['seed'].get('address'),
+                                'cascade': evidence,
                                 'baseline_ids': [b['business_id'] for b in evidence['baseline']['exposed_businesses']],
                                 'filtered_ids': [b['business_id'] for b in evidence['filtered']['exposed_businesses']]})
     except TimeoutError:
         return {'status': 'incomplete', 'message': 'Analysis timed out; no complete comparison or funding recommendation issued.'}
     decision = allocate(fund, results)
     selected = set((decision['recommendation'] or {}).get('business_ids', []))
+    target_ids = set(selected) | set((decision.get('runner_up') or {}).get('business_ids', []))
+    if not target_ids and results:
+        target_ids = {results[0]['business_id']}
     for r in results:
         r['grant_amount'] = r['gap_cents'] / 100 if r['business_id'] in selected else 0
         r['eligibility'] = 'eligible' if r['gap_cents'] <= min(r['request_cents'], fund) else 'gap_exceeds_request_or_budget'
         r.pop('gap_cents'); r.pop('request_cents'); r.pop('baseline_ids'); r.pop('filtered_ids')
+        if r['business_id'] in target_ids and r['cascade'].get('graph'):
+            ctx = await get_neighborhood_context(r['business_id'])
+            if ctx.get('status') == 'ok':
+                r['neighborhood_context'] = ctx
     simulated = any(a['input_type'] == 'simulated' for a in clean)
     report = {'status': 'ok', 'decision_scope': 'simulated_scenario' if simulated else 'conditional_decision_support',
             'corridor': CORRIDOR, 'budget': fund / 100, 'horizon_days': horizon_days,
-            'direction': direction, 'min_intensity': min_intensity, 'applicants': results, **decision,
+            'direction': direction, 'min_intensity': min_intensity,
+            'gql_traversal': cascade_sql(2, direction).strip(),
+            'applicants': results, **decision,
             'limitations': ['Financial need and operating assumptions are supplied inputs; not inferred from BigQuery.',
                            'All supply links are modeled from industry averages and proximity, not observed transactions.',
                            'Do not claim predicted closures, jobs saved, calibrated risk probabilities or proven grant effects.',

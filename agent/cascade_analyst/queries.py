@@ -5,7 +5,7 @@ GRAPH_DDL = f"""
 CREATE PROPERTY GRAPH IF NOT EXISTS {DATASET}.{GRAPH}
 NODE TABLES (
   {DATASET}.businesses KEY (business_id)
-  LABEL Business PROPERTIES (business_id, name, naics4, corridor, latitude, longitude)
+  LABEL Business PROPERTIES (business_id, name, address, naics4, corridor, latitude, longitude)
 )
 EDGE TABLES (
   {DATASET}.supplies KEY (edge_id)
@@ -16,7 +16,7 @@ EDGE TABLES (
 """
 
 SEARCH_SQL = f"""
-SELECT business_id, name, naics4, corridor
+SELECT business_id, name, address, zip, naics4, corridor
 FROM `{PROJECT}.{DATASET}.businesses`
 WHERE corridor = @corridor
   AND (business_id = @query OR STRPOS(LOWER(name), LOWER(@query)) > 0)

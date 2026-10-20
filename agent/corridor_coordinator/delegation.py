@@ -8,11 +8,19 @@ def receipt(name, response):
                 'sensitivity', 'recommendation', 'runner_up', 'unallocated_amount',
                 'choice_changes_without_edge_filter', 'approval_ready', 'consistency_checks_passed',
                 'findings', 'modeled_worker_allocation', 'linked_block_count', 'linked_block_jobs',
-                'missing_demographic_tracts', 'footfall_status', 'seed'):
+                'missing_demographic_tracts', 'footfall_status', 'seed', 'gql_query', 'gql_traversal',
+                'linked_tracts', 'dataset_tract_context'):
         if key in response: data[key] = response[key]
     for key in ('baseline', 'filtered'):
         if key in response:
             data[key] = {k:v for k,v in response[key].items() if k != 'exposed_businesses'}
+    if 'applicants' in response:
+        data['applicants'] = [
+            {k: a[k] for k in ('business_id', 'name', 'address', 'requested_amount', 'cash_gap',
+                               'grant_amount', 'input_type', 'operating_assumption', 'neighborhood_context')
+             if k in a}
+            for a in response['applicants']
+        ]
     if 'matches' in response: data['matches'] = response['matches']
     if 'evidence_review' in response: data['evidence_review'] = response['evidence_review']
     return data

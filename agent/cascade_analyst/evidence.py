@@ -15,7 +15,10 @@ def normalize_path(raw) -> dict:
             raise ValueError("Malformed graph path")
         props = element["properties"]
         if expected == "node":
-            nodes.append({k: props[k] for k in ("business_id", "name", "naics4", "corridor")})
+            node = {k: props[k] for k in ("business_id", "name", "naics4", "corridor")}
+            if props.get("address"):
+                node["address"] = props["address"]
+            nodes.append(node)
         else:
             weight = float(props["intensity"])
             metres = float(props["metres"])

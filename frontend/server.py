@@ -427,14 +427,14 @@ def chat_context(req: ChatRequest, applicants: list) -> str:
     if selected and selected not in pool:
         pool = pool[:4] + [selected]
     specs = [{
-        'business_id': a['business_id'], 'name': a['name'],
+        'business_id': a['business_id'], 'name': a['name'], 'address': a.get('address'), 'tract_id': a.get('tract_id'),
         'requested_amount': max(1, int(a.get('grant_ask') or 10000)),
         'cash_gap': max(1, int(a.get('cash_gap') or a.get('grant_ask') or 10000)),
         'input_type': 'simulated',
         'evidence_note': 'SYNTHETIC UI DEMO ONLY. Not factual financial evidence about this business.',
         'operating_assumption': a.get('operating_assumption', 'Assume full gap funding sustains operation for 90 days in this simulation.')
     } for a in pool]
-    context = {'selected_business': {'business_id': selected['business_id'], 'name': selected['name']} if selected else None,
+    context = {'selected_business': {'business_id': selected['business_id'], 'name': selected['name'], 'address': selected.get('address'), 'tract_id': selected.get('tract_id')} if selected else None,
         'demo_scenario': {'budget': max(1, int(req.budget or 50000)), 'horizon_days': 90, 'applicants': specs},
         'provenance': 'UI financial inputs are simulated. Queue rankings and KPIs are mock previews, not live agent decisions.',
         'ui_only_settings': {'weighting_mode': req.weighting_mode, 'equity_carveout': req.equity_carveout,
