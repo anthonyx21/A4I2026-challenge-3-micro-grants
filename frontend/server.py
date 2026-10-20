@@ -428,13 +428,14 @@ def chat_context(req: ChatRequest, applicants: list) -> str:
         pool = pool[:4] + [selected]
     specs = [{
         'business_id': a['business_id'], 'name': a['name'],
-        'requested_amount': a['grant_ask'], 'cash_gap': a.get('cash_gap', a['grant_ask']),
+        'requested_amount': max(1, int(a.get('grant_ask') or 10000)),
+        'cash_gap': max(1, int(a.get('cash_gap') or a.get('grant_ask') or 10000)),
         'input_type': 'simulated',
         'evidence_note': 'SYNTHETIC UI DEMO ONLY. Not factual financial evidence about this business.',
         'operating_assumption': a.get('operating_assumption', 'Assume full gap funding sustains operation for 90 days in this simulation.')
     } for a in pool]
     context = {'selected_business': {'business_id': selected['business_id'], 'name': selected['name']} if selected else None,
-        'demo_scenario': {'budget': req.budget, 'horizon_days': 90, 'applicants': specs},
+        'demo_scenario': {'budget': max(1, int(req.budget or 50000)), 'horizon_days': 90, 'applicants': specs},
         'provenance': 'UI financial inputs are simulated. Queue rankings and KPIs are mock previews, not live agent decisions.',
         'ui_only_settings': {'weighting_mode': req.weighting_mode, 'equity_carveout': req.equity_carveout,
                              'risk_reduction_pct': req.risk_reduction_pct}}
