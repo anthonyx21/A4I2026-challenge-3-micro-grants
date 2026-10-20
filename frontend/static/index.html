@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Corridor Grant Portal</title>
+<title>Relief IQ</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -550,7 +550,7 @@ const IC = {
 function render(){
   const app = $('#app');
   if(S.screen==='login'){ app.innerHTML = loginView(); return; }
-  app.innerHTML = `<aside class="sidebar ${S.sidebarOpen?'':'collapsed'}" id="sidebar" aria-label="CorridorGrants navigation"></aside><div class="app-main"><header class="topbar gut" id="topbar"></header><section class="drawer" id="drawer"></section><main class="ws" id="ws"></main></div><div id="menu"></div><div id="toast" aria-live="polite"></div>`;
+  app.innerHTML = `<aside class="sidebar ${S.sidebarOpen?'':'collapsed'}" id="sidebar" aria-label="Relief IQ navigation"></aside><div class="app-main"><header class="topbar gut" id="topbar"></header><section class="drawer" id="drawer"></section><main class="ws" id="ws"></main></div><div id="menu"></div><div id="toast" aria-live="polite"></div>`;
   renderSidebar(); renderTop(); renderDrawer(); renderWS(); renderMenu();
 }
 
@@ -565,9 +565,9 @@ function loginView(){
     <div class="login-card">
     <div style="display:flex;align-items:center;justify-content:center;gap:10px">
       <span class="sb-logo">${IC.logo}</span>
-      <span style="font-weight:700;font-size:17px;letter-spacing:-.02em">CorridorGrants</span>
+      <span style="font-weight:700;font-size:17px;letter-spacing:-.02em">Relief IQ</span>
     </div>
-    <h1>Corridor Grant Intelligence Portal</h1>
+    <h1>Relief IQ</h1>
     <form id="login-form" autocomplete="off">
       <h2>Sign in to Reviewer Workspace</h2>
       <div class="field"><label for="email">Email</label><input class="input" id="email" type="email" value="reviewer@city.gov"></div>
@@ -591,9 +591,9 @@ function renderSidebar(){
   const rpt = reportCount();
   sb.innerHTML = `
     <div class="sb-head">
-      <button class="sb-brand" data-act="go" data-v="triage" aria-label="CorridorGrants, go to dashboard">
+      <button class="sb-brand" data-act="go" data-v="triage" aria-label="Relief IQ, go to dashboard">
         <span class="sb-logo">${IC.logo}</span>
-        <span>CorridorGrants</span>
+        <span>Relief IQ</span>
       </button>
       <button class="icobtn" data-act="toggle-sidebar" aria-label="Collapse sidebar" title="Collapse sidebar">${IC.sidebar}</button>
     </div>
