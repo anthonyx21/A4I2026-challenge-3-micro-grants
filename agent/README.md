@@ -13,6 +13,27 @@ For detailed operational instructions, Cloud Run proxy usage, and decision polic
 
 ---
 
+## Overview: Our 4 Corridor Micro-Grants Agents
+
+We built 4 agents for the corridor micro-grants challenge:
+
+- **🔗 Cascade Analyst (`cascade_analyst`)**  
+  Traces supplier/customer relationships across 2–3 hops in BigQuery. Shows named cascade paths, exposed businesses, and how results change when weak modeled links are removed.
+
+- **💰 Grant Advisor (`grant_advisor`)**  
+  Compares applicants using the budget, supplied financial needs, and cascade evidence. Produces a grant memo with recommended recipients, amounts, runner-up, and sensitivity analysis. Counts overlapping exposure once.
+
+- **🔍 Evidence Reviewer (`evidence_reviewer`)**  
+  Checks budget math, recipient identities, exposure counts, and missing evidence. Flags unsupported claims in draft memos and provides corrections and an officer checklist.
+
+- **🏘️ Neighborhood Context (`neighborhood_context`)**  
+  Explains modeled worker-footfall links and tract demographics, including poverty, vehicle access, and assistance rates. Highlights data gaps and questions about community needs.
+
+### How They Work Together
+**Grant Advisor** coordinates the specialists and includes automatic evidence checks in every comparison. All four are deployed to Google Cloud ([`https://cascade-analyst-89073885580.us-central1.run.app`](https://cascade-analyst-89073885580.us-central1.run.app)) and available in the chat UI.
+
+---
+
 ## How to Use the App
 
 **Live Service URL**: [https://cascade-analyst-89073885580.us-central1.run.app](https://cascade-analyst-89073885580.us-central1.run.app)
