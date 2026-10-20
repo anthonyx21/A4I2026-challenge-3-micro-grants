@@ -22,6 +22,17 @@ this component is a design extension, not a deployed service. The agents already
 memo findings and text. See the [architecture notes](docs/reliefiq-architecture.md),
 [data ERD](docs/data-erd.md), and [public-data integration](docs/public-data-integration.md).
 
+### Persistent dashboard backend
+
+The FastAPI dashboard now has database-backed application records, financial edits,
+reviewer notes, budget-limited recommendations and versioned live Grant Advisor memos.
+The seed preserves all eight original UI scenarios and labels their financial/document
+inputs as simulated. Generated memos retain their input versions and tool evidence,
+restore after refresh and export to Word. Cloud SQL, Secret Manager and Cloud Tasks
+support the Google Cloud deployment; see [backend setup](frontend/README.md) and
+[implementation status](docs/backend-implementation-status.md) for verification and
+remaining deployment work.
+
 The original challenge guide follows.
 
 **Agents for Impact 2026**
