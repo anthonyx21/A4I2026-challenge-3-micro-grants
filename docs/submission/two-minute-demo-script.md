@@ -1,7 +1,7 @@
 # ReliefIQ — two-minute presentation and demo
 
-**Challenge:** Community Economic Resilience & Micro-Grants · Main Street Relief  
-**Audience:** Challenge judges and grant reviewers  
+**Challenge:** Community Economic Resilience & Micro-Grants · Main Street Relief<br>
+**Audience:** Challenge judges and grant reviewers<br>
 **Format:** One presenter, dashboard walkthrough, saved agent report. Start the timer after logging in.
 
 ## Prepare before presenting

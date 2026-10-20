@@ -32,8 +32,8 @@ Recorded verification covers persistent edits, queued live memo generation, matc
 
 ## Try it
 
-**Dashboard:** https://reliefiq-backend-89073885580.us-central1.run.app/  
-**Agent service:** https://cascade-analyst-89073885580.us-central1.run.app/  
+**Dashboard:** https://reliefiq-backend-89073885580.us-central1.run.app/<br>
+**Agent service:** https://cascade-analyst-89073885580.us-central1.run.app/<br>
 **Project:** `qwiklabs-gcp-04-029c15637557`
 
 Select **Quick Demo Login**, open an application, then review a saved memo or select **Generate Dashboard Memo**. The default comparison includes up to six applications, not all eight. Recommendations require human review and do not disburse funds. Availability depends on the Qwiklabs project lifetime.
