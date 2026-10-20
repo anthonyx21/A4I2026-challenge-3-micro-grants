@@ -34,3 +34,7 @@ Merge the desired changes into `release` and push that branch. Inspect **GitHub 
 - https://cascade-analyst-89073885580.us-central1.run.app
 
 Use [scripts/deploy_release.sh](../scripts/deploy_release.sh) for the implementation details. Release image tags and Cloud Run revision suffixes contain the Git commit SHA.
+
+## Verified first release
+
+On October 20, 2026, pushing commit `82d6f198a7a0f1c4fa8de160d3808e8786fb4c33` to `release` triggered [GitHub Actions run 39489104514](https://github.com/anthonyx21/A4I2026-challenge-3-micro-grants/actions/runs/39489104514). Both validation and deployment completed successfully. The run passed 14 backend/chat tests and 42 agent tests, authenticated through OIDC, built/published both images, checked candidate revisions and promoted traffic. Post-release endpoint checks confirmed PostgreSQL backend health and all five agents with MCP ready.
