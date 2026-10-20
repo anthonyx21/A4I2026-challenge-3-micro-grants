@@ -8,6 +8,19 @@ ReliefIQ helps grant reviewers decide where limited small-business relief funds 
 
 Our demonstration covers **Central Market, San Francisco**. The beneficiaries are small businesses, their workers and suppliers, neighborhood residents, and officers reviewing scarce relief funding. The goal is to make those decisions easier to inspect and explain, including the effects that extend beyond a single applicant.
 
+## What we built
+
+- **A deployed grant-review dashboard:** Application queue, funding pool, application details, document checklists, financial review, an agent chat assistant and saved reports in one workspace.
+- **A persistent backend and database:** FastAPI and Cloud SQL PostgreSQL store eight seeded applications, financial edits, reviewer notes, budget settings, human recommendations, analysis runs and memo versions. Version checks protect against stale edits, and budget checks prevent recommendations from exceeding available funds.
+- **Five custom AI agents:** Corridor Coordinator routes questions; Cascade Analyst traces modeled business dependencies; Neighborhood Context adds local and public evidence; Grant Advisor compares funding options and writes memos; Evidence Reviewer checks consistency and assumptions. Built with Google ADK and Vertex AI Gemini 2.5 Flash.
+- **An analytical data layer and MCP integration:** BigQuery tables and the `CascadeEconomy` property graph support named two-hop cascade analysis, funding comparisons, neighborhood context and sensitivity checks. Embedded Google MCP Toolbox provides read-only access to the analytical data.
+- **Public-data loaders and enrichment:** Scripts fetch and load San Francisco business registry history and California WARN notices into BigQuery, retaining source dates and match limits alongside the challenge's business, supply, workplace, demographic and historical lending data.
+- **Queued, versioned grant reports:** Cloud Tasks runs memo generation from saved input snapshots. Completed reports retain structured evidence, reopen after refresh and export to Word. The backend validates comparison inputs, reuses duplicate active requests and records failed runs.
+- **An automated release pipeline:** Pushing to `release` runs backend and agent tests, builds both containers, checks candidate deployments and promotes the five-agent service and combined frontend/backend on Cloud Run. Google Workload Identity Federation authenticates deployments; Secret Manager supplies backend credentials.
+- **Submission materials and technical diagrams:** Service architecture, PostgreSQL and BigQuery ERDs, field definitions, data provenance, validation records, an example Word memo, and [two-minute](docs/submission/two-minute-demo-script.md) and [five-minute](docs/submission/demo-guide.md) demo guides.
+
+The build demonstrates a complete decision-support workflow. Application financials and document claims are simulated, business dependencies are modeled, and people remain responsible for verifying evidence and approving grants.
+
 ## Use the submission
 
 1. Open the dashboard and select **Quick Demo Login**. The shared challenge reviewer password is `demopassword`.
