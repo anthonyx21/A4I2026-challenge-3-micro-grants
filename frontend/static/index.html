@@ -1,200 +1,1437 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SF OEWD · Micro-Grant Advisor</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css" />
-</head>
-<body class="bg-slate-50 text-slate-900 h-screen flex flex-col overflow-hidden">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Corridor Grant Portal</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: one-screen app. 48px bar → animated map drawer (44px / 38% / 85%) → two-stage workspace (triage, then 2- or 3-column review). */
+:root{
+  --bg:#F4F5F2; --surface:#FFFFFF; --sunk:#ECEEE9; --line:#DCDFD8; --line-2:#C9CDC4;
+  --ink:#1A211F; --muted:#59635F; --faint:#8A938F;
+  --accent:#1F5E58; --accent-soft:#DCEBE8; --on-accent:#FFFFFF;
+  --app:#D6602A; --app-soft:rgba(214,96,42,.18);
+  --out:#1E7F72; --in:#4B57B0; --spill:#C98A1E;
+  --warn:#A86A10; --warn-soft:#F7ECD6; --crit:#AE3B2C; --crit-soft:#F6DEDA; --ok:#2E7A4B; --ok-soft:#DDEFE3;
+  --map:#E9ECE6; --street:#FFFFFF; --street-main:#FBFBF9; --street-edge:#D6DAD2;
+  --flash:#FBE7B8;
+  --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111514; --surface:#181D1C; --sunk:#0D1110; --line:#2A3230; --line-2:#3A4441;
+  --ink:#E5EAE8; --muted:#9BA5A1; --faint:#6C7673;
+  --accent:#6CC0B5; --accent-soft:#1D3532; --on-accent:#0D1110;
+  --app:#F08A4F; --app-soft:rgba(240,138,79,.22);
+  --out:#4FC2B2; --in:#8E99F2; --spill:#E2AA48;
+  --warn:#E2AA48; --warn-soft:#33291A; --crit:#EF8A7A; --crit-soft:#3A2220; --ok:#7CCB98; --ok-soft:#1C3125;
+  --map:#151A19; --street:#232A28; --street-main:#2A3230; --street-edge:#1C2221;
+  --flash:#4A3C1A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111514; --surface:#181D1C; --sunk:#0D1110; --line:#2A3230; --line-2:#3A4441;
+  --ink:#E5EAE8; --muted:#9BA5A1; --faint:#6C7673;
+  --accent:#6CC0B5; --accent-soft:#1D3532; --on-accent:#0D1110;
+  --app:#F08A4F; --app-soft:rgba(240,138,79,.22);
+  --out:#4FC2B2; --in:#8E99F2; --spill:#E2AA48;
+  --warn:#E2AA48; --warn-soft:#33291A; --crit:#EF8A7A; --crit-soft:#3A2220; --ok:#7CCB98; --ok-soft:#1C3125;
+  --map:#151A19; --street:#232A28; --street-main:#2A3230; --street-edge:#1C2221;
+  --flash:#4A3C1A; color-scheme:dark}
 
-  <!-- TOP HEADER -->
-  <header class="bg-slate-900 text-white px-5 py-3 border-b border-slate-800 shrink-0">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-sm">
-          SF
-        </div>
-        <div>
-          <h1 class="font-bold text-sm">Central Market Micro-Grant Relief Advisor</h1>
-          <p class="text-[11px] text-slate-400">
-            Track 1: Main Street Relief · Live Cloud Run ADK (<code class="text-emerald-300">a4i_econ.CascadeEconomy</code>)
-          </p>
-        </div>
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45;overflow:hidden;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
+.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* Login */
+.login{height:100%;display:grid;place-items:center;padding-block:24px;overflow:auto}
+.login-card{width:min(380px,100%);display:flex;flex-direction:column;gap:20px}
+.login h1{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin:0;text-align:center;color:var(--muted)}
+.login form{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px;display:flex;flex-direction:column;gap:14px}
+.login h2{margin:0;font-size:18px;font-weight:600}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;color:var(--muted);font-weight:500}
+.input{height:38px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--bg);padding:0 12px}
+.btn{height:36px;border-radius:var(--r);border:1px solid var(--line-2);background:var(--surface);padding:0 14px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.btn:hover{background:var(--sunk)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.sm{height:28px;padding:0 10px;font-size:12px}
+.or{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:12px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.login small{color:var(--faint);font-size:12px;text-align:center}
+
+/* Shell */
+#app{height:100%;display:flex;flex-direction:column}
+.topbar{flex:0 0 48px;height:48px;display:flex;align-items:center;gap:16px;background:var(--surface);border-bottom:1px solid var(--line);min-width:0}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 0}
+.brand{font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.brand i{font-style:normal;color:var(--app)}
+.crumb{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumb button{border:0;background:none;padding:0;color:var(--muted);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px}
+.crumb button:hover{color:var(--ink)}
+.crumb b{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.tb-center{flex:0 1 auto;display:flex;justify-content:center}
+.switcher{height:30px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--bg);padding:0 8px;max-width:260px}
+.tb-right{flex:1 1 0;display:flex;justify-content:flex-end;align-items:center;gap:10px}
+.pool{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;background:var(--sunk);white-space:nowrap;display:flex;gap:6px;align-items:center}
+.pool .bar{width:42px;height:4px;border-radius:2px;background:var(--line-2);overflow:hidden}
+.pool .bar span{display:block;height:100%;background:var(--accent)}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.avatar.lg{width:56px;height:56px;font-size:18px}
+.avatar.alt{background:var(--sunk);color:var(--muted)}
+button.brand{border:0;background:none;padding:0;font-size:15px}
+.nav{display:flex;align-self:stretch;margin-left:12px}
+.navlink{border:0;background:none;padding:0 12px;color:var(--muted);font-weight:500;font-size:13px;border-bottom:2px solid transparent;border-top:2px solid transparent;white-space:nowrap}
+.navlink:hover{color:var(--ink)}
+.navlink[aria-current="page"]{color:var(--ink);border-bottom-color:var(--app)}
+.navlink .ct{font-family:var(--mono);font-size:11px;color:var(--faint);margin-left:4px}
+.search{position:relative;display:flex;align-items:center}
+.search svg{position:absolute;left:9px;width:14px;height:14px;color:var(--faint);pointer-events:none}
+.search input{height:30px;width:210px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--bg);padding:0 10px 0 28px;font-size:13px}
+.bell{position:relative}
+.bell .badge{position:absolute;top:1px;right:0;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:var(--app);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;line-height:1}
+.profbtn{display:flex;align-items:center;gap:8px;border:0;background:none;padding:3px 6px 3px 3px;border-radius:999px;font-size:13px;font-weight:500}
+.profbtn:hover,.profbtn[aria-expanded="true"]{background:var(--sunk)}
+.profbtn .car{color:var(--faint);font-size:10px}
+.menu{position:fixed;z-index:40;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 14px 36px rgba(0,0,0,.16);padding:6px;display:flex;flex-direction:column;max-height:70vh;overflow:auto;animation:rise .16s ease-out}
+.menu hr{border:0;border-top:1px solid var(--line);margin:6px 0;width:100%}
+.mi{display:flex;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:6px;gap:10px;align-items:flex-start;font-size:13px}
+.mi:hover,.mi:focus-visible{background:var(--sunk)}
+.mi .sub{display:block;font-size:12px;color:var(--muted)}
+.mi .t{display:block;font-size:11px;color:var(--faint);font-family:var(--mono);margin-top:2px}
+.mh{display:flex;gap:10px;align-items:center;padding:8px 10px}
+.mh b{display:block}
+.mh span.e{font-size:12px;color:var(--muted)}
+.mhd{display:flex;justify-content:space-between;align-items:center;padding:6px 10px 8px}
+.linkbtn{border:0;background:none;padding:0;color:var(--accent);font-size:12px;font-weight:500}
+.ndot{width:7px;height:7px;border-radius:50%;flex:none;margin-top:6px;background:transparent}
+.unread .ndot{background:var(--app)}
+.unread{font-weight:500}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;font-size:13px;gap:10px}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden;flex:none}
+.seg button{border:0;border-right:1px solid var(--line);background:var(--surface);padding:5px 10px;font-size:12px;white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.seg .ct{font-family:var(--mono);opacity:.6;margin-left:4px}
+.m-only{display:none}
+.bc{display:flex;gap:6px;font-size:12px;color:var(--muted);align-items:center;flex-wrap:wrap}
+.bc button{border:0;background:none;padding:0;color:var(--muted);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px;font-size:12px}
+.bc button:hover{color:var(--ink)}
+.bc .sep{color:var(--faint)}
+.bc [aria-current]{color:var(--ink);font-weight:500}
+.toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}
+.input.sm{height:32px;font-size:13px;width:240px;max-width:100%}
+.toast{position:fixed;z-index:60;bottom:calc(16px + env(safe-area-inset-bottom,0px));right:max(16px,env(safe-area-inset-right,0px));background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:8px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:rise .2s ease-out;max-width:calc(100% - 32px)}
+.empty-row{padding:32px 16px;text-align:center;color:var(--muted)}
+.prof-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:24px;align-items:start}
+.prof-card{padding:20px;display:flex;flex-direction:column;gap:16px}
+.prof-id{display:flex;gap:14px;align-items:center}
+.prof-id h2{margin:0;font-size:18px;font-weight:600}
+.prof-id p{margin:0;color:var(--muted);font-size:13px}
+.stat-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.prefrow{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:13px}
+.prefrow:last-child{border-bottom:0}
+.prefrow .d{display:block;font-size:12px;color:var(--muted)}
+.switch{width:36px;height:20px;border-radius:10px;border:0;background:var(--line-2);position:relative;flex:none;padding:0}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:transform .15s}
+.switch[aria-checked="true"]{background:var(--accent)}
+.switch[aria-checked="true"]::after{transform:translateX(16px)}
+.act{display:flex;flex-direction:column}
+.act div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:13px}
+.act div:last-child{border-bottom:0}
+.act .t{font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap}
+.qa{display:flex;flex-direction:column;gap:4px}
+.qa .q{font-size:12px;color:var(--muted);font-weight:500}
+.sig{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.sig b{color:var(--ink);font-family:"Brush Script MT","Segoe Script",cursive;font-size:18px;font-weight:400}
+
+/* Map drawer */
+.drawer{position:relative;flex:0 0 auto;height:38%;background:var(--map);border-bottom:1px solid var(--line);overflow:hidden;transition:height .38s cubic-bezier(.2,.7,.2,1)}
+.drawer[data-state="collapsed"]{height:44px}
+.drawer[data-state="max"]{height:85%}
+.ribbon{position:absolute;inset:0 0 auto;height:44px;display:flex;align-items:center;gap:10px;background:var(--surface);font-size:13px;min-width:0}
+.ribbon .dot{width:9px;height:9px;border-radius:50%;background:var(--app);box-shadow:0 0 0 4px var(--app-soft);flex:none}
+.ribbon .txt{font-family:var(--mono);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+.ribbon .txt b{font-family:var(--sans);font-weight:600;font-size:13px}
+.mapwrap{position:absolute;inset:0}
+.mapwrap svg{width:100%;height:100%;display:block}
+.drawer[data-state="collapsed"] .mapwrap,.drawer[data-state="collapsed"] .overlay{visibility:hidden}
+.drawer:not([data-state="collapsed"]) .ribbon{visibility:hidden}
+
+.overlay{position:absolute;display:flex;gap:6px;flex-wrap:wrap;pointer-events:auto}
+.ov-layers{top:10px;left:max(12px,env(safe-area-inset-left,0px));max-width:calc(100% - 200px)}
+.ov-ctrl{top:10px;right:max(12px,env(safe-area-inset-right,0px))}
+.ov-legend{bottom:10px;left:max(12px,env(safe-area-inset-left,0px))}
+.chipbar{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.toggle{border:0;background:transparent;border-radius:5px;padding:4px 8px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;gap:6px;color:var(--muted)}
+.toggle .sw{width:14px;height:3px;border-radius:2px;background:currentColor}
+.toggle[aria-pressed="true"]{color:var(--ink);background:var(--sunk)}
+.toggle[data-v="out"] .sw{background:var(--out)}
+.toggle[data-v="in"] .sw{background:var(--in)}
+.toggle[data-v="spill"] .sw{background:repeating-linear-gradient(90deg,var(--spill) 0 3px,transparent 3px 5px)}
+.toggle[aria-pressed="false"] .sw{opacity:.35}
+.toggle:disabled{opacity:.45;cursor:not-allowed}
+.icobtn{width:28px;height:28px;border:0;border-radius:5px;background:transparent;display:grid;place-items:center;color:var(--muted)}
+.icobtn:hover{background:var(--sunk);color:var(--ink)}
+.icobtn[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.icobtn svg{width:16px;height:16px}
+.legend{display:flex;gap:12px;align-items:center;font-size:11px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.legend span{display:flex;align-items:center;gap:6px}
+.lg-app{width:10px;height:10px;border-radius:50%;background:var(--app);box-shadow:0 0 0 3px var(--app-soft)}
+.lg-node{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+
+/* SVG map */
+.m-street{stroke:var(--street);fill:none;stroke-linecap:square}
+.m-street-edge{stroke:var(--street-edge);fill:none}
+.m-main{stroke:var(--street-main)}
+.m-stlabel{fill:var(--faint);font-family:var(--mono);font-size:11px;letter-spacing:.18em}
+.m-node{cursor:pointer;outline:none}
+.m-node circle.core{fill:var(--faint);transition:r .2s}
+.m-node.on circle.core{fill:var(--ink)}
+.m-node.dim{opacity:.35}
+.m-node .lbl{fill:var(--muted);font-size:13px;font-family:var(--sans);paint-order:stroke;stroke:var(--map);stroke-width:4px;stroke-linejoin:round}
+.m-node.on .lbl{fill:var(--ink);font-weight:500}
+.m-node:hover circle.core,.m-node:focus-visible circle.core{fill:var(--accent)}
+.m-app .halo{fill:var(--app);opacity:.18}
+.m-app .core{fill:var(--app) !important;stroke:var(--surface);stroke-width:2.5}
+.m-app .badge rect{fill:var(--ink)}
+.m-app .badge text{fill:var(--bg);font-family:var(--mono);font-size:11px;font-weight:500}
+.m-app .lbl{fill:var(--ink);font-size:14px;font-weight:600}
+.m-app.sel .halo{opacity:.28}
+.m-app.pulse .halo{animation:pulse 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.18}50%{transform:scale(1.35);opacity:.08}}
+.m-edge{fill:none;stroke-width:2.2}
+.m-edge.out{stroke:var(--out)}
+.m-edge.in{stroke:var(--in)}
+.m-edge.spill{stroke:var(--spill);stroke-dasharray:5 6;stroke-width:1.6}
+.anim .m-edge.out,.anim .m-edge.in{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .9s cubic-bezier(.3,.6,.2,1) forwards}
+.anim .m-edge.spill,.anim .m-ring{opacity:0;animation:fade .6s .5s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fade{to{opacity:1}}
+
+.mpop{position:absolute;z-index:5;width:260px;background:var(--surface);border:1px solid var(--line-2);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:12px;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.mpop .k{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.mpop h4{margin:0;font-size:14px}
+.mpop p{margin:0;color:var(--muted)}
+.mpop .row{display:flex;gap:6px;flex-wrap:wrap}
+.tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:4px;background:var(--sunk);color:var(--muted)}
+.tag.out{color:var(--out)} .tag.in{color:var(--in)} .tag.spill{color:var(--spill)}
+
+/* Main workspace */
+.ws{flex:1 1 auto;min-height:0;position:relative;display:flex;flex-direction:column}
+.peek{flex:1;display:flex;align-items:center;gap:12px;background:var(--surface);border-top:1px solid var(--line);font-size:13px;min-height:0}
+.peek .txt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.peek .txt b{color:var(--ink)}
+
+/* Stage 1 */
+.triage{flex:1;min-height:0;overflow:auto;padding-block:20px 32px}
+.triage-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.triage-head h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+.triage-head .stats{display:flex;gap:18px;color:var(--muted);font-size:13px;flex-wrap:wrap}
+.triage-head .stats b{color:var(--ink);font-family:var(--mono);font-weight:500}
+.triage-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:24px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;min-width:0}
+.panel-h{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+.panel-h h2{margin:0;font-size:14px;font-weight:600}
+.tablewrap{overflow-x:auto}
+table.q{width:100%;border-collapse:collapse;font-size:13px}
+table.q th{text-align:left;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:10px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.q td{padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+table.q tr:last-child td{border-bottom:0}
+table.q tbody tr{cursor:pointer}
+table.q tbody tr:hover td{background:var(--sunk)}
+table.q td.r,table.q th.r{text-align:right}
+.biz b{font-weight:600;display:block}
+.biz span{color:var(--muted);font-size:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:2px 8px;border-radius:999px;white-space:nowrap;background:var(--sunk);color:var(--muted)}
+.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.chip.ready{background:var(--ok-soft);color:var(--ok)}
+.chip.info{background:var(--warn-soft);color:var(--warn)}
+.chip.rev{background:var(--accent-soft);color:var(--accent)}
+.chip.new{background:var(--sunk);color:var(--muted)}
+.flagct{font-family:var(--mono);font-size:12px;color:var(--warn)}
+.flagct.zero{color:var(--faint)}
+
+.lb{display:flex;flex-direction:column}
+.lb-card{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;width:100%}
+.lb-card:last-child{border-bottom:0}
+.lb-card:hover{background:var(--sunk)}
+.lb-rank{font-family:var(--mono);color:var(--faint);font-size:12px}
+.lb-name{font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-meta{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.lb-meter{height:4px;background:var(--sunk);border-radius:2px;margin-top:6px;overflow:hidden}
+.lb-meter span{display:block;height:100%;background:var(--app)}
+.lb-score{font-family:var(--mono);font-size:20px;font-weight:500;text-align:right;line-height:1}
+.lb-score small{display:block;font-size:10px;color:var(--faint);letter-spacing:.06em;margin-top:4px}
+
+/* Stage 2 */
+.review{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,0fr);transition:grid-template-columns .4s cubic-bezier(.2,.7,.2,1)}
+.review.l2b{grid-template-columns:minmax(0,.92fr) minmax(0,1fr) minmax(0,1.2fr)}
+.pane{min-width:0;min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--line)}
+.pane:last-child{border-right:0}
+.review:not(.l2b) .art{border-left:0;visibility:hidden}
+.left{background:var(--surface)}
+.lhead{padding:16px 20px 0;display:flex;flex-direction:column;gap:10px}
+.lhead .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.lhead h1{margin:0;font-size:19px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+.lhead .sub{color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{border:0;background:none;padding:10px 12px;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:500}
+.tab .n{font-family:var(--mono);font-size:11px;color:var(--warn);margin-left:4px}
+.lbody{flex:1;min-height:0;overflow:auto;padding:16px 20px 32px;display:flex;flex-direction:column;gap:22px}
+.sec{display:flex;flex-direction:column;gap:10px;border-radius:6px;scroll-margin:16px}
+.sec h3{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px}
+.kv div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kv dt{font-size:12px;color:var(--muted)}
+.kv dd{margin:0;font-weight:500}
+.prose{margin:0;max-width:62ch;color:var(--ink)}
+.ib{display:flex;flex-direction:column;gap:12px}
+.ib-row{display:grid;grid-template-columns:minmax(0,1fr) 56px;gap:4px 12px;align-items:center}
+.ib-row .nm{font-weight:500;font-size:13px}
+.ib-row .sc{font-family:var(--mono);font-size:12px;text-align:right;grid-row:span 2}
+.ib-row .bar{height:6px;border-radius:3px;background:var(--sunk);overflow:hidden}
+.ib-row .bar span{display:block;height:100%;background:var(--app)}
+.ib-row .note{grid-column:1/-1;font-size:12px;color:var(--muted)}
+.ib-total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);padding-top:10px}
+.ib-total b{font-family:var(--mono);font-size:22px;font-weight:500}
+.links{display:flex;flex-direction:column}
+.links .ln{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.links .ln:last-child{border-bottom:0}
+.links .amt{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.docs{display:flex;flex-direction:column}
+.doc{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 12px;border-radius:6px;border:1px solid var(--line);scroll-margin:16px}
+.docs .doc + .doc{margin-top:8px}
+.doc .nm{font-weight:500}
+.doc .meta{font-size:12px;color:var(--muted);grid-column:1}
+.doc.missing{border-style:dashed;border-color:var(--warn);background:var(--warn-soft)}
+.doc .st{grid-row:span 2;align-self:center}
+table.fin{width:100%;border-collapse:collapse;font-size:13px}
+table.fin th,table.fin td{padding:8px 0;border-bottom:1px solid var(--line);text-align:left}
+table.fin th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:600}
+table.fin td.r,table.fin th.r{text-align:right;font-family:var(--mono)}
+.var-warn{color:var(--warn)} .var-crit{color:var(--crit)} .var-ok{color:var(--ok)}
+.callout{border-left:3px solid var(--warn);background:var(--warn-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:13px}
+.callout.crit{border-color:var(--crit);background:var(--crit-soft)}
+.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%,30%{background:var(--flash);box-shadow:0 0 0 6px var(--flash)}100%{background:transparent;box-shadow:0 0 0 6px transparent}}
+
+/* Chat */
+.chat{background:var(--bg)}
+.chat-h{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line);gap:10px;flex-wrap:wrap}
+.chat-h h2{margin:0;font-size:14px;font-weight:600}
+.msgs{flex:1;min-height:0;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:18px}
+.msg{display:flex;flex-direction:column;gap:8px;max-width:640px}
+.msg.user{align-self:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:10px 10px 2px 10px;padding:8px 12px;max-width:85%}
+.msg .who{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.msg .who .adk-src{font-family:var(--mono);font-size:10px;text-transform:none;letter-spacing:0;padding:1px 6px;border-radius:4px;background:var(--accent-soft);color:var(--accent);font-weight:500}
+.msg .who .adk-tools{font-family:var(--mono);font-size:10px;text-transform:none;letter-spacing:0;color:var(--muted);font-weight:400}
+.msg p{margin:0}
+.msg ul,.msg ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.msg blockquote{margin:0;border-left:2px solid var(--line-2);padding:6px 12px;color:var(--muted);background:var(--surface);border-radius:0 6px 6px 0}
+.msg pre{margin:0;padding:10px 12px;background:var(--sunk);border:1px solid var(--line);border-radius:6px;font-family:var(--mono);font-size:12px;overflow-x:auto;white-space:pre-wrap}
+.msg code{font-family:var(--mono);font-size:12px;background:var(--sunk);padding:1px 4px;border-radius:3px}
+.src{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:11px;line-height:1;padding:3px 6px;border-radius:4px;border:1px solid var(--line-2);background:var(--surface);color:var(--accent);vertical-align:1px;white-space:nowrap}
+.src:hover{background:var(--accent-soft);border-color:var(--accent)}
+.summary{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.summary .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.summary .stats div{display:flex;flex-direction:column;gap:2px}
+.summary .stats b{font-family:var(--mono);font-weight:500;font-size:15px}
+.summary .stats span{font-size:11px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{border:1px solid var(--line-2);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:500;text-align:left}
+.pchip:hover{border-color:var(--accent);color:var(--accent)}
+.pchip.art::after{content:" ↗";color:var(--faint)}
+.next{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.next .flag{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--warn)}
+.next .flag::before{content:"!";flex:none;width:16px;height:16px;border-radius:50%;background:var(--warn-soft);border:1px solid var(--warn);display:grid;place-items:center;font-size:10px;font-weight:700;line-height:1;margin-top:1px}
+.typing{display:flex;gap:4px;padding:6px 0;align-items:center}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--faint);animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+.typing span{font-size:12px;color:var(--muted);margin-left:6px;font-family:var(--mono)}
+@keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+.composer{display:flex;gap:8px;padding:12px 20px 16px;border-top:1px solid var(--line)}
+.composer .input{flex:1;min-width:0;background:var(--surface)}
+
+/* Artifact */
+.art{background:var(--surface);overflow:hidden}
+.art-h{display:flex;align-items:center;gap:8px;padding:8px 12px 0 20px;border-bottom:1px solid var(--line);min-width:0}
+.art-h .tabs{border-bottom:0;flex:1;min-width:0}
+.art-body{flex:1;min-height:0;overflow:auto;padding:20px 24px 40px}
+.doc-art{max-width:66ch;display:flex;flex-direction:column;gap:18px}
+.doc-art .kicker{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.doc-art h1{margin:0;font-size:22px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+.doc-art h2{margin:0 0 6px;font-size:13px;font-weight:600}
+.doc-art section{scroll-margin:16px;border-radius:6px}
+.doc-art p{margin:0}
+.rec{border:1px solid var(--line-2);border-radius:8px;padding:12px 14px;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.rec b{font-size:16px}
+.stream-in{animation:rise .35s ease-out both}
+@keyframes rise{from{opacity:.0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tile{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.tile b{font-family:var(--mono);font-size:18px;font-weight:500}
+.tile span{font-size:12px;color:var(--muted)}
+.tile.out b{color:var(--out)} .tile.in b{color:var(--in)} .tile.spill b{color:var(--spill)}
+.chartwrap{overflow-x:auto}
+.chartwrap svg{display:block;width:100%;min-width:420px;height:auto}
+.c-lbl{fill:var(--ink);font-size:12px;font-family:var(--sans)}
+.c-val{fill:var(--muted);font-size:11px;font-family:var(--mono)}
+.c-grp{fill:var(--faint);font-size:10px;font-family:var(--sans);letter-spacing:.08em;font-weight:600}
+.c-grid{stroke:var(--line);stroke-width:1}
+.empty{height:100%;display:grid;place-items:center;color:var(--faint);text-align:center;padding:24px}
+
+@media (max-width:900px){
+  .triage-grid{grid-template-columns:minmax(0,1fr)}
+  .review,.review.l2b{display:flex;flex-direction:column;overflow:auto}
+  .pane{border-right:0;border-bottom:1px solid var(--line);flex:none}
+  .left .lbody{max-height:60vh}
+  .chat{height:70vh}
+  .review:not(.l2b) .art{display:none}
+  .art{min-height:70vh}
+  .tb-center,.ov-legend,.pool .bar,.pool .lbl{display:none}
+  .ov-layers{max-width:calc(100% - 150px)}
+  .search input{width:150px}
+  .prof-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:720px){
+  .nav,.search,.profbtn .nm,.pool{display:none}
+  .m-only{display:flex}
+}
+@media (max-width:560px){
+  .crumb{display:none}
+  .kv{grid-template-columns:minmax(0,1fr)}
+  .summary .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tiles{grid-template-columns:minmax(0,1fr)}
+  table.q .hide-s{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+</style>
+
+<div id="app"></div>
+
+<script>
+(function(){
+"use strict";
+const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
+const fk = n => '$' + Math.round(n/1000) + 'k';
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = s => document.querySelector(s);
+
+/* ---------- Central Market Corridor Data (Connected to BigQuery a4i_econ.CascadeEconomy) ---------- */
+const CORRIDOR = 'Central Market Corridor';
+const POOL_TOTAL = 150000, POOL_COMMITTED = 100000;
+const ROUND_BUDGET = 50000;
+
+const AGENT_APPS = [
+  ['corridor_coordinator', 'Auto · Corridor Coordinator'],
+  ['grant_advisor', 'Grant Advisor (Memos & Allocations)'],
+  ['cascade_analyst', 'Cascade Analyst (2-Hop Graph)'],
+  ['evidence_reviewer', 'Evidence Reviewer (Financial Audit)'],
+  ['neighborhood_context', 'Neighborhood Context (Census & Footfall)']
+];
+
+const NODES = {
+  warfield:{name:'The Warfield Theater',x:90,y:150,kind:'Performing arts venue · 982 Market St'},
+  waypoint:{name:'Waypoint Consulting',x:245,y:120,kind:'B2B technical consulting · 1155 Market St'},
+  baart:{name:'Baart Programs Market',x:530,y:135,kind:'Community care clinic · 1111 Market St'},
+  kearny:{name:'Kearny Kitchen Catering',x:800,y:120,kind:'Commissary & catering supplier'},
+  artisan:{name:'Market St Artisan Bakery',x:1110,y:150,kind:'Wholesale & café bakery'},
+  noodle:{name:'Civic Center Noodle & Grill',x:270,y:360,kind:'Corridor restaurant'},
+  deli:{name:'UN Plaza Delicatessen',x:400,y:305,kind:'Deli & lunch counter'},
+  larkin:{name:'Larkin Community Event Hall',x:700,y:355,kind:'Community event venue'},
+  ggtheater:{name:'Golden Gate Concessions',x:830,y:300,kind:'Theater concessions & stage supply'},
+  mintav:{name:'Mint Plaza Sound & Stage',x:965,y:355,kind:'AV & event staging rental'},
+  cleaners:{name:'Mid-Market Eco Cleaners',x:560,y:445,kind:'Commercial laundry & linen'},
+  pharmacy:{name:'Civic Center Pharmacy',x:900,y:445,kind:'Neighborhood retail pharmacy'}
+};
+
+const STD_DOCS = [['app','Application form'],['tax','2025 tax return'],['q1','Q1 2026 bank statement'],['q2','Q2 2026 bank statement'],['q3','Q3 2026 bank statement'],['lease','Lease agreement'],['quote','Equipment quote']];
+
+const APPS = [
+ {id:'1026779-04-151',key:'steel',name:'Steel + Lacquer',cat:'Salon & hospitality service',address:'1067 Market St, San Francisco, CA 94103',owner:'Elena Vance',since:2017,staff:14,ask:15000,
+  use:'Bridge payroll and rent gap ($18k cash gap) while rebooking corporate corridor accounts',impact:89,status:'ready',submitted:'Oct 6',x:330,y:190,
+  parts:[['Cascade & B2B reach',26,30,'7 total 2-hop businesses reached in Central Market'],['Distress & cash gap',24,25,'Verified payroll summary and landlord ledger ($18k 90-day gap)'],['Tract equity need',24,30,'Tract 06075017601 · 24.6% poverty rate, 58.0% no-vehicle households'],['Footfall & spillover',15,15,'410 shared corridor workers across Mid-Market blocks']],
+  fin:{appRev:680000,taxRev:645000,q:[162000,171000,168000],staffFiled:'12 FT + 2 PT',vendor:'Mid-Market Commercial Equipment',quote:14500},
+  missing:[],notes:{lease:'Landlord ledger verified — 90-day stabilization agreement on file'},
+  edges:{out:[['kearny',28000,18],['artisan',22000,12],['cleaners',14000,16]],
+         in:[['waypoint',48000,26],['larkin',38000,24],['deli',29000,19],['noodle',24000,15]],
+         spill:[['baart',9],['pharmacy',11]]}},
+ {id:'0111663-06-001',key:'orpheum',name:'Orpheum Theatre',cat:'Performing arts & historic venue',address:'1192 Market St, San Francisco, CA 94102',owner:'Marcus Sterling',since:2014,staff:24,ask:18000,
+  use:'Stabilize stage rigging, utility arrears, and local show vendor contracts over 90 days',impact:86,status:'ready',submitted:'Oct 4',x:890,y:190,
+  parts:[['Cascade & B2B reach',25,30,'7 downstream businesses across 2 hops (3 direct, 4 secondary)'],['Distress & cash gap',22,25,'$18,000 working-capital gap from utility and rigging arrears'],['Tract equity need',24,30,'Civic Center / Mid-Market border tract · high transit reliance'],['Footfall & spillover',15,15,'Major evening footfall anchor for 8th & Market dining']],
+  fin:{appRev:1420000,taxRev:1365000,q:[340000,358000,352000],staffFiled:'20 FT + 4 PT',vendor:'Bay Stage & Rigging Systems',quote:17400},
+  missing:[],notes:{},
+  edges:{out:[['mintav',64000,28],['ggtheater',52000,31],['cleaners',19000,14]],
+         in:[['larkin',41000,22],['kearny',36000,19],['deli',28000,15],['noodle',22000,12]],
+         spill:[['warfield',14],['artisan',9]]}},
+ {id:'1402027-10-251',key:'sumfer',name:'Sumfer Market Sf LLC',cat:'Corridor food service & market',address:'1084 Market St, San Francisco, CA 94102',owner:'David Chen',since:2018,staff:11,ask:15000,
+  use:'Replace failing walk-in refrigeration compressor and clear 60-day lease arrears',impact:81,status:'info',submitted:'Oct 2',x:590,y:300,
+  parts:[['Cascade & B2B reach',22,30,'5 direct 1-hop corridor links in Central Market'],['Distress & cash gap',21,25,'$15,000 refrigeration & lease arrears cash gap'],['Tract equity need',24,30,'Tract 06075012502 · 28.4% poverty rate, 63.5% no-vehicle access'],['Footfall & spillover',14,15,'320 shared weekday corridor workers']],
+  fin:{appRev:540000,taxRev:485000,q:[128000,136000,null],staffFiled:'9 FT + 2 PT',vendor:'Golden Gate Cold Chain',quote:13800},
+  missing:['q3'],notes:{lease:'Expires Mar 2027 — renewal addendum requested'},
+  edges:{out:[['kearny',39000,21],['artisan',27000,15]],
+         in:[['noodle',34000,24],['deli',31000,19],['larkin',18000,12]],
+         spill:[['cleaners',8],['pharmacy',10]]}},
+ {id:'1051330-01-161',key:'pdm',name:'Pdm Group Inc',cat:'Management & B2B consulting',address:'1355 Market St, San Francisco, CA 94103',owner:'Priya Deshmukh',since:2016,staff:9,ask:17000,
+  use:'Bridge short-term payroll and B2B vendor liquidity gap across 6 corridor accounts',impact:75,status:'rev',submitted:'Sep 29',x:195,y:295,
+  parts:[['Cascade & B2B reach',22,30,'6 total 2-hop businesses reached (4 Hop-1, 2 Hop-2)'],['Distress & cash gap',18,25,'Applicant-reported $17,000 receivables delay'],['Tract equity need',21,30,'10th & Market block · 24.6% poverty rate'],['Footfall & spillover',14,15,'280 shared corridor office workers']],
+  fin:{appRev:610000,taxRev:590000,q:[148000,152000,155000],staffFiled:'8 FT + 1 PT',vendor:'Market St IT & Fleet Systems',quote:15900},
+  missing:[],notes:{},
+  edges:{out:[['waypoint',42000,22],['mintav',24000,14]],
+         in:[['baart',31000,18],['larkin',26000,15]],
+         spill:[['warfield',7],['noodle',6]]}},
+ {id:'1188036-05-181',key:'aalegal',name:'A & A Legal Service, Inc.',cat:'Legal & compliance hub (22-node reach)',address:'1212 Market St, San Francisco, CA 94102',owner:'Arthur Alvarez',since:2011,staff:16,ask:20000,
+  use:'Upgrade document automation and compliance filing workstations',impact:71,status:'rev',submitted:'Oct 8',x:660,y:185,
+  parts:[['Cascade & B2B reach',29,30,'22 exposed businesses (17 Hop-1, 5 Hop-2) — largest hub in graph'],['Distress & cash gap',10,25,'Low financial distress: SBA 7(a) loan Paid in Full (8% baseline risk)'],['Tract equity need',19,30,'Civic Center corridor block'],['Footfall & spillover',13,15,'Serves 17 corridor business clients']],
+  fin:{appRev:1280000,taxRev:1255000,q:[312000,318000,324000],staffFiled:'15 FT + 1 PT',vendor:'LexTech Office Systems',quote:19200},
+  missing:[],notes:{},
+  edges:{out:[['waypoint',58000,29],['mintav',34000,17]],
+         in:[['baart',44000,21],['kearny',29000,14],['larkin',25000,12]],
+         spill:[['cleaners',6],['pharmacy',5]]}},
+ {id:'1056704-02-161',key:'impark',name:'Impark 0314',cat:'Corridor parking & mobility support',address:'1050 Market St, San Francisco, CA 94102',owner:'Jordan Pike',since:2015,staff:8,ask:15000,
+  use:'Cover attendant staffing and gate equipment during evening theatre recovery',impact:64,status:'info',submitted:'Oct 9',x:470,y:345,
+  parts:[['Cascade & B2B reach',14,30,'24 unfiltered edges, 0 above 0.01 intensity threshold (Demo Benchmark #2)'],['Distress & cash gap',18,25,'Self-reported POS decline and vendor invoices ($18k cash gap)'],['Tract equity need',19,30,'Mid-Market Tract 06075012502'],['Footfall & spillover',13,15,'Supports evening theatre and dining visitors']],
+  fin:{appRev:420000,taxRev:362000,q:[98000,104000,null],staffFiled:'6 FT + 2 PT',vendor:'GateWorks Access Control',quote:14200},
+  missing:['q3'],notes:{},
+  edges:{out:[['cleaners',9000,6]],
+         in:[['warfield',18000,9],['ggtheater',14000,7]],
+         spill:[['noodle',6],['deli',5]]}},
+ {id:'1080659-07-161',key:'blick',name:'Blick Art Materials LLC',cat:'Creative & retail supply anchor',address:'979 Market St, San Francisco, CA 94103',owner:'Clara Vance',since:2013,staff:12,ask:10000,
+  use:'Storefront security glazing and student/artist workshop supply display',impact:61,status:'new',submitted:'Oct 10',x:1060,y:285,
+  parts:[['Cascade & B2B reach',12,30,'Retail anchor (0 outgoing B2B edges at 0.01 cutoff)'],['Distress & cash gap',17,25,'$10,000 storefront glazing and inventory gap'],['Tract equity need',18,30,'Tract 06075017802 · 18.8% poverty, 75.5% no-vehicle households'],['Footfall & spillover',14,15,'12 linked workplace blocks (153.5 modeled workers)']],
+  fin:{appRev:490000,taxRev:476000,q:[118000,122000,125000],staffFiled:'10 FT + 2 PT',vendor:'Market Street Glass & Fixture',quote:9600},
+  missing:[],notes:{},
+  edges:{out:[['mintav',8000,5]],
+         in:[['larkin',15000,9],['ggtheater',11000,6]],
+         spill:[['warfield',11],['artisan',8]]}},
+ {id:'1373515-10-241',key:'m1010',name:'1010 Market LLC',cat:'Neighborhood grocery retailer (Leaf)',address:'1010 Market St, San Francisco, CA 94102',owner:'Mei Lin',since:2019,staff:6,ask:8000,
+  use:'Produce cooler repair and SNAP/EBT point-of-sale terminal upgrade',impact:55,status:'new',submitted:'Oct 11',x:760,y:220,
+  parts:[['Cascade & B2B reach',6,30,'0 B2B outgoing edges (resident-facing grocery leaf node)'],['Distress & cash gap',18,25,'Verified $8,000 cash gap in high-poverty tract'],['Tract equity need',20,30,'High-poverty Tenderloin/Market border tract (31.2% poverty)'],['Footfall & spillover',11,15,'Essential daily food access for no-vehicle households']],
+  fin:{appRev:240000,taxRev:233000,q:[58000,61000,62000],staffFiled:'5 FT + 1 PT',vendor:'Bay Area POS & Cooler',quote:7600},
+  missing:['quote'],notes:{},
+  edges:{out:[['kearny',6000,4]],
+         in:[['deli',7000,4]],
+         spill:[['pharmacy',12],['baart',9]]}}
+];
+const BY = Object.fromEntries(APPS.map(a=>[a.id,a]));
+const STATUS = {ready:['ready','Ready for review'],info:['info','Needs info'],rev:['rev','In review'],new:['new','New']};
+const variance = a => (a.fin.appRev - a.fin.taxRev)/a.fin.taxRev;
+const docName = (a,k) => k==='quote' ? 'Equipment quote — '+a.fin.vendor : STD_DOCS.find(d=>d[0]===k)[1];
+const sum = arr => arr.reduce((s,e)=>s+e[1],0);
+const nodeName = k => NODES[k] ? NODES[k].name : k;
+
+/* ---------- State ---------- */
+const S = {
+  screen:'login', map:'expanded', pinned:false, current:null,
+  layers:{out:true,in:true,spill:true},
+  awarded:{}, ui:{}, chats:{}, arts:{}, animSel:null, pop:null,
+  menu:null, q:'', aq:'', filter:'all', theme:'system', seeded:false,
+  agentApp:'corridor_coordinator',
+  clientId:(window.crypto && crypto.randomUUID) ? crypto.randomUUID() : '00000000-0000-4000-8000-' + String(Date.now()).padStart(12,'0').slice(-12),
+  prefs:{emailDocs:true, digest:false, keepMap:false},
+  user:{name:'Priya Natarajan',initials:'PN',email:'reviewer@city.gov',title:'Grant Reviewer',dept:'SF Office of Economic & Workforce Development',id:'Reviewer 1'},
+  notifs:[
+    {t:'Steel + Lacquer (1026779-04-151) verified payroll & landlord ledger uploaded',time:'1h ago',app:'1026779-04-151',unread:true},
+    {t:'Blick Art Materials LLC (1080659-07-161) neighborhood footfall benchmark ready',time:'3h ago',app:'1080659-07-161',unread:true},
+    {t:'Sumfer Market Sf LLC (1402027-10-251) flagged for Q3 bank statement',time:'Yesterday',app:'1402027-10-251',unread:true},
+    {t:'Central Market Round 1 closed: $100,000 committed across corridor',time:'Oct 14',app:null,unread:false}
+  ],
+  activity:[
+    {t:'Connected to Cloud Run ADK (corridor_coordinator)',time:'Just now'},
+    {t:'Generated Grant Memo for Orpheum Theatre (0111663-06-001)',time:'Oct 14, 3:12 PM'},
+    {t:'Requested Q3 bank statement from Sumfer Market Sf LLC',time:'Oct 13, 10:40 AM'}
+  ]
+};
+const ASSIGNED = {
+  '1026779-04-151':'PN',
+  '0111663-06-001':'PN',
+  '1402027-10-251':'PN',
+  '1051330-01-161':'PN',
+  '1188036-05-181':'MK',
+  '1056704-02-161':'PN',
+  '1080659-07-161':'MK',
+  '1373515-10-241':'PN'
+};
+const NAV = [['triage','Dashboard'],['apps','Applications'],['reports','Reports']];
+const ui = id => S.ui[id] || (S.ui[id] = {tab:'overview', layout:'2A', art:null});
+const timeLabel = () => new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+const bc = items => `<nav class="bc" aria-label="Breadcrumb">${items.map(([k,l])=> k?`<button data-act="go" data-v="${k}">${esc(l)}</button>`:`<span aria-current="page">${esc(l)}</span>`).join('<span class="sep">›</span>')}</nav>`;
+function log(t){ S.activity.unshift({t,time:timeLabel()}); S.activity.length = Math.min(S.activity.length, 20); }
+let toastT;
+function toast(msg){ const t=$('#toast'); if(!t) return; t.innerHTML=`<div class="toast" role="status">${esc(msg)}</div>`; clearTimeout(toastT); toastT=setTimeout(()=>{ t.innerHTML=''; }, 2800); }
+function applyTheme(){
+  if(S.theme==='system') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', S.theme);
+  try{ localStorage.setItem('cgp-theme', S.theme); }catch(_){}
+}
+try{ const th = localStorage.getItem('cgp-theme'); if(th==='light'||th==='dark'||th==='system') S.theme = th; }catch(_){}
+applyTheme();
+function startSession(email){
+  if(email) S.user.email = email;
+  S.screen='triage'; S.map='expanded'; S.menu=null;
+  if(!S.seeded){
+    S.seeded = true;
+    const b = BY['0111663-06-001'];
+    makeArtifact(b,'memo',false,true);
+    S.arts[b.id][0].created = 'Oct 14, 3:12 PM';
+  }
+  render();
+}
+
+/* ---------- Icons ---------- */
+const IC = {
+  collapse:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h10"/></svg>',
+  split:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/><path d="M2.5 8h11"/></svg>',
+  max:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2.5H2.5V6M10 2.5h3.5V6M6 13.5H2.5V10M10 13.5h3.5V10"/></svg>',
+  pin:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2.5h4M7 2.5v4L4.5 9h7L9 6.5v-4M8 9v4.5"/></svg>',
+  bell:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 11.5V7a4 4 0 0 1 8 0v4.5l1 1H3z"/><path d="M6.5 14a1.6 1.6 0 0 0 3 0"/></svg>',
+  search:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg>'
+};
+
+/* ---------- Render: shell ---------- */
+function render(){
+  const app = $('#app');
+  if(S.screen==='login'){ app.innerHTML = loginView(); return; }
+  app.innerHTML = `<header class="topbar gut" id="topbar"></header><section class="drawer" id="drawer"></section><main class="ws" id="ws"></main><div id="menu"></div><div id="toast" aria-live="polite"></div>`;
+  renderTop(); renderDrawer(); renderWS(); renderMenu();
+}
+
+function loginView(){
+  return `<div class="login gut"><div class="login-card">
+    <h1>Corridor Grant Intelligence Portal</h1>
+    <form id="login-form" autocomplete="off">
+      <h2>Sign in to Reviewer Workspace</h2>
+      <div class="field"><label for="email">Email</label><input class="input" id="email" type="email" value="reviewer@city.gov"></div>
+      <div class="field"><label for="pw">Password</label><input class="input" id="pw" type="password" value="demopassword"></div>
+      <button class="btn primary" type="submit">Sign In to Dashboard</button>
+      <div class="or">or</div>
+      <button class="btn" type="button" data-act="demo-login"><span style="color:var(--app)">⚡</span> Quick Demo Login (Reviewer 1)</button>
+    </form>
+    <small>Live Cloud Run ADK Agent · ${CORRIDOR} (a4i_econ.CascadeEconomy)</small>
+  </div></div>`;
+}
+
+function poolRemaining(){ return POOL_TOTAL - POOL_COMMITTED - Object.values(S.awarded).reduce((s,v)=>s+v,0); }
+
+const reportCount = () => Object.values(S.arts).reduce((s,l)=>s+l.length,0);
+function renderTop(){
+  const rem = poolRemaining();
+  const unread = S.notifs.filter(n=>n.unread).length;
+  const cur = S.screen==='review' ? 'apps' : S.screen;
+  const switcher = S.screen==='review'
+    ? `<select class="switcher" id="switcher" aria-label="Switch applicant">${APPS.map(x=>`<option value="${x.id}" ${x.id===S.current?'selected':''}>${x.id} · ${esc(x.name)}</option>`).join('')}</select>`
+    : '';
+  $('#topbar').innerHTML = `
+    <div class="tb-left"><button class="brand" data-act="go" data-v="triage" aria-label="Corridor Grants, go to dashboard">Corridor<i>·</i>Grants</button>
+      <nav class="nav" aria-label="Primary">${NAV.map(([k,l])=>`<button class="navlink" data-act="go" data-v="${k}" ${cur===k?'aria-current="page"':''}>${l}${k==='reports'&&reportCount()?`<span class="ct">${reportCount()}</span>`:''}</button>`).join('')}</nav></div>
+    <div class="tb-center">${switcher}</div>
+    <div class="tb-right">
+      <div class="search">${IC.search}<input id="q" type="search" placeholder="Search applications" value="${esc(S.q)}" autocomplete="off" aria-label="Search applications"></div>
+      <span class="pool" title="Grant pool remaining this round"><span class="lbl">Pool remaining</span> ${fmt(rem)} / ${fmt(POOL_TOTAL)} <span class="bar"><span style="width:${Math.max(0,rem/POOL_TOTAL*100)}%"></span></span></span>
+      <button class="icobtn bell" data-act="menu" data-v="notif" aria-label="Notifications, ${unread} unread" aria-expanded="${S.menu==='notif'}">${IC.bell}${unread?`<span class="badge">${unread}</span>`:''}</button>
+      <button class="profbtn" data-act="menu" data-v="profile" aria-label="Account menu" aria-expanded="${S.menu==='profile'}"><span class="avatar">${S.user.initials}</span><span class="nm">${esc(S.user.name.split(' ')[0])}</span><span class="car">▾</span></button>
+    </div>`;
+}
+
+function renderMenu(){
+  const m = $('#menu'); if(!m) return;
+  document.querySelectorAll('[data-act="menu"]').forEach(b=>b.setAttribute('aria-expanded', S.menu===b.dataset.v));
+  if(!S.menu){ m.innerHTML=''; return; }
+  let html = '', w = 300;
+  if(S.menu==='notif'){
+    w = 340;
+    html = `<div class="mhd"><b>Notifications</b>${S.notifs.some(n=>n.unread)?'<button class="linkbtn" data-act="mark-read">Mark all read</button>':''}</div>
+      ${S.notifs.map((n,i)=>`<button class="mi ${n.unread?'unread':''}" data-act="notif" data-i="${i}"><span class="ndot"></span><span>${esc(n.t)}<span class="t">${n.time}</span></span></button>`).join('')}`;
+  } else if(S.menu==='profile'){
+    w = 280;
+    html = `<div class="mh"><span class="avatar">${S.user.initials}</span><div><b>${esc(S.user.name)}</b><span class="e">${esc(S.user.email)}</span></div></div><hr>
+      ${NAV.map(([k,l])=>`<button class="mi m-only" data-act="go" data-v="${k}">${l}</button>`).join('')}
+      <button class="mi" data-act="go" data-v="profile">Profile & preferences</button>
+      <button class="mi" data-act="go" data-v="reports">My reports</button>
+      <div class="mrow"><span>Theme</span><div class="seg" role="group" aria-label="Theme">${['system','light','dark'].map(t=>`<button data-act="theme" data-v="${t}" aria-pressed="${S.theme===t}">${t[0].toUpperCase()+t.slice(1)}</button>`).join('')}</div></div>
+      <hr><button class="mi" data-act="logout">Sign out</button>`;
+  } else if(S.menu==='search'){
+    const q = S.q.trim().toLowerCase();
+    const res = APPS.filter(a=>(a.name+' '+a.id+' '+a.cat+' '+a.owner).toLowerCase().includes(q));
+    w = 340;
+    html = res.length ? res.map(a=>`<button class="mi" data-act="open" data-id="${a.id}" data-from="search"><span class="mono" style="color:var(--faint);font-size:11px">${a.id}</span><span>${esc(a.name)}<span class="sub">${esc(a.cat)} · ${STATUS[a.status][1]}</span></span></button>`).join('')
+      : `<div class="mrow" style="color:var(--muted)">No applications match “${esc(S.q)}”.</div>`;
+  }
+  const anchor = S.menu==='search' ? $('#q') : document.querySelector(`[data-act="menu"][data-v="${S.menu}"]`);
+  if(!anchor || !anchor.offsetParent){
+    m.innerHTML = `<div class="menu" style="top:56px;right:12px;width:min(${w}px,calc(100vw - 24px))" role="menu">${html}</div>`; return;
+  }
+  const r = anchor.getBoundingClientRect();
+  const width = Math.min(w, innerWidth - 16);
+  let left = S.menu==='search' ? r.left : r.right - width;
+  left = Math.max(8, Math.min(left, innerWidth - width - 8));
+  m.innerHTML = `<div class="menu" style="top:${r.bottom+6}px;left:${left}px;width:${width}px" role="menu">${html}</div>`;
+}
+
+/* ---------- Render: map drawer ---------- */
+function ribbonText(){
+  if(S.screen==='review'){
+    const a = BY[S.current];
+    return `<b>Active: ${esc(a.name)} (${a.id})</b> — ${a.edges.out.length} Suppliers • ${a.edges.in.length} Buyers • 2nd-Degree Consumer Zone`;
+  }
+  const linked = new Set(); APPS.forEach(a=>['out','in','spill'].forEach(t=>a.edges[t].forEach(e=>linked.add(e[0]))));
+  return `<b>${CORRIDOR}</b> — ${APPS.length} applicants • ${linked.size} linked businesses • ${fmt(APPS.reduce((s,a)=>s+a.ask,0))} requested`;
+}
+
+function renderDrawer(){
+  const d = $('#drawer'); d.dataset.state = S.map;
+  const sel = S.screen==='review';
+  d.innerHTML = `
+    <div class="ribbon gut"><span class="dot"></span><span class="txt">${ribbonText()}</span>
+      <button class="btn sm" data-act="map" data-v="expanded">Expand Map ▾</button></div>
+    <div class="mapwrap" id="mapwrap">${mapSVG()}</div>
+    <div class="overlay ov-layers"><div class="chipbar" role="group" aria-label="Network layers">
+      ${[['out','Revenue Out (1st-Deg Suppliers)'],['in','Revenue In (1st-Deg Buyers)'],['spill','2nd-Degree Spillover']].map(([k,l])=>
+        `<button class="toggle" data-act="layer" data-v="${k}" aria-pressed="${S.layers[k]}" ${sel?'':'disabled title="Select an applicant to see its network"'}><span class="sw"></span>${l}</button>`).join('')}
+    </div></div>
+    <div class="overlay ov-ctrl"><div class="chipbar">
+      <button class="icobtn" data-act="map" data-v="collapsed" aria-label="Collapse map" title="Collapse to ribbon">${IC.collapse}</button>
+      <button class="icobtn" data-act="map" data-v="expanded" aria-label="Split view" title="Split drawer" aria-pressed="${S.map==='expanded'}">${IC.split}</button>
+      <button class="icobtn" data-act="map" data-v="max" aria-label="Maximize map" title="Full canvas" aria-pressed="${S.map==='max'}">${IC.max}</button>
+      <button class="icobtn" data-act="pin" aria-label="Keep map open" title="Keep map at this size when opening a business" aria-pressed="${S.pinned}">${IC.pin}</button>
+    </div></div>
+    <div class="overlay ov-legend"><div class="legend"><span><i class="lg-app"></i>Applicant + impact score</span><span><i class="lg-node"></i>Corridor business</span></div></div>
+    <div id="mpop"></div>`;
+  S.animSel = sel ? S.current : null;
+}
+
+function mapSVG(){
+  const sel = S.screen==='review' ? BY[S.current] : null;
+  const connected = new Map();
+  if(sel){ ['out','in','spill'].forEach(t=>{ if(S.layers[t]) sel.edges[t].forEach(e=>connected.set(e[0],t)); }); }
+  const anim = sel && S.animSel !== sel.id && !RM;
+  const H = [90,240,400], V = [180,460,740,1020];
+  let s = `<svg viewBox="0 0 1200 480" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Top-down map of the ${CORRIDOR}" class="${anim?'anim':''}">
+    <defs>
+      <radialGradient id="spillGrad"><stop offset="0" style="stop-color:var(--spill);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--spill);stop-opacity:0"/></radialGradient>
+      ${['out','in'].map(t=>`<marker id="ar-${t}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--${t})"/></marker>`).join('')}
+    </defs>`;
+  H.forEach((y,i)=>{ const w = i===1?30:16; s += `<line class="m-street-edge" x1="-900" y1="${y}" x2="2100" y2="${y}" stroke-width="${w+2}"/><line class="m-street ${i===1?'m-main':''}" x1="-900" y1="${y}" x2="2100" y2="${y}" stroke-width="${w}"/>`; });
+  V.forEach(x=>{ s += `<line class="m-street-edge" x1="${x}" y1="-900" x2="${x}" y2="1400" stroke-width="16"/><line class="m-street" x1="${x}" y1="-900" x2="${x}" y2="1400" stroke-width="14"/>`; });
+  s += `<text class="m-stlabel" x="600" y="244" text-anchor="middle">MARKET ST · CENTRAL MARKET</text>
+        <text class="m-stlabel" x="320" y="94">TURK / GOLDEN GATE AVE</text><text class="m-stlabel" x="320" y="404">MISSION ST</text>`;
+  if(sel){
+    if(S.layers.spill) s += `<circle class="m-ring" cx="${sel.x}" cy="${sel.y}" r="190" fill="url(#spillGrad)"/>`;
+    let flip = 1;
+    const curve = (x1,y1,x2,y2,k)=>{ const mx=(x1+x2)/2,my=(y1+y2)/2,dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1; flip=-flip; const o=.16*len*flip; return `M${x1} ${y1} Q${mx - dy/len*o} ${my + dx/len*o} ${x2} ${y2}`; };
+    const shorten = (x1,y1,x2,y2,d)=>{ const len=Math.hypot(x2-x1,y2-y1)||1; return [x2-(x2-x1)/len*d, y2-(y2-y1)/len*d]; };
+    if(S.layers.spill) sel.edges.spill.forEach(([k])=>{ const n=NODES[k]; if(n) s+=`<path class="m-edge spill" d="${curve(sel.x,sel.y,n.x,n.y)}"/>`; });
+    if(S.layers.out) sel.edges.out.forEach(([k])=>{ const n=NODES[k]; if(n){ const [ex,ey]=shorten(sel.x,sel.y,n.x,n.y,10); s+=`<path class="m-edge out" pathLength="1" marker-end="url(#ar-out)" d="${curve(sel.x,sel.y,ex,ey)}"/>`; } });
+    if(S.layers.in) sel.edges.in.forEach(([k])=>{ const n=NODES[k]; if(n){ const [ex,ey]=shorten(n.x,n.y,sel.x,sel.y,16); s+=`<path class="m-edge in" pathLength="1" marker-end="url(#ar-in)" d="${curve(n.x,n.y,ex,ey)}"/>`; } });
+  }
+  Object.entries(NODES).forEach(([k,n])=>{
+    const on = connected.has(k), dim = sel && !on;
+    const lx = n.x > 1050 ? -10 : 10, anchor = n.x > 1050 ? 'end' : 'start';
+    s += `<g class="m-node ${on?'on':''} ${dim?'dim':''}" data-act="node" data-n="${k}" tabindex="0" role="button" aria-label="${esc(n.name)}">
+      <circle cx="${n.x}" cy="${n.y}" r="14" fill="transparent"/>
+      <circle class="core" cx="${n.x}" cy="${n.y}" r="${on?6:4.5}"/>
+      ${on || !sel ? `<text class="lbl" x="${n.x+lx}" y="${n.y+4}" text-anchor="${anchor}">${esc(n.name)}</text>`:''}
+      <title>${esc(n.name)} · ${esc(n.kind)}</title></g>`;
+  });
+  APPS.forEach(a=>{
+    const isSel = sel && sel.id===a.id;
+    const lx = a.x > 1050 ? -18 : 18, anchor = a.x > 1050 ? 'end' : 'start';
+    const bx = a.x > 1050 ? a.x-46 : a.x+10;
+    s += `<g class="m-node m-app ${isSel?'sel':''} ${(!sel||isSel)?'pulse':''} ${sel&&!isSel?'dim':''}" data-act="node" data-n="${a.id}" tabindex="0" role="button" aria-label="${esc(a.name)}, impact score ${a.impact}">
+      <circle class="halo" cx="${a.x}" cy="${a.y}" r="${isSel?22:17}"/>
+      <circle class="core" cx="${a.x}" cy="${a.y}" r="${isSel?10:8}"/>
+      <g class="badge"><rect x="${bx}" y="${a.y-30}" width="36" height="18" rx="4"/><text x="${bx+18}" y="${a.y-17}" text-anchor="middle">${a.impact}</text></g>
+      <text class="lbl" x="${a.x+lx}" y="${a.y+20}" text-anchor="${anchor}">${esc(a.name)}</text>
+      <title>#${a.id} ${esc(a.name)} · Impact ${a.impact}</title></g>`;
+  });
+  return s + '</svg>';
+}
+
+function refreshMap(){
+  const w = $('#mapwrap'); if(!w) return;
+  w.innerHTML = mapSVG();
+  S.animSel = S.screen==='review' ? S.current : null;
+  document.querySelectorAll('[data-act="layer"]').forEach(b=>b.setAttribute('aria-pressed', S.layers[b.dataset.v]));
+}
+
+function setMap(state){
+  S.map = state; S.pop = null;
+  const d = $('#drawer'); if(!d) return;
+  d.dataset.state = state;
+  document.querySelectorAll('.ov-ctrl [data-act="map"]').forEach(b=>{ if(b.dataset.v!=='collapsed') b.setAttribute('aria-pressed', b.dataset.v===state); });
+  $('#mpop').innerHTML='';
+  renderWS();
+}
+
+/* map popover */
+function showPop(nodeKey){
+  const pop = $('#mpop'); if(!pop) return;
+  const svg = $('#mapwrap svg'), g = svg.querySelector(`[data-n="${nodeKey}"] .core`);
+  if(!g){ pop.innerHTML=''; return; }
+  const r = g.getBoundingClientRect(), dr = $('#drawer').getBoundingClientRect();
+  let left = r.left - dr.left + 16, top = r.top - dr.top - 10;
+  left = Math.max(8, Math.min(left, dr.width - 270)); top = Math.max(52, Math.min(top, dr.height - 170));
+  let html = '';
+  if(BY[nodeKey]){
+    const t = BY[nodeKey];
+    if(S.screen==='review'){
+      html = `<span class="k">#${t.id} · Impact ${t.impact}</span><h4>${esc(t.name)}</h4><p>${esc(t.cat)} · requests ${fmt(t.ask)}</p>
+        <div class="row"><button class="btn primary sm" data-act="switch" data-id="${t.id}">Switch Workspace</button><button class="btn sm" data-act="close-pop">Cancel</button></div>`;
+    }
+  } else {
+    const n = NODES[nodeKey], a = S.screen==='review' ? BY[S.current] : null;
+    let rel = null;
+    if(a){ for(const t of ['out','in','spill']){ const e = a.edges[t].find(x=>x[0]===nodeKey); if(e){ rel=[t,e]; break; } } }
+    if(a && rel){
+      const [t,e] = rel;
+      const label = {out:'1st-Degree Supplier',in:'1st-Degree Buyer',spill:'2nd-Degree Spillover'}[t];
+      const body = t==='out' ? `Receives ${fk(e[1])}/yr from ${esc(a.name)}. Estimated ${e[2]}% revenue dependency.`
+                 : t==='in' ? `Spends ${fk(e[1])}/yr at ${esc(a.name)}, about ${e[2]}% of its cost of goods.`
+                 : `Shares foot traffic with ${esc(a.name)}. About ${e[1]}% of weekday visits overlap.`;
+      html = `<span class="tag ${t}">${label}</span><h4>${esc(n.name)}</h4><p>${body}</p>
+        <div class="row"><button class="btn sm" data-act="ask-link" data-n="${nodeKey}">Ask AI about this link</button><button class="btn ghost sm" data-act="close-pop">Close</button></div>`;
+    } else if(n) {
+      html = `<span class="k">${esc(n.kind)}</span><h4>${esc(n.name)}</h4><p>${a ? 'No filed direct link with '+esc(a.name)+'.' : 'Corridor business in Central Market.'}</p>
+        <div class="row"><button class="btn ghost sm" data-act="close-pop">Close</button></div>`;
+    }
+  }
+  if(!html){ pop.innerHTML=''; return; }
+  pop.innerHTML = `<div class="mpop" style="left:${left}px;top:${top}px" role="dialog">${html}</div>`;
+}
+
+/* ---------- Render: workspace ---------- */
+function renderWS(){
+  const ws = $('#ws'); if(!ws) return;
+  if(S.map==='max'){
+    const a = S.current && BY[S.current];
+    const names = {triage:'Dashboard',apps:'Applications',reports:'Reports',profile:'Profile'};
+    const txt = S.screen==='review'
+      ? `<b>${esc(a.name)}</b> · ${(S.chats[a.id]||[]).length} chat messages · ${(S.arts[a.id]||[]).length} artifacts`
+      : `<b>${names[S.screen]}</b> · ${APPS.length} open applications`;
+    ws.innerHTML = `<div class="peek gut"><span class="label">Workspace</span><span class="txt">${txt}</span><button class="btn sm" data-act="map" data-v="expanded">Restore workspace ▴</button></div>`;
+    return;
+  }
+  if(S.screen==='triage') ws.innerHTML = triageView();
+  else if(S.screen==='apps') ws.innerHTML = appsView();
+  else if(S.screen==='reports') ws.innerHTML = reportsView();
+  else if(S.screen==='profile') ws.innerHTML = profileView();
+  else { ws.innerHTML = reviewShell(); renderLeft(); renderChat(); renderArt(); }
+}
+
+const FILTERS = [['all','All'],['ready','Ready'],['rev','In review'],['info','Needs info'],['new','New']];
+function appRows(){
+  const q = S.aq.trim().toLowerCase();
+  const list = APPS.filter(a=>(S.filter==='all'||a.status===S.filter) && (!q || (a.name+' '+a.id+' '+a.cat+' '+a.owner).toLowerCase().includes(q)));
+  if(!list.length) return `<tr><td colspan="8" class="empty-row">No applications match these filters.</td></tr>`;
+  return list.map(a=>{
+    const [c,l] = STATUS[a.status], who = ASSIGNED[a.id] || 'PN';
+    return `<tr data-act="open" data-id="${a.id}" data-from="queue" tabindex="0">
+      <td class="mono">${a.id}</td>
+      <td class="biz"><b>${esc(a.name)}</b><span>${esc(a.cat)}</span></td>
+      <td class="hide-s">${esc(a.owner)}</td>
+      <td class="r mono">${fmt(a.ask)}</td>
+      <td class="r mono">${a.impact}</td>
+      <td><span class="chip ${c}">${l}</span></td>
+      <td class="hide-s"><span class="avatar ${who==='PN'?'':'alt'}" title="${who==='PN'?esc(S.user.name):'Marcus Kim'}">${who}</span></td>
+      <td class="hide-s mono" style="color:var(--muted)">${a.submitted}</td></tr>`;
+  }).join('');
+}
+function appsView(){
+  const counts = {all:APPS.length}; APPS.forEach(a=>counts[a.status]=(counts[a.status]||0)+1);
+  return `<div class="triage gut">
+    ${bc([['triage','Dashboard'],[null,'Applications']])}
+    <div class="triage-head" style="margin-top:6px"><h1>Applications</h1><div class="stats"><span>${CORRIDOR} · Round 2</span><span>Closes <b>Nov 14</b></span></div></div>
+    <div class="toolbar"><div class="seg" role="group" aria-label="Filter by status">${FILTERS.map(([k,l])=>`<button data-act="filter" data-v="${k}" aria-pressed="${S.filter===k}">${l}<span class="ct">${counts[k]||0}</span></button>`).join('')}</div>
+      <input class="input sm" id="apps-q" type="search" placeholder="Filter by name, ID or owner" value="${esc(S.aq)}" autocomplete="off" aria-label="Filter applications"></div>
+    <section class="panel"><div class="tablewrap"><table class="q"><thead><tr><th>Business ID</th><th>Business</th><th class="hide-s">Owner</th><th class="r">Amount</th><th class="r">Impact</th><th>Status</th><th class="hide-s">Reviewer</th><th class="hide-s">Filed</th></tr></thead>
+      <tbody id="apps-body">${appRows()}</tbody></table></div></section></div>`;
+}
+
+function reportsView(){
+  const all = [];
+  Object.entries(S.arts).forEach(([id,l])=>l.forEach(x=>all.push({id,kind:x.kind,title:x.title,created:x.created||'—'})));
+  all.reverse();
+  const body = all.length ? `<div class="tablewrap"><table class="q"><thead><tr><th>Report</th><th>Business</th><th class="hide-s">Created</th><th class="hide-s">Author</th><th></th></tr></thead><tbody>
+      ${all.map(r=>`<tr data-act="open-report" data-id="${r.id}" data-k="${r.kind}" tabindex="0"><td><b>${esc(r.title)}</b></td><td class="biz"><b>${esc(BY[r.id].name)}</b><span class="mono">#${r.id}</span></td>
+        <td class="hide-s mono" style="color:var(--muted)">${esc(r.created)}</td><td class="hide-s">${esc(S.user.name)} + ADK Agent</td><td class="r"><span class="linkbtn">Open →</span></td></tr>`).join('')}
+    </tbody></table></div>`
+    : `<div class="empty-row">No reports yet. Open an application and ask the assistant for a grant memo, network chart or discrepancy report.</div>`;
+  return `<div class="triage gut">${bc([['triage','Dashboard'],[null,'Reports']])}
+    <div class="triage-head" style="margin-top:6px"><h1>Reports</h1><div class="stats"><span><b>${all.length}</b> generated this round</span></div></div>
+    <section class="panel">${body}</section></div>`;
+}
+
+function profileView(){
+  const mine = APPS.filter(a=>ASSIGNED[a.id]==='PN');
+  const recs = Object.entries(S.awarded);
+  const recSum = recs.reduce((s,[,v])=>s+v,0);
+  const sw = (k,l,d) => `<div class="prefrow"><span>${l}<span class="d">${d}</span></span><button class="switch" role="switch" data-act="pref" data-v="${k}" aria-checked="${S.prefs[k]}" aria-label="${esc(l)}"></button></div>`;
+  return `<div class="triage gut">${bc([['triage','Dashboard'],[null,'Profile']])}
+    <div class="triage-head" style="margin-top:6px"><h1>Profile & preferences</h1></div>
+    <div class="prof-grid">
+      <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+        <section class="panel prof-card">
+          <div class="prof-id"><span class="avatar lg">${S.user.initials}</span><div><h2>${esc(S.user.name)}</h2><p>${esc(S.user.title)} · ${esc(S.user.dept)}</p><p class="mono" style="font-size:12px">${esc(S.user.email)} · ${S.user.id}</p></div></div>
+          <div class="stat-row"><div class="tile"><b>${mine.length}</b><span>Assigned to you</span></div><div class="tile"><b>${recs.length}</b><span>Recommended${recSum?' · '+fk(recSum):''}</span></div><div class="tile"><b>${reportCount()}</b><span>Reports</span></div></div>
+          <dl class="kv"><div><dt>Review round</dt><dd>${CORRIDOR} · Round 2</dd></div><div><dt>Round closes</dt><dd>Nov 14, 2026</dd></div>
+            <div><dt>Conflict of interest</dt><dd>None declared</dd></div><div><dt>Signing authority</dt><dd class="mono">Up to $50,000</dd></div></dl>
+        </section>
+        <section class="panel"><div class="panel-h"><h2>Preferences</h2></div>
+          <div class="prefrow"><span>Theme<span class="d">Follows your device by default</span></span><div class="seg" role="group" aria-label="Theme">${['system','light','dark'].map(t=>`<button data-act="theme" data-v="${t}" aria-pressed="${S.theme===t}">${t[0].toUpperCase()+t.slice(1)}</button>`).join('')}</div></div>
+          ${sw('emailDocs','Email me when applicants upload documents','Sent to '+esc(S.user.email))}
+          ${sw('digest','Daily queue digest','A summary of new and updated applications at 8 AM')}
+          ${sw('keepMap','Keep the map open when opening a business','Same as the pin button on the map')}
+        </section>
       </div>
+      <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+        <section class="panel"><div class="panel-h"><h2>Your queue</h2><span class="label">${mine.length} assigned</span></div>
+          <div class="lb">${mine.map((a,i)=>`<button class="lb-card" data-act="open" data-id="${a.id}" data-from="queue"><span class="lb-rank">${String(i+1).padStart(2,'0')}</span><span style="min-width:0"><span class="lb-name">${esc(a.name)}</span><span class="lb-meta">${a.id} · ${STATUS[a.status][1]} · ${fmt(a.ask)}</span></span><span class="lb-score">${a.impact}<small>IMPACT</small></span></button>`).join('')}</div></section>
+        <section class="panel"><div class="panel-h"><h2>Recent activity</h2></div>
+          <div class="act">${S.activity.map(x=>`<div><span>${esc(x.t)}</span><span class="t">${esc(x.time)}</span></div>`).join('')}</div></section>
+      </div>
+    </div></div>`;
+}
 
-      <!-- Compact Budget & KPI Bar -->
-      <div class="flex flex-wrap items-center gap-4 text-xs">
-        <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1">
-          <span class="text-slate-400">Budget:</span>
-          <input
-            id="budget-input"
-            type="number"
-            step="5000"
-            min="10000"
-            max="150000"
-            value="50000"
-            class="w-20 bg-slate-900 text-white font-mono text-xs font-semibold px-2 py-0.5 rounded border border-slate-600 focus:border-blue-400 focus:outline-none"
-          />
-          <button
-            id="recompute-btn"
-            class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-semibold px-2.5 py-0.5 rounded transition"
-          >
-            Allocate
-          </button>
-        </div>
+function triageView(){
+  const rows = APPS.slice().sort((a,b)=>({ready:0,rev:1,info:2,new:3}[a.status]-({ready:0,rev:1,info:2,new:3}[b.status]))).map(a=>{
+    const fl = a.missing.length + (variance(a)>.08?1:0);
+    const [c,l] = STATUS[a.status];
+    return `<tr data-act="open" data-id="${a.id}" data-from="queue" tabindex="0">
+      <td class="mono">${a.id}</td>
+      <td class="biz"><b>${esc(a.name)}</b><span>${esc(a.use)}</span></td>
+      <td class="r mono">${fmt(a.ask)}</td>
+      <td><span class="chip ${c}">${l}</span></td>
+      <td class="r hide-s"><span class="flagct ${fl?'':'zero'}">${fl?fl+' flag'+(fl>1?'s':''):'—'}</span></td>
+      <td class="hide-s mono" style="color:var(--muted)">${a.submitted}</td></tr>`;
+  }).join('');
+  const lb = APPS.slice().sort((a,b)=>b.impact-a.impact).map((a,i)=>`
+    <button class="lb-card" data-act="open" data-id="${a.id}" data-from="leader">
+      <span class="lb-rank">${String(i+1).padStart(2,'0')}</span>
+      <span style="min-width:0"><span class="lb-name">${esc(a.name)}</span>
+        <span class="lb-meta">${a.id} · ${a.edges.out.length} suppliers · ${a.edges.in.length} buyers · ${fk(sum(a.edges.out)+sum(a.edges.in))}/yr</span>
+        <span class="lb-meter"><span style="width:${a.impact}%"></span></span></span>
+      <span class="lb-score">${a.impact}<small>IMPACT</small></span>
+    </button>`).join('');
+  const req = APPS.reduce((s,a)=>s+a.ask,0);
+  return `<div class="triage gut">
+    ${bc([[null,CORRIDOR],[null,'Triage Dashboard']]).replace('<span aria-current="page">'+CORRIDOR+'</span>','<span>'+CORRIDOR+'</span>')}
+    <div class="triage-head" style="margin-top:6px"><h1>${(h=>h<12?'Good morning':h<18?'Good afternoon':'Good evening')(new Date().getHours())}, ${esc(S.user.name.split(' ')[0])}</h1>
+      <div class="stats"><span><b>${APPS.length}</b> open</span><span><b>${fmt(req)}</b> requested</span><span><b>${fmt(poolRemaining())}</b> available</span></div></div>
+    <div class="triage-grid">
+      <section class="panel"><div class="panel-h"><h2>Help-desk queue</h2><span class="label">Sorted by readiness · BigQuery CascadeEconomy</span></div>
+        <div class="tablewrap"><table class="q"><thead><tr><th>Business ID</th><th>Business & request</th><th class="r">Amount</th><th>Status</th><th class="r hide-s">Flags</th><th class="hide-s">Filed</th></tr></thead><tbody>${rows}</tbody></table></div></section>
+      <section class="panel"><div class="panel-h"><h2>Impact leaderboard</h2><span class="label">Score / 100</span></div><div class="lb">${lb}</div></section>
+    </div></div>`;
+}
 
-        <label class="flex items-center gap-1.5 cursor-pointer select-none bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1" title="Reserves $8k for high-poverty retail leaf businesses (1010 Market LLC)">
-          <input id="equity-carveout-toggle" type="checkbox" class="accent-amber-500 cursor-pointer" />
-          <span class="text-[11px] text-amber-300 font-medium">15% Equity Leaf Carve-Out</span>
-        </label>
+function reviewShell(){
+  const u = ui(S.current);
+  return `<div class="review ${u.layout==='2B'?'l2b':''}" id="review">
+    <section class="pane left" id="left"></section>
+    <section class="pane chat" id="chat"></section>
+    <section class="pane art" id="art"></section></div>`;
+}
 
-        <div class="hidden md:flex items-center gap-3 bg-slate-800/70 px-3 py-1 rounded-lg border border-slate-700/70 font-mono text-[11px]">
-          <span>Allocated: <strong id="kpi-allocated" class="text-white">$50,000</strong></span>
-          <span class="text-slate-600">|</span>
-          <span>Funded: <strong id="kpi-funded-count" class="text-emerald-400">3</strong></span>
-          <span class="text-slate-600">|</span>
-          <span>2-Hop Reach: <strong id="kpi-downstream-reach" class="text-blue-300">18 biz</strong></span>
-        </div>
+/* Left pane */
+function renderLeft(){
+  const a = BY[S.current], u = ui(a.id), el = $('#left'); if(!el) return;
+  const [c,l] = STATUS[a.status];
+  const awarded = S.awarded[a.id];
+  const docFlags = a.missing.length, finFlags = variance(a)>.08?1:0;
+  el.innerHTML = `<div class="lhead">
+      ${bc([['triage','Dashboard'],['apps','Applications'],[null,'#'+a.id]])}
+      <div class="top"><div><h1>${esc(a.name)}</h1><div class="sub">${esc(a.cat)} · <span class="mono">${a.id}</span> · filed ${a.submitted}</div></div>
+        <span class="chip ${c}">${l}</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn sm ${awarded?'':'primary'}" data-act="award">${awarded?'Withdraw recommendation':'Recommend '+fmt(a.ask)}</button>
+      </div>
+      <div class="tabs" role="tablist">
+        ${[['overview','Overview & Data',0],['app','Application',0],['docs','Documents',docFlags],['fin','Financials',finFlags]].map(([k,t,n])=>`<button class="tab" role="tab" data-act="tab" data-v="${k}" aria-selected="${u.tab===k}">${t}${n?`<span class="n">${n}</span>`:''}</button>`).join('')}
+      </div></div>
+    <div class="lbody" id="lbody">${u.tab==='overview'?tabOverview(a):u.tab==='app'?tabApp(a):u.tab==='docs'?tabDocs(a):tabFin(a)}</div>`;
+}
+
+function tabApp(a){
+  const first = a.owner.split(' ')[0].toLowerCase();
+  const slug = a.name.toLowerCase().replace(/[^a-z]+/g,'');
+  const addr = a.address || `${1000 + Math.round(a.x/4)*2} Market St, San Francisco, CA`;
+  const quoteMissing = a.missing.includes('quote');
+  const install = Math.max(0, Math.min(Math.round(a.ask*.05/100)*100, a.ask - a.fin.quote));
+  const cont = Math.max(0, a.ask - a.fin.quote - install);
+  const qa = [
+    ['What will the grant pay for?', a.use+'.'],
+    ['How will this grant strengthen the corridor?', `${a.parts[2][3]}. ${a.parts[0][3]}. Keeping this business open protects those relationships on Central Market.`],
+    ['What happens if the grant is not awarded?', a.impact>=70 ? 'We would face an immediate 90-day working capital shortfall that risks disrupting downstream corridor partners.' : 'We would postpone the stabilization project and scale back hours.']
+  ];
+  return `<div class="sec" id="L-applicant"><h3>Applicant</h3><dl class="kv">
+      <div><dt>Legal name</dt><dd>${esc(a.name)}</dd></div><div><dt>Registry ID (BigQuery)</dt><dd class="mono">${esc(a.id)}</dd></div>
+      <div><dt>Business address</dt><dd>${esc(addr)}</dd></div><div><dt>Primary contact</dt><dd>${esc(a.owner)}, Owner</dd></div>
+      <div><dt>Email</dt><dd class="mono" style="font-size:12px">${first}@${slug}.sf.example</dd></div>
+      <div><dt>Operating since</dt><dd>${a.since}</dd></div>
+      <div><dt>Employees</dt><dd>${a.staff}</dd></div><div><dt>Category</dt><dd>${esc(a.cat)}</dd></div></dl></div>
+    <div class="sec" id="L-budget"><h3>Use of funds</h3>
+      <table class="fin"><tbody>
+        <tr><td>${quoteMissing?'Contractor estimate (quote not yet uploaded)':'Stabilization / Equipment — '+esc(a.fin.vendor)}</td><td class="r">${fmt(a.fin.quote)}</td></tr>
+        <tr><td>Installation & permits</td><td class="r">${fmt(install)}</td></tr>
+        <tr><td>Working capital / contingency</td><td class="r">${fmt(cont)}</td></tr>
+        <tr><td><b>Total requested</b></td><td class="r"><b>${fmt(a.ask)}</b></td></tr></tbody></table></div>
+    <div class="sec" id="L-narrative"><h3>Applicant responses</h3>
+      ${qa.map(([q,r])=>`<div class="qa"><span class="q">${q}</span><p class="prose">${esc(r)}</p></div>`).join('')}</div>
+    <div class="sec"><h3>Certification</h3><div class="sig"><b>${esc(a.owner)}</b><span>Signed electronically · ${a.submitted}, 2026</span></div></div>`;
+}
+
+function tabOverview(a){
+  const total = sum(a.edges.out)+sum(a.edges.in);
+  return `<div class="sec" id="L-summary"><h3>Request</h3><p class="prose">${esc(a.use)}.</p>
+      <dl class="kv"><div><dt>Amount requested</dt><dd class="mono">${fmt(a.ask)}</dd></div><div><dt>Quote on file</dt><dd class="mono">${a.missing.includes('quote')?'Missing':fmt(a.fin.quote)}</dd></div>
+      <div><dt>Staff</dt><dd>${a.staff}</dd></div><div><dt>Reported revenue</dt><dd class="mono">${fmt(a.fin.appRev)}</dd></div></dl></div>
+    <div class="sec" id="L-impact"><h3>Impact breakdown</h3><div class="ib">
+      ${a.parts.map(([n,s,m,note])=>`<div class="ib-row"><span class="nm">${n}</span><span class="sc">${s}/${m}</span><span class="bar"><span style="width:${s/m*100}%"></span></span><span class="note">${esc(note)}</span></div>`).join('')}
+      <div class="ib-total"><span class="label">Impact score</span><b>${a.impact}</b></div></div></div>
+    <div class="sec" id="L-network"><h3>Corridor network · ${fk(total)}/yr direct</h3><div class="links">
+      ${a.edges.out.map(e=>`<div class="ln"><span class="tag out">OUT</span><span>${esc(nodeName(e[0]))}</span><span class="amt">${fk(e[1])} · ${e[2]}%</span></div>`).join('')}
+      ${a.edges.in.map(e=>`<div class="ln"><span class="tag in">IN</span><span>${esc(nodeName(e[0]))}</span><span class="amt">${fk(e[1])} · ${e[2]}%</span></div>`).join('')}
+      ${a.edges.spill.map(e=>`<div class="ln"><span class="tag spill">2ND</span><span>${esc(nodeName(e[0]))}</span><span class="amt">${e[1]}% overlap</span></div>`).join('')}
+    </div></div>`;
+}
+
+function tabDocs(a){
+  return `<div class="sec"><h3>Submitted documents</h3><div class="docs">
+    ${STD_DOCS.map(([k])=>{ const miss = a.missing.includes(k), note = a.notes[k];
+      return `<div class="doc ${miss?'missing':''}" id="L-doc-${k}"><span class="nm">${esc(docName(a,k))}</span>
+        <span class="st">${miss?'<span class="chip info">Missing</span>':note?'<span class="chip info">Note</span>':'<span class="chip ready">Received</span>'}</span>
+        <span class="meta">${miss?'Not uploaded — request from applicant':note?esc(note):'Uploaded '+a.submitted+(k==='quote'?' · '+fmt(a.fin.quote):'')}</span></div>`; }).join('')}
+  </div></div>`;
+}
+
+function tabFin(a){
+  const v = variance(a), vc = v>.12?'var-crit':v>.08?'var-warn':'var-ok';
+  const known = a.fin.q.filter(x=>x!=null), ann = known.reduce((s,x)=>s+x,0)/known.length*4;
+  return `<div class="sec" id="L-rev"><h3>Revenue check</h3>
+      <table class="fin"><thead><tr><th>Source</th><th class="r">Annual revenue</th></tr></thead><tbody>
+        <tr><td>Application (self-reported)</td><td class="r">${fmt(a.fin.appRev)}</td></tr>
+        <tr><td>2025 tax return</td><td class="r">${fmt(a.fin.taxRev)}</td></tr>
+        <tr><td>2026 bank statements, annualized</td><td class="r">${fmt(ann)}</td></tr>
+        <tr><td><b>Variance vs. tax return</b></td><td class="r ${vc}"><b>${v>=0?'+':''}${(v*100).toFixed(1)}%</b></td></tr></tbody></table>
+      ${v>.08?`<div class="callout ${v>.12?'crit':''}">Self-reported revenue is ${(v*100).toFixed(1)}% above the 2025 tax return. Program threshold is 8%.</div>`:''}</div>
+    <div class="sec" id="L-quarters"><h3>Quarterly deposits · 2026</h3>
+      <table class="fin"><tbody>${a.fin.q.map((x,i)=>`<tr><td>Q${i+1}</td><td class="r">${x==null?'<span class="var-warn">Statement missing</span>':fmt(x)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="sec" id="L-staff"><h3>Staffing</h3>
+      <table class="fin"><tbody><tr><td>Application</td><td class="r">${a.staff} employees</td></tr><tr><td>Latest payroll filing</td><td class="r">${a.fin.staffFiled}</td></tr></tbody></table></div>`;
+}
+
+/* ---------- Chat (Connected to Live Cloud Run ADK via /api/chat) ---------- */
+function renderChat(){
+  const a = BY[S.current], el = $('#chat'); if(!el) return;
+  el.innerHTML = `<div class="chat-h">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <h2>Review assistant</h2>
+        <span class="chip ready" style="font-size:11px;padding:1px 7px" title="Connected to live Cloud Run ADK agent via /api/chat">ADK Live</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;min-width:0">
+        <select class="switcher" id="agent-select" aria-label="Select ADK agent" style="height:26px;font-size:12px;max-width:225px">
+          ${AGENT_APPS.map(([val,lbl])=>`<option value="${val}" ${S.agentApp===val?'selected':''}>${esc(lbl)}</option>`).join('')}
+        </select>
       </div>
     </div>
-  </header>
+    <div class="msgs" id="msgs" aria-live="polite">${(S.chats[a.id]||[]).map(msgHTML).join('')}</div>
+    <form class="composer" id="composer"><input class="input" id="composer-in" placeholder="Ask the live ADK agent about ${esc(a.name)} (${a.id}), or request a memo or chart" autocomplete="off"><button class="btn primary" type="submit">Send</button></form>`;
+  scrollMsgs();
+}
+function scrollMsgs(){ const m = $('#msgs'); if(m) m.scrollTop = m.scrollHeight; }
+const isArtPrompt = p => /memo|report|chart|visual|graph/i.test(p);
+const chipsHTML = list => `<div class="chips">${list.map(p=>`<button class="pchip ${isArtPrompt(p)?'art':''}" data-act="prompt" data-p="${esc(p)}">${esc(p)}</button>`).join('')}</div>`;
 
-  <!-- CLEAN 2-PANEL LAYOUT: LEFT APPLICANT QUEUE (4 COLS) + RIGHT AGENT PROMPT (8 COLS) -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 overflow-hidden">
+function formatAgentMarkdown(md){
+  if(!md) return '';
+  const lines = String(md).split('\n');
+  let html = '', inList = false, inCode = false, codeBuf = [];
+  const inline = s => esc(s)
+    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+  for(const raw of lines){
+    const line = raw.trimEnd();
+    if(line.trim().startsWith('```')){
+      if(inList){ html += '</ul>'; inList = false; }
+      if(inCode){ html += `<pre>${esc(codeBuf.join('\n'))}</pre>`; codeBuf = []; inCode = false; }
+      else { inCode = true; }
+      continue;
+    }
+    if(inCode){ codeBuf.push(raw); continue; }
+    const trimmed = line.trim();
+    if(!trimmed){
+      if(inList){ html += '</ul>'; inList = false; }
+      continue;
+    }
+    if(/^#{1,4}\s+/.test(trimmed)){
+      if(inList){ html += '</ul>'; inList = false; }
+      const txt = trimmed.replace(/^#{1,4}\s+/, '');
+      html += `<p style="margin-top:6px"><b>${inline(txt)}</b></p>`;
+    } else if(/^[-*•]\s+/.test(trimmed) || /^\d+\.\s+/.test(trimmed)){
+      if(!inList){ html += '<ul>'; inList = true; }
+      const item = trimmed.replace(/^([-*•]|\d+\.)\s+/, '');
+      html += `<li>${inline(item)}</li>`;
+    } else if(/^>\s*/.test(trimmed)){
+      if(inList){ html += '</ul>'; inList = false; }
+      html += `<blockquote>${inline(trimmed.replace(/^>\s*/, ''))}</blockquote>`;
+    } else {
+      if(inList){ html += '</ul>'; inList = false; }
+      html += `<p>${inline(trimmed)}</p>`;
+    }
+  }
+  if(inList) html += '</ul>';
+  if(inCode) html += `<pre>${esc(codeBuf.join('\n'))}</pre>`;
+  return html;
+}
 
-    <!-- LEFT PANEL: APPLICANT QUEUE (4 COLS) -->
-    <aside class="lg:col-span-4 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col overflow-hidden">
-      <div class="p-3.5 border-b border-slate-200 flex items-center justify-between">
-        <div>
-          <h2 class="font-bold text-sm text-slate-900">Applicant Queue</h2>
-          <p class="text-[11px] text-slate-500">Demo shortlist · financial inputs and queue allocations are simulated</p>
-        </div>
-        <div class="flex gap-1">
-          <button data-filter="ALL" class="queue-filter-btn text-[11px] font-semibold px-2 py-1 rounded bg-slate-900 text-white">All</button>
-          <button data-filter="FUNDED" class="queue-filter-btn text-[11px] font-semibold px-2 py-1 rounded bg-slate-100 text-slate-600 hover:bg-slate-200">Funded</button>
-          <button data-filter="ALERTS" class="queue-filter-btn text-[11px] font-semibold px-2 py-1 rounded bg-slate-100 text-slate-600 hover:bg-slate-200">Hub / Bias</button>
-        </div>
-      </div>
+function msgHTML(m){
+  if(m.role==='user') return `<div class="msg user"><p>${esc(m.text)}</p></div>`;
+  if(m.role==='typing') return `<div class="msg"><span class="who">Assistant <span class="adk-src">${esc(m.agent||S.agentApp)}</span></span><div class="typing"><i></i><i></i><i></i><span>Querying Cloud Run ADK & BigQuery graph…</span></div></div>`;
+  if(m.kind==='summary'){
+    const a = BY[m.app];
+    return `<div class="msg"><span class="who">Assistant <span class="adk-src">ADK Ready · ${esc(a.id)}</span></span><div class="summary">
+      <p>${esc(a.name)} (<span class="mono">${esc(a.id)}</span>) requests <b>${fmt(a.ask)}</b> to ${esc(a.use.charAt(0).toLowerCase()+a.use.slice(1))}. ${m.lead||''}</p>
+      <div class="stats"><div><b>${a.impact}</b><span>Impact score</span></div><div><b>${a.edges.out.length}/${a.edges.in.length}</b><span>Suppliers / buyers</span></div>
+        <div><b>${fk(sum(a.edges.out)+sum(a.edges.in))}</b><span>Linked $/yr</span></div><div><b>${a.missing.length + (variance(a)>.08?1:0)}</b><span>Open flags</span></div></div>
+      ${chipsHTML(m.chips)}</div></div>`;
+  }
+  const srcBadge = m.source ? `<span class="adk-src">${esc(m.source)}</span>` : '';
+  const toolsBadge = (m.tools && m.tools.length) ? `<span class="adk-tools">Tools: ${esc(m.tools.join(' → '))}</span>` : '';
+  return `<div class="msg"><span class="who">Assistant ${srcBadge} ${toolsBadge}</span>${m.html}
+    <div class="next"><span class="label">Suggested next steps / Context needed</span>
+      ${(m.flags||[]).map(f=>`<div class="flag">${f}</div>`).join('')}${chipsHTML(m.chips||[])}</div></div>`;
+}
 
-      <div id="applicant-queue-list" class="flex-1 overflow-y-auto p-2.5 space-y-2">
-        <!-- Populated by app.js -->
-      </div>
-    </aside>
+const pill = (side,tab,anchor,label) => `<button class="src" data-act="src" data-src="${side}|${tab}|${anchor}">${side==='L'?'←':'→'} ${esc(label)}</button>`;
 
-    <!-- RIGHT PANEL: CLEAN AGENT CHAT WITH PROMPT TAB & RECOMMENDED QUESTIONS (8 COLS) -->
-    <section class="lg:col-span-8 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col overflow-hidden">
+function flagsFor(a){
+  const f = a.missing.map(k=>`Missing ${esc(docName(a,k))} — ask applicant? ${pill('L','docs','doc-'+k,'Documents')}`);
+  const v = variance(a); if(v>.08) f.push(`Reported revenue is ${(v*100).toFixed(1)}% above the tax return — confirm? ${pill('L','fin','rev','Financials')}`);
+  if(a.notes.lease) f.push(`${esc(a.notes.lease)} ${pill('L','docs','doc-lease','Lease')}`);
+  if(!f.length) f.push('No missing documents. Ready for live ADK evaluation & recommendation.');
+  return f;
+}
+const requestChip = a => a.missing.length ? 'Draft request for the '+docName(a,a.missing[0]).replace(/^Equipment quote — .*/,'contractor quote') : 'Compare with '+rival(a).name;
+const rival = a => APPS.slice().sort((x,y)=>y.impact-x.impact).find(x=>x.id!==a.id && Math.abs(x.impact-a.impact)<=15) || APPS.find(x=>x.id!==a.id);
+const topDep = a => [...a.edges.out.map(e=>['out',...e]),...a.edges.in.map(e=>['in',...e])].sort((x,y)=>y[3]-x[3])[0];
 
-      <!-- Clean Header with Single Prompt Tab, Live Agent Selector & Active Applicant Context -->
-      <div class="bg-slate-900 text-white px-4 pt-2.5 pb-0 border-b border-slate-800 shrink-0 flex flex-wrap items-center justify-between gap-2">
-        <div class="flex items-center gap-3 border-b-2 border-blue-400 pb-2">
-          <span class="text-xs font-semibold text-white">💬 Agent Prompt</span>
-          <select
-            id="agent-app-select"
-            class="bg-slate-800 text-emerald-300 font-mono text-[11px] px-2 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer"
-            title="Select Cloud Run ADK Agent"
-          >
-            <option value="corridor_coordinator">Auto-route: Corridor Coordinator</option>
-            <option value="grant_advisor">Agent: grant_advisor (Portfolio & Memo)</option>
-            <option value="cascade_analyst">Agent: cascade_analyst (Graph Specialist)</option>
-            <option value="evidence_reviewer">Agent: Evidence Reviewer</option>
-            <option value="neighborhood_context">Agent: Neighborhood Context</option>
-          </select>
-        </div>
+function detectLocalArtifact(a, text){
+  const t = text.toLowerCase();
+  if(/memo/.test(t)) return {art:'memo', tight:/conditions|tight/.test(t), chips:['Visualize 2-Degree Network Impact','Audit Financial Discrepancies',requestChip(a)]};
+  if(/(network|visual|chart|graph|map)/.test(t)){
+    S.layers={out:true,in:true,spill:true};
+    return {art:'network', tight:false, chips:['Generate Grant Memo',`What is the 2-hop supply cascade for ${a.name} (${a.id})?`]};
+  }
+  if((/report/.test(t) && /(audit|discrep)/.test(t)) || /discrepancy report|audit financial/i.test(t)){
+    return {art:'audit', tight:false, chips:['Generate Grant Memo',requestChip(a)]};
+  }
+  return {art:null, tight:false, chips:['Generate Grant Memo','Visualize 2-Degree Network Impact','Audit Financial Discrepancies']};
+}
 
-        <div id="selected-applicant-banner" class="pb-2 text-xs">
-          <!-- Active applicant context pill populated by app.js -->
-        </div>
-      </div>
+async function send(text){
+  text = text.trim(); if(!text) return;
+  const a = BY[S.current];
+  const sw = /^switch to (.+)$/i.exec(text);
+  if(sw){ const o = APPS.find(x=>x.name.toLowerCase()===sw[1].toLowerCase()); if(o){ openBiz(o.id,'switch'); return; } }
+  const chat = S.chats[a.id];
+  chat.push({role:'user',text});
+  const chosenAgent = S.agentApp || 'corridor_coordinator';
+  const typing = {role:'typing', agent:chosenAgent};
+  chat.push(typing);
+  renderChat();
+  const id = a.id;
+  const hint = detectLocalArtifact(a, text);
+  if(hint.art){
+    if(S.current===id){
+      makeArtifact(BY[id], hint.art, hint.tight);
+      if(/network|visual|chart|graph|map/i.test(text)) refreshMap();
+    } else {
+      makeArtifact(BY[id], hint.art, hint.tight, true);
+    }
+  }
+  try {
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        message:text,
+        selected_business_id:id,
+        budget:ROUND_BUDGET,
+        risk_reduction_pct:45.0,
+        weighting_mode:'compound_intensity',
+        equity_carveout:false,
+        agent_app:chosenAgent,
+        client_id:S.clientId
+      })
+    });
+    const data = await res.json().catch(()=>({}));
+    const c = S.chats[id];
+    const idx = c.indexOf(typing);
+    if(idx !== -1) c.splice(idx, 1);
+    if(!res.ok){
+      const errDetail = data.detail || `HTTP ${res.status}`;
+      c.push({
+        role:'ai',
+        source:`Error (${chosenAgent})`,
+        tools:[],
+        html:`<div class="callout crit"><b>Live ADK Agent Error:</b> ${esc(errDetail)}</div>`,
+        flags:flagsFor(BY[id]),
+        chips:hint.chips
+      });
+    } else {
+      const formatted = formatAgentMarkdown(data.reply || '');
+      const refPills = `<p style="margin-top:6px">Workspace references: ${pill('L','overview','impact','Impact')} ${pill('L','overview','network','Network')} ${pill('L','fin','rev','Financials')}</p>`;
+      c.push({
+        role:'ai',
+        source:data.source || `Cloud Run ADK (${chosenAgent})`,
+        tools:data.tool_calls || [],
+        html:formatted + refPills,
+        flags:flagsFor(BY[id]),
+        chips:hint.chips
+      });
+      if(/memo|recommend|allocation/i.test(text) && data.reply){
+        makeLiveAdkArtifact(BY[id], data.reply, data.source, data.tool_calls);
+      }
+      log(`ADK (${data.agent_app || chosenAgent}) answered for ${BY[id].name}`);
+    }
+  } catch (err) {
+    const c = S.chats[id];
+    const idx = c.indexOf(typing);
+    if(idx !== -1) c.splice(idx, 1);
+    c.push({
+      role:'ai',
+      source:'Connection Error',
+      tools:[],
+      html:`<div class="callout crit"><b>Could not reach /api/chat:</b> ${esc(err.message || String(err))}</div>`,
+      flags:flagsFor(BY[id]),
+      chips:hint.chips
+    });
+  }
+  if(S.current===id) renderChat();
+}
 
-      <!-- Recommended Questions to the Agents -->
-      <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 shrink-0">
-        <div class="text-[11px] font-semibold text-slate-500 mb-2">Recommended Questions to the Agents:</div>
-        <div class="flex flex-wrap items-center gap-1.5">
-          <button
-            data-agent="cascade_analyst"
-            data-prompt="Trace the 2-hop supply_disruption cascade for the selected business using analyze_cascade and report direct, multi-hop, and sensitivity results."
-            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
-          >
-            🕸️ Analyze 2-hop supply_disruption
-          </button>
-          <button
-            data-agent="cascade_analyst"
-            data-prompt="Run analyze_cascade with direction='customer_loss' for the selected business and explain upstream supplier exposure."
-            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
-          >
-            🔄 Analyze upstream customer_loss
-          </button>
-          <button
-            data-agent="grant_advisor"
-            data-prompt="Call compare_applicants for the candidate pool using the current budget and 90-day horizon, and write the full conditional GRANT MEMO."
-            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
-          >
-            📄 Compare applicants & write Grant Memo
-          </button>
-          <button
-            data-agent="grant_advisor"
-            data-prompt="Why shouldn't we recommend A & A Legal Service, Inc. (1188036-05-181) solely because it has the largest 22-business centrality?"
-            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
-          >
-            🛑 Why skip the biggest hub?
-          </button>
-          <button
-            data-agent="cascade_analyst"
-            data-prompt="Analyze 1010 Market LLC (1373515-10-241) and explain why a resident-facing grocery store has 0 supply_disruption paths in the BEA model."
-            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
-          >
-            ⚖️ Retail leaf & industry bias audit
-          </button>
-          <button
-            data-agent="grant_advisor"
-            data-prompt="What edges in this graph are modeled vs real, and what operating assumptions and limitations must the grant officer verify before approving?"
-            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
-          >
-            🔍 Real vs. Modeled & assumptions
-          </button>
-        </div>
-      </div>
+function makeLiveAdkArtifact(a, replyMd, source, tools){
+  const list = S.arts[a.id] || (S.arts[a.id]=[]);
+  let art = list.find(x=>x.kind==='adk');
+  const toolLine = (tools && tools.length) ? ` · Tools: ${tools.join(', ')}` : '';
+  const secs = [
+    `<div class="kicker">${esc(source || 'CLOUD RUN ADK')} · #${esc(a.id)}${esc(toolLine)}</div><h1>${esc(a.name)}: Live Agent Analysis</h1>`,
+    `<section id="R-adk-body">${formatAgentMarkdown(replyMd)}</section>`
+  ];
+  if(!art){ art = {kind:'adk',title:'Live ADK Memo',secs:[]}; list.push(art); }
+  art.secs = secs;
+  art.pending = null;
+  art.created = timeLabel();
+  const u = ui(a.id); u.layout='2B'; u.art='adk';
+  if(S.current===a.id){
+    const rv = $('#review'); if(rv) rv.classList.add('l2b');
+    renderArt();
+    renderTop();
+  }
+}
 
-      <!-- Clean Chat Messages Area -->
-      <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
-        <div class="bg-slate-100 border border-slate-200 rounded-xl p-3.5 text-slate-800 space-y-1.5">
-          <div class="text-[10px] font-mono text-emerald-700 font-semibold">
-            Live chat via Corridor Coordinator · Cloud Run ADK · https://cascade-analyst-89073885580.us-central1.run.app
-          </div>
-          <p class="leading-relaxed">
-            Corridor Coordinator routes questions to our four specialists querying
-            <code>qwiklabs-gcp-04-029c15637557.a4i_econ.CascadeEconomy</code> in <strong>Central Market</strong>.
-            Select a demo applicant and ask a question. Queue allocations are simulated previews; chat results come from live specialists.
-          </p>
-        </div>
-      </div>
+/* ---------- Artifacts ---------- */
+function recLine(a){
+  const v = variance(a);
+  if(v>.12) return 'hold pending financial clarification';
+  if(a.missing.length) return `fund ${fmt(a.ask)}, conditional on the ${docName(a,a.missing[0]).replace(/^Equipment quote — /,'quote from ')}`;
+  return `fund ${fmt(a.ask)} in full`;
+}
 
-      <!-- Prompt Input Bar -->
-      <form id="chat-form" class="p-3 border-t border-slate-200 flex gap-2 bg-slate-50 shrink-0">
-        <input
-          id="chat-input"
-          type="text"
-          placeholder="Ask about applicants, cascades, evidence, or neighborhood context..."
-          class="flex-1 bg-white text-xs px-3.5 py-2.5 rounded-lg border border-slate-300 focus:border-blue-500 focus:outline-none"
-        />
-        <button
-          id="chat-submit-btn"
-          type="submit"
-          class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition"
-        >
-          Send
-        </button>
-      </form>
+function artSections(a, kind, tight){
+  const total = sum(a.edges.out)+sum(a.edges.in), v = variance(a);
+  if(kind==='memo'){
+    const conds = tight
+      ? [`Upload ${a.missing.length?docName(a,a.missing[0]):'Q4 bank statement'} before disbursement`,`Written explanation of the ${(v*100).toFixed(1)}% revenue variance, within 14 days`,`Proof of stabilization / installation (invoice from ${a.fin.vendor}) within 90 days of award`]
+      : [a.missing.length?`Receipt of the ${docName(a,a.missing[0])}`:'Standard reporting at 6 and 12 months', v>.08?'Explanation of the revenue variance':'Invoice matching the quote on file', a.notes.lease?'Evidence of lease renewal or landlord consent':'Retain listed staff for 12 months'];
+    return [
+      `<div class="kicker">GRANT MEMO · #${a.id} · DRAFT ${tight?'v2':'v1'}</div><h1>${esc(a.name)}: ${fmt(a.ask)} request</h1>`,
+      `<section id="R-m-rec"><h2>1. Recommendation</h2><div class="rec"><b>${recLine(a).replace(/^./,c=>c.toUpperCase())}</b><span class="mono" style="color:var(--muted)">Impact ${a.impact}/100</span></div></section>`,
+      `<section id="R-m-sum"><h2>2. Applicant</h2><p>${esc(a.cat)} (<span class="mono">${esc(a.id)}</span>) run by ${esc(a.owner)} since ${a.since}, ${a.staff} staff. The grant would ${esc(a.use.charAt(0).toLowerCase()+a.use.slice(1))}, backed by a ${fmt(a.fin.quote)} quote from ${esc(a.fin.vendor)} ${pill('L','docs','doc-quote','Quote')}.</p></section>`,
+      `<section id="R-m-impact"><h2>3. Corridor impact</h2><p>${a.edges.out.length} corridor suppliers receive ${fk(sum(a.edges.out))}/yr and ${a.edges.in.length} corridor buyers spend ${fk(sum(a.edges.in))}/yr here, ${fk(total)} in direct local trade ${pill('L','overview','network','Network')}. The largest dependency is ${esc(nodeName(topDep(a)[1]))} at ${topDep(a)[3]}%. Score detail: ${a.parts.map(p=>p[0].toLowerCase()+' '+p[1]+'/'+p[2]).join(', ')} ${pill('L','overview','impact','Impact')}.</p></section>`,
+      `<section id="R-m-fin"><h2>4. Financial review</h2><p>Self-reported revenue of ${fmt(a.fin.appRev)} is ${(v*100).toFixed(1)}% ${v>=0?'above':'below'} the 2025 tax return ${pill('L','fin','rev','Revenue')}. ${v>.08?'This exceeds the 8% threshold and needs an explanation before award.':'This is within program tolerance.'} ${a.fin.q.includes(null)?'Q3 deposits are unverified.':''}</p></section>`,
+      `<section id="R-m-cond"><h2>5. Conditions</h2><ul>${conds.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></section>`
+    ];
+  }
+  if(kind==='network'){
+    const rows = [['Revenue out · 1st-degree suppliers','out',a.edges.out],['Revenue in · 1st-degree buyers','in',a.edges.in]];
+    const max = Math.max(...a.edges.out.map(e=>e[1]),...a.edges.in.map(e=>e[1]));
+    const L=170, W=300, rowH=24; let y=12, body='';
+    const ticks=[0,.25,.5,.75,1].map(f=>f*max);
+    rows.forEach(([g,cls,list])=>{
+      body += `<text class="c-grp" x="0" y="${y+10}">${g.toUpperCase()}</text>`; y+=20;
+      list.slice().sort((p,q)=>q[1]-p[1]).forEach(e=>{
+        const w = e[1]/max*W;
+        body += `<text class="c-lbl" x="${L-8}" y="${y+14}" text-anchor="end">${esc(nodeName(e[0]))}</text>
+          <rect x="${L}" y="${y+4}" width="${w}" height="14" rx="2" style="fill:var(--${cls})"/>
+          <text class="c-val" x="${L+w+6}" y="${y+15}">${fk(e[1])} · ${e[2]}%</text>`; y+=rowH; });
+      y+=8;
+    });
+    const spillEst = total*.35;
+    const sw = Math.min(spillEst/max*W, W);
+    body += `<text class="c-grp" x="0" y="${y+10}">2ND-DEGREE SPILLOVER · ESTIMATE</text>`; y+=20;
+    body += `<text class="c-lbl" x="${L-8}" y="${y+14}" text-anchor="end">Indirect businesses</text><rect x="${L}" y="${y+4}" width="${sw}" height="14" rx="2" style="fill:none;stroke:var(--spill);stroke-dasharray:4 3;stroke-width:1.5"/><text class="c-val" x="${L+sw+6}" y="${y+15}">${fk(spillEst)}</text>`; y+=rowH+6;
+    const grid = ticks.map(tk=>`<line class="c-grid" x1="${L+tk/max*W}" y1="28" x2="${L+tk/max*W}" y2="${y-8}"/><text class="c-val" x="${L+tk/max*W}" y="${y+6}" text-anchor="middle">${fk(tk)}</text>`).join('');
+    return [
+      `<div class="kicker">NETWORK IMPACT · #${a.id}</div><h1>${esc(a.name)}: 2-degree corridor network</h1>`,
+      `<section id="R-n-tiles"><div class="tiles"><div class="tile out"><b>${fk(sum(a.edges.out))}</b><span>Revenue out to ${a.edges.out.length} suppliers</span></div>
+        <div class="tile in"><b>${fk(sum(a.edges.in))}</b><span>Revenue in from ${a.edges.in.length} buyers</span></div>
+        <div class="tile spill"><b>~${fk(spillEst)}</b><span>2nd-degree, estimated</span></div></div></section>`,
+      `<section id="R-n-chart"><h2>Annual flows by partner</h2><div class="chartwrap"><svg viewBox="0 0 560 ${y+14}" role="img" aria-label="Bar chart of annual flows">${grid}${body}</svg></div></section>`,
+      `<section><h2>Method</h2><p>Direct flows come from the applicant's supplier and buyer network in Central Market ${pill('L','overview','network','Network')}. Percentages are each partner's estimated dependency. The 2nd-degree figure applies a 0.35 local multiplier to direct flows and covers the consumer zone within 400 m, shown as the shaded ring on the map.</p></section>`
+    ];
+  }
+  const known = a.fin.q.filter(x=>x!=null), ann = known.reduce((s,x)=>s+x,0)/known.length*4;
+  const sev = x => x>.12?'<span class="var-crit">High</span>':x>.08?'<span class="var-warn">Medium</span>':'<span class="var-ok">Low</span>';
+  const staffFiled = a.fin.staffFiled.match(/\d+/g).map(Number).reduce((s,x)=>s+x,0);
+  return [
+    `<div class="kicker">DISCREPANCY REPORT · #${a.id}</div><h1>${esc(a.name)}: financial audit</h1>`,
+    `<section id="R-a-table"><div class="tablewrap"><table class="fin"><thead><tr><th>Item</th><th class="r">Application</th><th class="r">Evidence</th><th class="r">Variance</th><th class="r">Severity</th></tr></thead><tbody>
+      <tr><td>Revenue vs. 2025 tax return</td><td class="r">${fk(a.fin.appRev)}</td><td class="r">${fk(a.fin.taxRev)}</td><td class="r">${(v*100).toFixed(1)}%</td><td class="r">${sev(v)}</td></tr>
+      <tr><td>Revenue vs. 2026 deposits</td><td class="r">${fk(a.fin.appRev)}</td><td class="r">${fk(ann)}</td><td class="r">${((a.fin.appRev-ann)/ann*100).toFixed(1)}%</td><td class="r">${sev((a.fin.appRev-ann)/ann)}</td></tr>
+      <tr><td>Headcount vs. payroll</td><td class="r">${a.staff}</td><td class="r">${staffFiled}</td><td class="r">${staffFiled-a.staff>=0?'+':''}${staffFiled-a.staff}</td><td class="r">${sev(Math.abs(staffFiled-a.staff)/a.staff>.15?.1:0)}</td></tr>
+      ${a.missing.map(k=>`<tr><td>${esc(docName(a,k))}</td><td class="r">—</td><td class="r">Missing</td><td class="r">—</td><td class="r"><span class="var-warn">Blocking</span></td></tr>`).join('')}
+    </tbody></table></div></section>`,
+    `<section><h2>Notes</h2><p>Figures come from the Financials tab ${pill('L','fin','rev','Revenue')} ${pill('L','fin','staff','Staffing')}. Deposits are annualized from the quarters on file.</p></section>`
+  ];
+}
 
-    </section>
+function makeArtifact(a, kind, tight, silent){
+  const titles = {memo:'Grant Memo',network:'Network Impact',audit:'Discrepancy Report',adk:'Live ADK Memo'};
+  const list = S.arts[a.id] || (S.arts[a.id]=[]);
+  let art = list.find(x=>x.kind===kind);
+  const secs = artSections(a, kind, tight);
+  if(!art){ art = {kind,title:titles[kind],secs:[]}; list.push(art); }
+  art.secs = []; art.pending = secs;
+  const u = ui(a.id); u.layout='2B'; u.art=kind;
+  art.created = timeLabel();
+  if(silent) { art.secs = secs; art.pending=null; return; }
+  const rv = $('#review'); if(rv) rv.classList.add('l2b');
+  renderArt();
+  log(`Generated ${art.title} for ${a.name}`);
+  const step = ()=>{
+    if(!art.pending || !art.pending.length){ art.pending=null; toast(`${art.title} ready · saved to Reports`); renderTop(); return; }
+    const s = art.pending.shift(); art.secs.push(s);
+    if(S.current===a.id && ui(a.id).art===kind){
+      const body = $('#art-doc'); if(body){ const d=document.createElement('div'); d.className='stream-in'; d.innerHTML=s; body.appendChild(d); }
+    }
+    setTimeout(step, RM?0:260);
+  };
+  setTimeout(step, RM?0:350);
+}
 
-  </main>
+function renderArt(){
+  const a = BY[S.current], el = $('#art'); if(!el) return;
+  const u = ui(a.id), list = S.arts[a.id]||[];
+  const art = list.find(x=>x.kind===u.art) || list[0];
+  if(!art){ el.innerHTML = `<div class="empty">Ask for a memo, report or chart and it will open here.</div>`; return; }
+  el.innerHTML = `<div class="art-h"><div class="tabs" role="tablist">${list.map(x=>`<button class="tab" role="tab" data-act="art-tab" data-v="${x.kind}" aria-selected="${x===art}">${x.title}</button>`).join('')}</div>
+      <button class="icobtn" data-act="art-close" aria-label="Close artifact window" title="Back to two columns">✕</button></div>
+    <div class="art-body"><div class="doc-art" id="art-doc">${art.secs.map(s=>`<div>${s}</div>`).join('')}</div></div>`;
+}
 
-  <script src="/static/app.js"></script>
-</body>
-</html>
+/* ---------- Navigation ---------- */
+function openBiz(id, from){
+  const a = BY[id];
+  if(!S.chats[id]){
+    const lead = from==='leader' ? 'Impact breakdown is loaded on the left.' : from==='map' ? 'Its corridor network is drawn on the map above.' : '';
+    const chips = from==='leader' ? [`Explain the ${a.impact} impact score and 2-hop cascade for ${a.name}`,'Visualize 2-Degree Network Impact','Compare with '+rival(a).name]
+                                  : ['Generate Grant Memo','Visualize 2-Degree Network Impact','Audit Financial Discrepancies'];
+    S.chats[id] = [{role:'ai',kind:'summary',app:id,lead,chips}];
+  }
+  const u = ui(id); u.tab = 'overview';
+  if(S.current!==id) log(`Opened #${id} ${a.name}`);
+  if(from==='search') S.q='';
+  S.screen = 'review'; S.current = id; S.pop = null; S.menu = null;
+  if(from==='map'){ S.map='expanded'; }
+  else if(from!=='switch'){ if(!S.pinned) S.map='collapsed'; }
+  render();
+  if(from==='leader'){ requestAnimationFrame(()=>{ const t=$('#L-impact'); if(t){ t.scrollIntoView({block:'start'}); t.classList.add('flash'); } }); }
+}
+
+function goSrc(s){
+  const [side,tab,anchor] = s.split('|'); const u = ui(S.current);
+  if(side==='L'){ if(u.tab!==tab){ u.tab=tab; renderLeft(); } }
+  else { const list=S.arts[S.current]||[]; if(!list.find(x=>x.kind===tab)) return; u.layout='2B'; u.art=tab; $('#review').classList.add('l2b'); renderArt(); }
+  requestAnimationFrame(()=>{ const el = document.getElementById((side==='L'?'L-':'R-')+anchor); if(el){ el.scrollIntoView({block:'center',behavior:RM?'auto':'smooth'}); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); } });
+}
+
+/* ---------- Events ---------- */
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-act]');
+  if(S.menu && !e.target.closest('.menu') && !(t && t.dataset.act==='menu') && e.target.id!=='q'){ S.menu=null; renderMenu(); }
+  if(!t){ if(S.pop && !e.target.closest('.mpop')){ S.pop=null; const p=$('#mpop'); if(p) p.innerHTML=''; } return; }
+  const act = t.dataset.act;
+  switch(act){
+    case 'demo-login': startSession(); break;
+    case 'logout': S.screen='login'; S.current=null; S.menu=null; render(); break;
+    case 'go': S.screen=t.dataset.v; S.current=null; S.menu=null; S.pop=null; if(S.screen==='triage'&&S.map==='collapsed'&&!S.pinned) S.map='expanded'; render(); break;
+    case 'menu': S.menu = S.menu===t.dataset.v ? null : t.dataset.v; renderMenu(); break;
+    case 'theme': S.theme=t.dataset.v; applyTheme(); renderMenu(); if(S.screen==='profile') renderWS(); break;
+    case 'mark-read': S.notifs.forEach(n=>n.unread=false); renderTop(); renderMenu(); break;
+    case 'notif': { const n=S.notifs[+t.dataset.i]; n.unread=false; S.menu=null; if(n.app) openBiz(n.app,'search'); else { renderTop(); renderMenu(); } break; }
+    case 'filter': S.filter=t.dataset.v; renderWS(); break;
+    case 'pref': S.prefs[t.dataset.v]=!S.prefs[t.dataset.v]; if(t.dataset.v==='keepMap') S.pinned=S.prefs.keepMap; t.setAttribute('aria-checked',S.prefs[t.dataset.v]); toast('Preference saved'); break;
+    case 'open-report': { const u=ui(t.dataset.id); u.layout='2B'; u.art=t.dataset.k; openBiz(t.dataset.id,'report'); break; }
+    case 'map': setMap(t.dataset.v); break;
+    case 'pin': S.pinned=!S.pinned; S.prefs.keepMap=S.pinned; t.setAttribute('aria-pressed',S.pinned); toast(S.pinned?'Map will stay open when you open a business':'Map will collapse when you open a business'); break;
+    case 'layer': S.layers[t.dataset.v]=!S.layers[t.dataset.v]; S.animSel=S.current; refreshMap(); break;
+    case 'open': openBiz(t.dataset.id, t.dataset.from); break;
+    case 'node': {
+      const k = t.dataset.n;
+      if(BY[k] && S.screen==='triage'){ openBiz(k,'map'); break; }
+      if(BY[k] && k===S.current){ break; }
+      S.pop=k; showPop(k); break; }
+    case 'close-pop': S.pop=null; $('#mpop').innerHTML=''; break;
+    case 'switch': openBiz(t.dataset.id,'switch'); break;
+    case 'ask-link': { const n = nodeName(t.dataset.n); S.pop=null; $('#mpop').innerHTML=''; if(S.map==='max') setMap('expanded'); send(`How does ${BY[S.current].name} (${BY[S.current].id}) depend on ${n} and what is its cascade impact?`); break; }
+    case 'prompt': send(t.dataset.p); break;
+    case 'tab': ui(S.current).tab=t.dataset.v; renderLeft(); break;
+    case 'src': goSrc(t.dataset.src); break;
+    case 'art-tab': ui(S.current).art=t.dataset.v; renderArt(); break;
+    case 'art-close': ui(S.current).layout='2A'; $('#review').classList.remove('l2b'); break;
+    case 'award': { const a=BY[S.current];
+      if(S.awarded[a.id]){ delete S.awarded[a.id]; log(`Withdrew recommendation for ${a.name}`); toast('Recommendation withdrawn'); }
+      else { S.awarded[a.id]=a.ask; log(`Recommended ${fmt(a.ask)} for ${a.name}`); toast(`Recommended ${fmt(a.ask)} · pool now ${fmt(poolRemaining())}`); }
+      renderTop(); renderLeft(); break; }
+  }
+});
+document.addEventListener('input', e=>{
+  if(e.target.id==='q'){ S.q=e.target.value; S.menu = S.q.trim() ? 'search' : null; renderMenu(); }
+  if(e.target.id==='apps-q'){ S.aq=e.target.value; const b=$('#apps-body'); if(b) b.innerHTML=appRows(); }
+});
+document.addEventListener('focusin', e=>{ if(e.target.id==='q' && S.q.trim()){ S.menu='search'; renderMenu(); } });
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && S.menu){ S.menu=null; renderMenu(); }
+  if(e.key==='Enter' && e.target.id==='q'){ const first=document.querySelector('.menu [data-act="open"]'); if(first){ S.q=''; first.click(); } }
+  if(e.key==='Escape' && S.pop){ S.pop=null; const p=$('#mpop'); if(p) p.innerHTML=''; }
+  if((e.key==='Enter'||e.key===' ') && e.target.matches && e.target.matches('g[data-act], tr[data-act]')){ e.preventDefault(); e.target.dispatchEvent(new MouseEvent('click',{bubbles:true})); }
+});
+document.addEventListener('submit', e=>{
+  e.preventDefault();
+  if(e.target.id==='login-form'){ const em=$('#email'); startSession(em && em.value.trim() ? em.value.trim() : null); }
+  if(e.target.id==='composer'){ const i=$('#composer-in'); const v=i.value; i.value=''; send(v); }
+});
+document.addEventListener('change', e=>{
+  if(e.target.id==='switcher') openBiz(e.target.value,'switch');
+  if(e.target.id==='agent-select'){ S.agentApp = e.target.value; toast(`Active agent: ${e.target.options[e.target.selectedIndex].text}`); }
+});
+window.addEventListener('resize', ()=>{ if(S.pop) showPop(S.pop); if(S.menu) renderMenu(); });
+
+render();
+})();
+</script>
+
+</body></html>
