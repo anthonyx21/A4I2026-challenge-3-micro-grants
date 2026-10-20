@@ -19,9 +19,9 @@ The dashboard loads its data from the API, saves financial edits, generates live
 - On the latest verified revision, default six-applicant run `680e6741-04ed-4396-b839-eed69bc115c0` completed and saved memo `cd10b8ef-588c-4d49-bada-761356cfd879`, containing all seven required sections.
 - Deployed browser restored saved reports and download links, exposed memo/edit actions and saved a reviewer-note edit. The earlier memo correctly became stale. Database records and memos survived deployment.
 
-## Remaining verification
+## Final deployment verification
 
-Schema/version and recovery update `e47df6f` deployed as `micro-grant-ui-00008-69t`. Direct PostgreSQL checks proved schema version 1, eight applications, two analysis runs and two memo versions. Another deployment then replaced the service with older mock revision `micro-grant-ui-00009-k7v`. The backend is being deployed separately as `reliefiq-backend`, with its own Cloud Tasks callback URL, to avoid competing deployments. Recheck that service before completion.
+Schema/version and recovery update `e47df6f` deployed as `micro-grant-ui-00008-69t`. Direct PostgreSQL checks proved schema version 1, eight applications, two analysis runs and two memo versions. Another deployment then replaced the service with older mock revision `micro-grant-ui-00009-k7v`. The backend is deployed separately as `reliefiq-backend`, with its own Cloud Tasks callback URL, to avoid competing deployments. Revision `reliefiq-backend-00001-8df` is ready and serving 100% of traffic. Health, login, eight PostgreSQL application records, saved memos and branded browser report restoration are verified. Queued live callback test completed: run `25639958-e5e1-44d2-8250-1e8242c2ced7` saved memo `e3bcc46d-9231-4c17-8acc-969509ea6bf9`. The application now has two saved versions, the database has three memos in total, the new memo matches current input versions and has all seven numbered sections, and Word download works.
 
 ## Practical scope
 

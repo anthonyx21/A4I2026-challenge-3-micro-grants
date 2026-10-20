@@ -31,7 +31,8 @@ inputs as simulated. Generated memos retain their input versions and tool eviden
 restore after refresh and export to Word. Cloud SQL, Secret Manager and Cloud Tasks
 support the Google Cloud deployment; see [backend setup](frontend/README.md) and
 [implementation status](docs/backend-implementation-status.md) for verification and
-remaining deployment work.
+deployment evidence. The complete dashboard and backend are deployed at
+https://reliefiq-backend-89073885580.us-central1.run.app .
 
 The original challenge guide follows.
 
