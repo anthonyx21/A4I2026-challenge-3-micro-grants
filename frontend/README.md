@@ -1,48 +1,42 @@
-# Central Market Micro-Grant Relief Advisor — Frontend UI
+# ReliefIQ dashboard backend
 
-Clean 2-panel web UI for **Challenge 3 (Track 1: Main Street Relief)** connected to the live Cloud Run ADK agents (`grant_advisor` and `cascade_analyst`) at `https://cascade-analyst-89073885580.us-central1.run.app/`.
+The existing FastAPI service serves the dashboard, stores application data and calls the deployed ADK agents. Eight original UI applications are seeded from `seed_data.json`; their financials, owners, document claims, scores and illustrated network remain simulated. Public business IDs do not verify those scenario details.
 
-Chat defaults to `corridor_coordinator`, which routes to the four specialists; all remain
-available in the selector. Preset questions also use automatic routing. The applicant queue
-and allocation KPIs remain a **simulated preview**, while chat uses live specialist evidence.
-Mock financial inputs are sent as simulated, never verified financial facts. No canned fallback
-answer is generated when the live API fails. Sessions are separated per browser tab and agent;
-the client UUID is a demo session identifier, not an authentication mechanism.
-
----
-
-## 1. Run Locally
+## Local development
 
 ```bash
 pip install -r frontend/requirements.txt
-python -m uvicorn frontend.server:app --host 127.0.0.1 --port 8080 --reload
+RELIEFIQ_DATA_DIR=./.local-data python -m uvicorn frontend.server:app --port 8080 --reload
 ```
 
-Open **`http://localhost:8080`**.
+SQLite persists locally. Set `DATABASE_URL` to a SQLAlchemy PostgreSQL URL to use PostgreSQL. Cloud Run requires an explicit database URL. Initial schema creation and seeding happen on first database access; reseeding preserves edits. The application JSON retains the original financial summaries, document metadata, network previews and notes. Analysis runs and memo versions are separate records with application references.
 
----
+The challenge reviewer password defaults to `demopassword`; enable signed-cookie enforcement locally with `REQUIRE_REVIEWER_LOGIN=true` and set `REVIEWER_PASSWORD`. This shared reviewer account is intended for the challenge demonstration, not municipal production authentication.
 
-## 2. Build & Deploy to Google Cloud Run
+## Dashboard memo
 
-Both the repo root ([Dockerfile](file:///c:/Projects/A4I2026-challenge-3-micro-grants/Dockerfile)) and `frontend/` ([frontend/Dockerfile](file:///c:/Projects/A4I2026-challenge-3-micro-grants/frontend/Dockerfile)) are configured for 1-command Cloud Build + Cloud Run deployment.
+Open an application and select **Generate Dashboard Memo**, or ask for a grant memo in chat. The backend snapshots saved applications, grant requests, cash gaps, assumptions, versions and round budget. The existing Grant Advisor uses live BigQuery cascade and public evidence. Its comparison inputs are checked against the saved snapshot before the memo and evidence are stored. Failed runs never create a successful report.
 
-### Option A: One-Line `gcloud run deploy` (from repo root or `frontend/`)
+The comparison tool supports 2–6 applicants. The default shortlist contains the selected application plus five others; callers can explicitly provide `applicant_ids`. A $15,000 request with an $18,000 gap remains an infeasible full-gap scenario. Earlier memo versions retain their original snapshot after edits. `GET /api/memos/{id}` reports whether versions are stale; `/download` exports Word.
 
-Run in **Google Cloud Shell** (or any terminal authenticated with `gcloud` for project `qwiklabs-gcp-04-029c15637557`):
+Cloud deployment uses Cloud Tasks for memo generation, with one concurrent job and explicit user retry after failures. The browser polls saved run status. Without `MEMO_TASK_QUEUE`, local generation runs in the request.
+
+## Google Cloud
+
+Enable SQL Admin, Secret Manager and Cloud Tasks APIs. Create PostgreSQL 15 instance `reliefiq-db` in `us-central1`, plus the `reliefiq-backend` service account with Cloud SQL Client access. Then run:
 
 ```bash
-gcloud run deploy micro-grant-ui \
-  --source ./frontend \
-  --project qwiklabs-gcp-04-029c15637557 \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --port 8080 \
-  --set-env-vars "ADK_AGENT_URL=https://cascade-analyst-89073885580.us-central1.run.app"
+./frontend/provision_backend.sh
 ```
 
-### Option B: Run the Deploy Script
+This first-time provisioning script creates the database/user, stores the database URL and reviewer password in Secret Manager, grants access, creates the queue and deploys. It is a first-time script; use `./frontend/deploy.sh` for later deployments. Do not rerun first-time credential creation against existing resources.
+
+Cloud Run connects to the Cloud SQL socket and receives secrets server-side. Cloud Tasks calls a protected internal worker route. Deployment currently uses the public challenge agent URL; if agent access is restricted, configure service-to-service identity authentication before changing that service's policy.
+
+## Verification
 
 ```bash
-chmod +x frontend/deploy.sh
-./frontend/deploy.sh
+pytest -q frontend/test_persistence.py frontend/test_chat.py
 ```
+
+Tests cover field-by-field seed parity, idempotence, durable edits, version conflicts, memo persistence/download/staleness, rejection of changed agent inputs, budget limits, reviewer login, live chat routing and failure behavior.

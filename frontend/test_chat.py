@@ -7,8 +7,8 @@ from frontend import server
 
 
 def test_ui_context_preserves_selected_applicant_and_labels_demo():
-    req = server.ChatRequest(message='Compare this applicant', selected_business_id=server.APPLICANTS[-1]['business_id'])
-    text = server.chat_context(req, server.APPLICANTS)
+    req = server.ChatRequest(message='Compare this applicant', selected_business_id=server.store().bootstrap()['applications'][-1]['id'])
+    text = server.chat_context(req, [{**a,'business_id':a['id'],'grant_ask':a['ask']} for a in server.store().bootstrap()['applications']])
     assert req.selected_business_id in text
     assert '"input_type": "verified"' not in text
     assert '"input_type": "simulated"' in text

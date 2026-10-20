@@ -1,0 +1,962 @@
+{
+  "applications": [
+    {
+      "id": "1026779-04-151",
+      "key": "steel",
+      "name": "Steel + Lacquer",
+      "cat": "Salon & hospitality service",
+      "address": "1067 Market St, San Francisco, CA 94103",
+      "owner": "Elena Vance",
+      "since": 2017,
+      "staff": 14,
+      "ask": 15000,
+      "use": "Bridge payroll and rent gap ($18k cash gap) while rebooking corporate corridor accounts",
+      "impact": 89,
+      "status": "ready",
+      "submitted": "Oct 6",
+      "x": 330,
+      "y": 190,
+      "parts": [
+        [
+          "Cascade & B2B reach",
+          26,
+          30,
+          "7 total 2-hop businesses reached in Central Market"
+        ],
+        [
+          "Distress & cash gap",
+          24,
+          25,
+          "Verified payroll summary and landlord ledger ($18k 90-day gap)"
+        ],
+        [
+          "Tract equity need",
+          24,
+          30,
+          "Tract 06075017601 \u00b7 24.6% poverty rate, 58.0% no-vehicle households"
+        ],
+        [
+          "Footfall & spillover",
+          15,
+          15,
+          "410 shared corridor workers across Mid-Market blocks"
+        ]
+      ],
+      "fin": {
+        "appRev": 680000,
+        "taxRev": 645000,
+        "q": [
+          162000,
+          171000,
+          168000
+        ],
+        "staffFiled": "12 FT + 2 PT",
+        "vendor": "Mid-Market Commercial Equipment",
+        "quote": 14500
+      },
+      "missing": [],
+      "notes": {
+        "lease": "Landlord ledger verified \u2014 90-day stabilization agreement on file"
+      },
+      "edges": {
+        "out": [
+          [
+            "kearny",
+            28000,
+            18
+          ],
+          [
+            "artisan",
+            22000,
+            12
+          ],
+          [
+            "cleaners",
+            14000,
+            16
+          ]
+        ],
+        "in": [
+          [
+            "waypoint",
+            48000,
+            26
+          ],
+          [
+            "larkin",
+            38000,
+            24
+          ],
+          [
+            "deli",
+            29000,
+            19
+          ],
+          [
+            "noodle",
+            24000,
+            15
+          ]
+        ],
+        "spill": [
+          [
+            "baart",
+            9
+          ],
+          [
+            "pharmacy",
+            11
+          ]
+        ]
+      },
+      "cash_gap": 18000,
+      "cash_gap_basis": "Explicit seeded scenario text"
+    },
+    {
+      "id": "0111663-06-001",
+      "key": "orpheum",
+      "name": "Orpheum Theatre",
+      "cat": "Performing arts & historic venue",
+      "address": "1192 Market St, San Francisco, CA 94102",
+      "owner": "Marcus Sterling",
+      "since": 2014,
+      "staff": 24,
+      "ask": 18000,
+      "use": "Stabilize stage rigging, utility arrears, and local show vendor contracts over 90 days",
+      "impact": 86,
+      "status": "ready",
+      "submitted": "Oct 4",
+      "x": 890,
+      "y": 190,
+      "parts": [
+        [
+          "Cascade & B2B reach",
+          25,
+          30,
+          "7 downstream businesses across 2 hops (3 direct, 4 secondary)"
+        ],
+        [
+          "Distress & cash gap",
+          22,
+          25,
+          "$18,000 working-capital gap from utility and rigging arrears"
+        ],
+        [
+          "Tract equity need",
+          24,
+          30,
+          "Civic Center / Mid-Market border tract \u00b7 high transit reliance"
+        ],
+        [
+          "Footfall & spillover",
+          15,
+          15,
+          "Major evening footfall anchor for 8th & Market dining"
+        ]
+      ],
+      "fin": {
+        "appRev": 1420000,
+        "taxRev": 1365000,
+        "q": [
+          340000,
+          358000,
+          352000
+        ],
+        "staffFiled": "20 FT + 4 PT",
+        "vendor": "Bay Stage & Rigging Systems",
+        "quote": 17400
+      },
+      "missing": [],
+      "notes": {},
+      "edges": {
+        "out": [
+          [
+            "mintav",
+            64000,
+            28
+          ],
+          [
+            "ggtheater",
+            52000,
+            31
+          ],
+          [
+            "cleaners",
+            19000,
+            14
+          ]
+        ],
+        "in": [
+          [
+            "larkin",
+            41000,
+            22
+          ],
+          [
+            "kearny",
+            36000,
+            19
+          ],
+          [
+            "deli",
+            28000,
+            15
+          ],
+          [
+            "noodle",
+            22000,
+            12
+          ]
+        ],
+        "spill": [
+          [
+            "warfield",
+            14
+          ],
+          [
+            "artisan",
+            9
+          ]
+        ]
+      },
+      "cash_gap": 18000,
+      "cash_gap_basis": "Seeded request used as assumed gap; requires reviewer confirmation"
+    },
+    {
+      "id": "1402027-10-251",
+      "key": "sumfer",
+      "name": "Sumfer Market Sf LLC",
+      "cat": "Corridor food service & market",
+      "address": "1084 Market St, San Francisco, CA 94102",
+      "owner": "David Chen",
+      "since": 2018,
+      "staff": 11,
+      "ask": 15000,
+      "use": "Replace failing walk-in refrigeration compressor and clear 60-day lease arrears",
+      "impact": 81,
+      "status": "info",
+      "submitted": "Oct 2",
+      "x": 590,
+      "y": 300,
+      "parts": [
+        [
+          "Cascade & B2B reach",
+          22,
+          30,
+          "5 direct 1-hop corridor links in Central Market"
+        ],
+        [
+          "Distress & cash gap",
+          21,
+          25,
+          "$15,000 refrigeration & lease arrears cash gap"
+        ],
+        [
+          "Tract equity need",
+          24,
+          30,
+          "Tract 06075012502 \u00b7 28.4% poverty rate, 63.5% no-vehicle access"
+        ],
+        [
+          "Footfall & spillover",
+          14,
+          15,
+          "320 shared weekday corridor workers"
+        ]
+      ],
+      "fin": {
+        "appRev": 540000,
+        "taxRev": 485000,
+        "q": [
+          128000,
+          136000,
+          null
+        ],
+        "staffFiled": "9 FT + 2 PT",
+        "vendor": "Golden Gate Cold Chain",
+        "quote": 13800
+      },
+      "missing": [
+        "q3"
+      ],
+      "notes": {
+        "lease": "Expires Mar 2027 \u2014 renewal addendum requested"
+      },
+      "edges": {
+        "out": [
+          [
+            "kearny",
+            39000,
+            21
+          ],
+          [
+            "artisan",
+            27000,
+            15
+          ]
+        ],
+        "in": [
+          [
+            "noodle",
+            34000,
+            24
+          ],
+          [
+            "deli",
+            31000,
+            19
+          ],
+          [
+            "larkin",
+            18000,
+            12
+          ]
+        ],
+        "spill": [
+          [
+            "cleaners",
+            8
+          ],
+          [
+            "pharmacy",
+            10
+          ]
+        ]
+      },
+      "cash_gap": 15000,
+      "cash_gap_basis": "Seeded request used as assumed gap; requires reviewer confirmation"
+    },
+    {
+      "id": "1051330-01-161",
+      "key": "pdm",
+      "name": "Pdm Group Inc",
+      "cat": "Management & B2B consulting",
+      "address": "1355 Market St, San Francisco, CA 94103",
+      "owner": "Priya Deshmukh",
+      "since": 2016,
+      "staff": 9,
+      "ask": 17000,
+      "use": "Bridge short-term payroll and B2B vendor liquidity gap across 6 corridor accounts",
+      "impact": 75,
+      "status": "rev",
+      "submitted": "Sep 29",
+      "x": 195,
+      "y": 295,
+      "parts": [
+        [
+          "Cascade & B2B reach",
+          22,
+          30,
+          "6 total 2-hop businesses reached (4 Hop-1, 2 Hop-2)"
+        ],
+        [
+          "Distress & cash gap",
+          18,
+          25,
+          "Applicant-reported $17,000 receivables delay"
+        ],
+        [
+          "Tract equity need",
+          21,
+          30,
+          "10th & Market block \u00b7 24.6% poverty rate"
+        ],
+        [
+          "Footfall & spillover",
+          14,
+          15,
+          "280 shared corridor office workers"
+        ]
+      ],
+      "fin": {
+        "appRev": 610000,
+        "taxRev": 590000,
+        "q": [
+          148000,
+          152000,
+          155000
+        ],
+        "staffFiled": "8 FT + 1 PT",
+        "vendor": "Market St IT & Fleet Systems",
+        "quote": 15900
+      },
+      "missing": [],
+      "notes": {},
+      "edges": {
+        "out": [
+          [
+            "waypoint",
+            42000,
+            22
+          ],
+          [
+            "mintav",
+            24000,
+            14
+          ]
+        ],
+        "in": [
+          [
+            "baart",
+            31000,
+            18
+          ],
+          [
+            "larkin",
+            26000,
+            15
+          ]
+        ],
+        "spill": [
+          [
+            "warfield",
+            7
+          ],
+          [
+            "noodle",
+            6
+          ]
+        ]
+      },
+      "cash_gap": 17000,
+      "cash_gap_basis": "Seeded request used as assumed gap; requires reviewer confirmation"
+    },
+    {
+      "id": "1188036-05-181",
+      "key": "aalegal",
+      "name": "A & A Legal Service, Inc.",
+      "cat": "Legal & compliance hub (22-node reach)",
+      "address": "1212 Market St, San Francisco, CA 94102",
+      "owner": "Arthur Alvarez",
+      "since": 2011,
+      "staff": 16,
+      "ask": 20000,
+      "use": "Upgrade document automation and compliance filing workstations",
+      "impact": 71,
+      "status": "rev",
+      "submitted": "Oct 8",
+      "x": 660,
+      "y": 185,
+      "parts": [
+        [
+          "Cascade & B2B reach",
+          29,
+          30,
+          "22 exposed businesses (17 Hop-1, 5 Hop-2) \u2014 largest hub in graph"
+        ],
+        [
+          "Distress & cash gap",
+          10,
+          25,
+          "Low financial distress: SBA 7(a) loan Paid in Full (8% baseline risk)"
+        ],
+        [
+          "Tract equity need",
+          19,
+          30,
+          "Civic Center corridor block"
+        ],
+        [
+          "Footfall & spillover",
+          13,
+          15,
+          "Serves 17 corridor business clients"
+        ]
+      ],
+      "fin": {
+        "appRev": 1280000,
+        "taxRev": 1255000,
+        "q": [
+          312000,
+          318000,
+          324000
+        ],
+        "staffFiled": "15 FT + 1 PT",
+        "vendor": "LexTech Office Systems",
+        "quote": 19200
+      },
+      "missing": [],
+      "notes": {},
+      "edges": {
+        "out": [
+          [
+            "waypoint",
+            58000,
+            29
+          ],
+          [
+            "mintav",
+            34000,
+            17
+          ]
+        ],
+        "in": [
+          [
+            "baart",
+            44000,
+            21
+          ],
+          [
+            "kearny",
+            29000,
+            14
+          ],
+          [
+            "larkin",
+            25000,
+            12
+          ]
+        ],
+        "spill": [
+          [
+            "cleaners",
+            6
+          ],
+          [
+            "pharmacy",
+            5
+          ]
+        ]
+      },
+      "cash_gap": 20000,
+      "cash_gap_basis": "Seeded request used as assumed gap; requires reviewer confirmation"
+    },
+    {
+      "id": "1056704-02-161",
+      "key": "impark",
+      "name": "Impark 0314",
+      "cat": "Corridor parking & mobility support",
+      "address": "1050 Market St, San Francisco, CA 94102",
+      "owner": "Jordan Pike",
+      "since": 2015,
+      "staff": 8,
+      "ask": 15000,
+      "use": "Cover attendant staffing and gate equipment during evening theatre recovery",
+      "impact": 64,
+      "status": "info",
+      "submitted": "Oct 9",
+      "x": 470,
+      "y": 345,
+      "parts": [
+        [
+          "Cascade & B2B reach",
+          14,
+          30,
+          "24 unfiltered edges, 0 above 0.01 intensity threshold (Demo Benchmark #2)"
+        ],
+        [
+          "Distress & cash gap",
+          18,
+          25,
+          "Self-reported POS decline and vendor invoices ($18k cash gap)"
+        ],
+        [
+          "Tract equity need",
+          19,
+          30,
+          "Mid-Market Tract 06075012502"
+        ],
+        [
+          "Footfall & spillover",
+          13,
+          15,
+          "Supports evening theatre and dining visitors"
+        ]
+      ],
+      "fin": {
+        "appRev": 420000,
+        "taxRev": 362000,
+        "q": [
+          98000,
+          104000,
+          null
+        ],
+        "staffFiled": "6 FT + 2 PT",
+        "vendor": "GateWorks Access Control",
+        "quote": 14200
+      },
+      "missing": [
+        "q3"
+      ],
+      "notes": {},
+      "edges": {
+        "out": [
+          [
+            "cleaners",
+            9000,
+            6
+          ]
+        ],
+        "in": [
+          [
+            "warfield",
+            18000,
+            9
+          ],
+          [
+            "ggtheater",
+            14000,
+            7
+          ]
+        ],
+        "spill": [
+          [
+            "noodle",
+            6
+          ],
+          [
+            "deli",
+            5
+          ]
+        ]
+      },
+      "cash_gap": 18000,
+      "cash_gap_basis": "Explicit seeded scenario text"
+    },
+    {
+      "id": "1080659-07-161",
+      "key": "blick",
+      "name": "Blick Art Materials LLC",
+      "cat": "Creative & retail supply anchor",
+      "address": "979 Market St, San Francisco, CA 94103",
+      "owner": "Clara Vance",
+      "since": 2013,
+      "staff": 12,
+      "ask": 10000,
+      "use": "Storefront security glazing and student/artist workshop supply display",
+      "impact": 61,
+      "status": "new",
+      "submitted": "Oct 10",
+      "x": 1060,
+      "y": 285,
+      "parts": [
+        [
+          "Cascade & B2B reach",
+          12,
+          30,
+          "Retail anchor (0 outgoing B2B edges at 0.01 cutoff)"
+        ],
+        [
+          "Distress & cash gap",
+          17,
+          25,
+          "$10,000 storefront glazing and inventory gap"
+        ],
+        [
+          "Tract equity need",
+          18,
+          30,
+          "Tract 06075017802 \u00b7 18.8% poverty, 75.5% no-vehicle households"
+        ],
+        [
+          "Footfall & spillover",
+          14,
+          15,
+          "12 linked workplace blocks (153.5 modeled workers)"
+        ]
+      ],
+      "fin": {
+        "appRev": 490000,
+        "taxRev": 476000,
+        "q": [
+          118000,
+          122000,
+          125000
+        ],
+        "staffFiled": "10 FT + 2 PT",
+        "vendor": "Market Street Glass & Fixture",
+        "quote": 9600
+      },
+      "missing": [],
+      "notes": {},
+      "edges": {
+        "out": [
+          [
+            "mintav",
+            8000,
+            5
+          ]
+        ],
+        "in": [
+          [
+            "larkin",
+            15000,
+            9
+          ],
+          [
+            "ggtheater",
+            11000,
+            6
+          ]
+        ],
+        "spill": [
+          [
+            "warfield",
+            11
+          ],
+          [
+            "artisan",
+            8
+          ]
+        ]
+      },
+      "cash_gap": 10000,
+      "cash_gap_basis": "Seeded request used as assumed gap; requires reviewer confirmation"
+    },
+    {
+      "id": "1373515-10-241",
+      "key": "m1010",
+      "name": "1010 Market LLC",
+      "cat": "Neighborhood grocery retailer (Leaf)",
+      "address": "1010 Market St, San Francisco, CA 94102",
+      "owner": "Mei Lin",
+      "since": 2019,
+      "staff": 6,
+      "ask": 8000,
+      "use": "Produce cooler repair and SNAP/EBT point-of-sale terminal upgrade",
+      "impact": 55,
+      "status": "new",
+      "submitted": "Oct 11",
+      "x": 760,
+      "y": 220,
+      "parts": [
+        [
+          "Cascade & B2B reach",
+          6,
+          30,
+          "0 B2B outgoing edges (resident-facing grocery leaf node)"
+        ],
+        [
+          "Distress & cash gap",
+          18,
+          25,
+          "Verified $8,000 cash gap in high-poverty tract"
+        ],
+        [
+          "Tract equity need",
+          20,
+          30,
+          "High-poverty Tenderloin/Market border tract (31.2% poverty)"
+        ],
+        [
+          "Footfall & spillover",
+          11,
+          15,
+          "Essential daily food access for no-vehicle households"
+        ]
+      ],
+      "fin": {
+        "appRev": 240000,
+        "taxRev": 233000,
+        "q": [
+          58000,
+          61000,
+          62000
+        ],
+        "staffFiled": "5 FT + 1 PT",
+        "vendor": "Bay Area POS & Cooler",
+        "quote": 7600
+      },
+      "missing": [
+        "quote"
+      ],
+      "notes": {},
+      "edges": {
+        "out": [
+          [
+            "kearny",
+            6000,
+            4
+          ]
+        ],
+        "in": [
+          [
+            "deli",
+            7000,
+            4
+          ]
+        ],
+        "spill": [
+          [
+            "pharmacy",
+            12
+          ],
+          [
+            "baart",
+            9
+          ]
+        ]
+      },
+      "cash_gap": 8000,
+      "cash_gap_basis": "Seeded request used as assumed gap; requires reviewer confirmation"
+    }
+  ],
+  "nodes": {
+    "warfield": {
+      "name": "The Warfield Theater",
+      "x": 90,
+      "y": 150,
+      "kind": "Performing arts venue \u00b7 982 Market St"
+    },
+    "waypoint": {
+      "name": "Waypoint Consulting",
+      "x": 245,
+      "y": 120,
+      "kind": "B2B technical consulting \u00b7 1155 Market St"
+    },
+    "baart": {
+      "name": "Baart Programs Market",
+      "x": 530,
+      "y": 135,
+      "kind": "Community care clinic \u00b7 1111 Market St"
+    },
+    "kearny": {
+      "name": "Kearny Kitchen Catering",
+      "x": 800,
+      "y": 120,
+      "kind": "Commissary & catering supplier"
+    },
+    "artisan": {
+      "name": "Market St Artisan Bakery",
+      "x": 1110,
+      "y": 150,
+      "kind": "Wholesale & caf\u00e9 bakery"
+    },
+    "noodle": {
+      "name": "Civic Center Noodle & Grill",
+      "x": 270,
+      "y": 360,
+      "kind": "Corridor restaurant"
+    },
+    "deli": {
+      "name": "UN Plaza Delicatessen",
+      "x": 400,
+      "y": 305,
+      "kind": "Deli & lunch counter"
+    },
+    "larkin": {
+      "name": "Larkin Community Event Hall",
+      "x": 700,
+      "y": 355,
+      "kind": "Community event venue"
+    },
+    "ggtheater": {
+      "name": "Golden Gate Concessions",
+      "x": 830,
+      "y": 300,
+      "kind": "Theater concessions & stage supply"
+    },
+    "mintav": {
+      "name": "Mint Plaza Sound & Stage",
+      "x": 965,
+      "y": 355,
+      "kind": "AV & event staging rental"
+    },
+    "cleaners": {
+      "name": "Mid-Market Eco Cleaners",
+      "x": 560,
+      "y": 445,
+      "kind": "Commercial laundry & linen"
+    },
+    "pharmacy": {
+      "name": "Civic Center Pharmacy",
+      "x": 900,
+      "y": 445,
+      "kind": "Neighborhood retail pharmacy"
+    }
+  },
+  "documents": [
+    [
+      "app",
+      "Application form"
+    ],
+    [
+      "tax",
+      "2025 tax return"
+    ],
+    [
+      "q1",
+      "Q1 2026 bank statement"
+    ],
+    [
+      "q2",
+      "Q2 2026 bank statement"
+    ],
+    [
+      "q3",
+      "Q3 2026 bank statement"
+    ],
+    [
+      "lease",
+      "Lease agreement"
+    ],
+    [
+      "quote",
+      "Equipment quote"
+    ]
+  ],
+  "assignments": {
+    "1026779-04-151": "PN",
+    "0111663-06-001": "PN",
+    "1402027-10-251": "PN",
+    "1051330-01-161": "PN",
+    "1188036-05-181": "MK",
+    "1056704-02-161": "PN",
+    "1080659-07-161": "MK",
+    "1373515-10-241": "PN"
+  },
+  "settings": {
+    "corridor": "Central Market Corridor",
+    "pool_total": 150000,
+    "pool_committed": 100000,
+    "round_budget": 50000
+  },
+  "reviewer": {
+    "name": "Priya Natarajan",
+    "initials": "PN",
+    "email": "reviewer@city.gov",
+    "title": "Grant Reviewer",
+    "dept": "SF Office of Economic & Workforce Development",
+    "id": "Reviewer 1"
+  },
+  "notifications": [
+    {
+      "t": "Steel + Lacquer (1026779-04-151) verified payroll & landlord ledger uploaded",
+      "time": "1h ago",
+      "app": "1026779-04-151",
+      "unread": true
+    },
+    {
+      "t": "Blick Art Materials LLC (1080659-07-161) neighborhood footfall benchmark ready",
+      "time": "3h ago",
+      "app": "1080659-07-161",
+      "unread": true
+    },
+    {
+      "t": "Sumfer Market Sf LLC (1402027-10-251) flagged for Q3 bank statement",
+      "time": "Yesterday",
+      "app": "1402027-10-251",
+      "unread": true
+    },
+    {
+      "t": "Central Market Round 1 closed: $100,000 committed across corridor",
+      "time": "Oct 14",
+      "app": null,
+      "unread": false
+    }
+  ],
+  "activity": [
+    {
+      "t": "Connected to Cloud Run ADK (corridor_coordinator)",
+      "time": "Just now"
+    },
+    {
+      "t": "Generated Grant Memo for Orpheum Theatre (0111663-06-001)",
+      "time": "Oct 14, 3:12 PM"
+    },
+    {
+      "t": "Requested Q3 bank statement from Sumfer Market Sf LLC",
+      "time": "Oct 13, 10:40 AM"
+    }
+  ]
+}

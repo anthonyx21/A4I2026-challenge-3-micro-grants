@@ -461,10 +461,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 const $ = s => document.querySelector(s);
 
 /* ---------- Central Market Corridor Data (Connected to BigQuery a4i_econ.CascadeEconomy) ---------- */
-const CORRIDOR = 'Central Market Corridor';
-const POOL_TOTAL = 150000, POOL_COMMITTED = 100000;
-const ROUND_BUDGET = 50000;
-
+let CORRIDOR='', POOL_TOTAL=0, POOL_COMMITTED=0, ROUND_BUDGET=0;
 const AGENT_APPS = [
   ['corridor_coordinator', 'Auto · Corridor Coordinator'],
   ['grant_advisor', 'Grant Advisor (Memos & Allocations)'],
@@ -473,90 +470,7 @@ const AGENT_APPS = [
   ['neighborhood_context', 'Neighborhood Context (Census & Footfall)']
 ];
 
-const NODES = {
-  warfield:{name:'The Warfield Theater',x:90,y:150,kind:'Performing arts venue · 982 Market St'},
-  waypoint:{name:'Waypoint Consulting',x:245,y:120,kind:'B2B technical consulting · 1155 Market St'},
-  baart:{name:'Baart Programs Market',x:530,y:135,kind:'Community care clinic · 1111 Market St'},
-  kearny:{name:'Kearny Kitchen Catering',x:800,y:120,kind:'Commissary & catering supplier'},
-  artisan:{name:'Market St Artisan Bakery',x:1110,y:150,kind:'Wholesale & café bakery'},
-  noodle:{name:'Civic Center Noodle & Grill',x:270,y:360,kind:'Corridor restaurant'},
-  deli:{name:'UN Plaza Delicatessen',x:400,y:305,kind:'Deli & lunch counter'},
-  larkin:{name:'Larkin Community Event Hall',x:700,y:355,kind:'Community event venue'},
-  ggtheater:{name:'Golden Gate Concessions',x:830,y:300,kind:'Theater concessions & stage supply'},
-  mintav:{name:'Mint Plaza Sound & Stage',x:965,y:355,kind:'AV & event staging rental'},
-  cleaners:{name:'Mid-Market Eco Cleaners',x:560,y:445,kind:'Commercial laundry & linen'},
-  pharmacy:{name:'Civic Center Pharmacy',x:900,y:445,kind:'Neighborhood retail pharmacy'}
-};
-
-const STD_DOCS = [['app','Application form'],['tax','2025 tax return'],['q1','Q1 2026 bank statement'],['q2','Q2 2026 bank statement'],['q3','Q3 2026 bank statement'],['lease','Lease agreement'],['quote','Equipment quote']];
-
-const APPS = [
- {id:'1026779-04-151',key:'steel',name:'Steel + Lacquer',cat:'Salon & hospitality service',address:'1067 Market St, San Francisco, CA 94103',owner:'Elena Vance',since:2017,staff:14,ask:15000,
-  use:'Bridge payroll and rent gap ($18k cash gap) while rebooking corporate corridor accounts',impact:89,status:'ready',submitted:'Oct 6',x:330,y:190,
-  parts:[['Cascade & B2B reach',26,30,'7 total 2-hop businesses reached in Central Market'],['Distress & cash gap',24,25,'Verified payroll summary and landlord ledger ($18k 90-day gap)'],['Tract equity need',24,30,'Tract 06075017601 · 24.6% poverty rate, 58.0% no-vehicle households'],['Footfall & spillover',15,15,'410 shared corridor workers across Mid-Market blocks']],
-  fin:{appRev:680000,taxRev:645000,q:[162000,171000,168000],staffFiled:'12 FT + 2 PT',vendor:'Mid-Market Commercial Equipment',quote:14500},
-  missing:[],notes:{lease:'Landlord ledger verified — 90-day stabilization agreement on file'},
-  edges:{out:[['kearny',28000,18],['artisan',22000,12],['cleaners',14000,16]],
-         in:[['waypoint',48000,26],['larkin',38000,24],['deli',29000,19],['noodle',24000,15]],
-         spill:[['baart',9],['pharmacy',11]]}},
- {id:'0111663-06-001',key:'orpheum',name:'Orpheum Theatre',cat:'Performing arts & historic venue',address:'1192 Market St, San Francisco, CA 94102',owner:'Marcus Sterling',since:2014,staff:24,ask:18000,
-  use:'Stabilize stage rigging, utility arrears, and local show vendor contracts over 90 days',impact:86,status:'ready',submitted:'Oct 4',x:890,y:190,
-  parts:[['Cascade & B2B reach',25,30,'7 downstream businesses across 2 hops (3 direct, 4 secondary)'],['Distress & cash gap',22,25,'$18,000 working-capital gap from utility and rigging arrears'],['Tract equity need',24,30,'Civic Center / Mid-Market border tract · high transit reliance'],['Footfall & spillover',15,15,'Major evening footfall anchor for 8th & Market dining']],
-  fin:{appRev:1420000,taxRev:1365000,q:[340000,358000,352000],staffFiled:'20 FT + 4 PT',vendor:'Bay Stage & Rigging Systems',quote:17400},
-  missing:[],notes:{},
-  edges:{out:[['mintav',64000,28],['ggtheater',52000,31],['cleaners',19000,14]],
-         in:[['larkin',41000,22],['kearny',36000,19],['deli',28000,15],['noodle',22000,12]],
-         spill:[['warfield',14],['artisan',9]]}},
- {id:'1402027-10-251',key:'sumfer',name:'Sumfer Market Sf LLC',cat:'Corridor food service & market',address:'1084 Market St, San Francisco, CA 94102',owner:'David Chen',since:2018,staff:11,ask:15000,
-  use:'Replace failing walk-in refrigeration compressor and clear 60-day lease arrears',impact:81,status:'info',submitted:'Oct 2',x:590,y:300,
-  parts:[['Cascade & B2B reach',22,30,'5 direct 1-hop corridor links in Central Market'],['Distress & cash gap',21,25,'$15,000 refrigeration & lease arrears cash gap'],['Tract equity need',24,30,'Tract 06075012502 · 28.4% poverty rate, 63.5% no-vehicle access'],['Footfall & spillover',14,15,'320 shared weekday corridor workers']],
-  fin:{appRev:540000,taxRev:485000,q:[128000,136000,null],staffFiled:'9 FT + 2 PT',vendor:'Golden Gate Cold Chain',quote:13800},
-  missing:['q3'],notes:{lease:'Expires Mar 2027 — renewal addendum requested'},
-  edges:{out:[['kearny',39000,21],['artisan',27000,15]],
-         in:[['noodle',34000,24],['deli',31000,19],['larkin',18000,12]],
-         spill:[['cleaners',8],['pharmacy',10]]}},
- {id:'1051330-01-161',key:'pdm',name:'Pdm Group Inc',cat:'Management & B2B consulting',address:'1355 Market St, San Francisco, CA 94103',owner:'Priya Deshmukh',since:2016,staff:9,ask:17000,
-  use:'Bridge short-term payroll and B2B vendor liquidity gap across 6 corridor accounts',impact:75,status:'rev',submitted:'Sep 29',x:195,y:295,
-  parts:[['Cascade & B2B reach',22,30,'6 total 2-hop businesses reached (4 Hop-1, 2 Hop-2)'],['Distress & cash gap',18,25,'Applicant-reported $17,000 receivables delay'],['Tract equity need',21,30,'10th & Market block · 24.6% poverty rate'],['Footfall & spillover',14,15,'280 shared corridor office workers']],
-  fin:{appRev:610000,taxRev:590000,q:[148000,152000,155000],staffFiled:'8 FT + 1 PT',vendor:'Market St IT & Fleet Systems',quote:15900},
-  missing:[],notes:{},
-  edges:{out:[['waypoint',42000,22],['mintav',24000,14]],
-         in:[['baart',31000,18],['larkin',26000,15]],
-         spill:[['warfield',7],['noodle',6]]}},
- {id:'1188036-05-181',key:'aalegal',name:'A & A Legal Service, Inc.',cat:'Legal & compliance hub (22-node reach)',address:'1212 Market St, San Francisco, CA 94102',owner:'Arthur Alvarez',since:2011,staff:16,ask:20000,
-  use:'Upgrade document automation and compliance filing workstations',impact:71,status:'rev',submitted:'Oct 8',x:660,y:185,
-  parts:[['Cascade & B2B reach',29,30,'22 exposed businesses (17 Hop-1, 5 Hop-2) — largest hub in graph'],['Distress & cash gap',10,25,'Low financial distress: SBA 7(a) loan Paid in Full (8% baseline risk)'],['Tract equity need',19,30,'Civic Center corridor block'],['Footfall & spillover',13,15,'Serves 17 corridor business clients']],
-  fin:{appRev:1280000,taxRev:1255000,q:[312000,318000,324000],staffFiled:'15 FT + 1 PT',vendor:'LexTech Office Systems',quote:19200},
-  missing:[],notes:{},
-  edges:{out:[['waypoint',58000,29],['mintav',34000,17]],
-         in:[['baart',44000,21],['kearny',29000,14],['larkin',25000,12]],
-         spill:[['cleaners',6],['pharmacy',5]]}},
- {id:'1056704-02-161',key:'impark',name:'Impark 0314',cat:'Corridor parking & mobility support',address:'1050 Market St, San Francisco, CA 94102',owner:'Jordan Pike',since:2015,staff:8,ask:15000,
-  use:'Cover attendant staffing and gate equipment during evening theatre recovery',impact:64,status:'info',submitted:'Oct 9',x:470,y:345,
-  parts:[['Cascade & B2B reach',14,30,'24 unfiltered edges, 0 above 0.01 intensity threshold (Demo Benchmark #2)'],['Distress & cash gap',18,25,'Self-reported POS decline and vendor invoices ($18k cash gap)'],['Tract equity need',19,30,'Mid-Market Tract 06075012502'],['Footfall & spillover',13,15,'Supports evening theatre and dining visitors']],
-  fin:{appRev:420000,taxRev:362000,q:[98000,104000,null],staffFiled:'6 FT + 2 PT',vendor:'GateWorks Access Control',quote:14200},
-  missing:['q3'],notes:{},
-  edges:{out:[['cleaners',9000,6]],
-         in:[['warfield',18000,9],['ggtheater',14000,7]],
-         spill:[['noodle',6],['deli',5]]}},
- {id:'1080659-07-161',key:'blick',name:'Blick Art Materials LLC',cat:'Creative & retail supply anchor',address:'979 Market St, San Francisco, CA 94103',owner:'Clara Vance',since:2013,staff:12,ask:10000,
-  use:'Storefront security glazing and student/artist workshop supply display',impact:61,status:'new',submitted:'Oct 10',x:1060,y:285,
-  parts:[['Cascade & B2B reach',12,30,'Retail anchor (0 outgoing B2B edges at 0.01 cutoff)'],['Distress & cash gap',17,25,'$10,000 storefront glazing and inventory gap'],['Tract equity need',18,30,'Tract 06075017802 · 18.8% poverty, 75.5% no-vehicle households'],['Footfall & spillover',14,15,'12 linked workplace blocks (153.5 modeled workers)']],
-  fin:{appRev:490000,taxRev:476000,q:[118000,122000,125000],staffFiled:'10 FT + 2 PT',vendor:'Market Street Glass & Fixture',quote:9600},
-  missing:[],notes:{},
-  edges:{out:[['mintav',8000,5]],
-         in:[['larkin',15000,9],['ggtheater',11000,6]],
-         spill:[['warfield',11],['artisan',8]]}},
- {id:'1373515-10-241',key:'m1010',name:'1010 Market LLC',cat:'Neighborhood grocery retailer (Leaf)',address:'1010 Market St, San Francisco, CA 94102',owner:'Mei Lin',since:2019,staff:6,ask:8000,
-  use:'Produce cooler repair and SNAP/EBT point-of-sale terminal upgrade',impact:55,status:'new',submitted:'Oct 11',x:760,y:220,
-  parts:[['Cascade & B2B reach',6,30,'0 B2B outgoing edges (resident-facing grocery leaf node)'],['Distress & cash gap',18,25,'Verified $8,000 cash gap in high-poverty tract'],['Tract equity need',20,30,'High-poverty Tenderloin/Market border tract (31.2% poverty)'],['Footfall & spillover',11,15,'Essential daily food access for no-vehicle households']],
-  fin:{appRev:240000,taxRev:233000,q:[58000,61000,62000],staffFiled:'5 FT + 1 PT',vendor:'Bay Area POS & Cooler',quote:7600},
-  missing:['quote'],notes:{},
-  edges:{out:[['kearny',6000,4]],
-         in:[['deli',7000,4]],
-         spill:[['pharmacy',12],['baart',9]]}}
-];
-const BY = Object.fromEntries(APPS.map(a=>[a.id,a]));
+let NODES={}, STD_DOCS=[], APPS=[], BY={};
 const STATUS = {ready:['ready','Ready for review'],info:['info','Needs info'],rev:['rev','In review'],new:['new','New']};
 const variance = a => (a.fin.appRev - a.fin.taxRev)/a.fin.taxRev;
 const docName = (a,k) => k==='quote' ? 'Equipment quote — '+a.fin.vendor : STD_DOCS.find(d=>d[0]===k)[1];
@@ -586,16 +500,7 @@ const S = {
     {t:'Requested Q3 bank statement from Sumfer Market Sf LLC',time:'Oct 13, 10:40 AM'}
   ]
 };
-const ASSIGNED = {
-  '1026779-04-151':'PN',
-  '0111663-06-001':'PN',
-  '1402027-10-251':'PN',
-  '1051330-01-161':'PN',
-  '1188036-05-181':'MK',
-  '1056704-02-161':'PN',
-  '1080659-07-161':'MK',
-  '1373515-10-241':'PN'
-};
+let ASSIGNED={};
 const NAV = [['triage','Dashboard'],['apps','Applications'],['reports','Reports']];
 const ui = id => S.ui[id] || (S.ui[id] = {tab:'overview', layout:'2A', art:null});
 const timeLabel = () => new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
@@ -618,12 +523,6 @@ applyTheme();
 function startSession(email){
   if(email) S.user.email = email;
   S.screen='triage'; S.map='expanded'; S.menu=null;
-  if(!S.seeded){
-    S.seeded = true;
-    const b = BY['0111663-06-001'];
-    makeArtifact(b,'memo',false,true);
-    S.arts[b.id][0].created = 'Oct 14, 3:12 PM';
-  }
   render();
 }
 
@@ -1081,12 +980,12 @@ function renderLeft(){
       <div class="top"><div><h1>${esc(a.name)}</h1><div class="sub">${esc(a.cat)} · <span class="mono">${a.id}</span> · filed ${a.submitted}</div></div>
         <span class="chip ${c}">${l}</span></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn sm ${awarded?'':'primary'}" data-act="award">${awarded?'Withdraw recommendation':'Recommend '+fmt(a.ask)}</button>
+        <button class="btn sm" data-act="generate-memo">Generate Dashboard Memo</button><button class="btn sm" data-act="edit-inputs">Edit financial inputs</button><button class="btn sm ${awarded?'':'primary'}" data-act="award">${awarded?'Withdraw recommendation':'Recommend '+fmt(a.ask)}</button>
       </div>
       <div class="tabs" role="tablist">
         ${[['overview','Overview & Data',0],['app','Application',0],['docs','Documents',docFlags],['fin','Financials',finFlags]].map(([k,t,n])=>`<button class="tab" role="tab" data-act="tab" data-v="${k}" aria-selected="${u.tab===k}">${t}${n?`<span class="n">${n}</span>`:''}</button>`).join('')}
       </div></div>
-    <div class="lbody" id="lbody">${u.tab==='overview'?tabOverview(a):u.tab==='app'?tabApp(a):u.tab==='docs'?tabDocs(a):tabFin(a)}</div>`;
+    <div class="lbody" id="lbody"><div class="callout">Simulated seeded applications, financials, document claims and network previews. Live agent evidence is shown in generated memos.</div>${u.tab==='overview'?tabOverview(a):u.tab==='app'?tabApp(a):u.tab==='docs'?tabDocs(a):tabFin(a)}</div>`;
 }
 
 function tabApp(a){
@@ -1279,7 +1178,7 @@ async function send(text){
   renderChat();
   const id = a.id;
   const hint = detectLocalArtifact(a, text);
-  if(hint.art){
+  if(hint.art && hint.art!=='memo'){
     if(S.current===id){
       makeArtifact(BY[id], hint.art, hint.tight);
       if(/network|visual|chart|graph|map/i.test(text)) refreshMap();
@@ -1288,10 +1187,11 @@ async function send(text){
     }
   }
   try {
-    const res = await fetch('/api/chat', {
+    const wantsMemo=/memo/i.test(text);
+    const res = await fetch(wantsMemo ? `/api/applications/${encodeURIComponent(id)}/memos` : '/api/chat', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
+      body:JSON.stringify(wantsMemo ? {} : {
         message:text,
         selected_business_id:id,
         budget:ROUND_BUDGET,
@@ -1302,12 +1202,30 @@ async function send(text){
         client_id:S.clientId
       })
     });
-    const data = await res.json().catch(()=>({}));
+    let data = await res.json().catch(()=>({}));
+    if(res.ok && data.mode==='queued'){
+      typing.agent='Grant Advisor · generating saved memo';renderChat();
+      const runId=data.run_id;
+      for(let attempt=0;attempt<180;attempt++){
+        await new Promise(resolve=>setTimeout(resolve,3000));
+        const statusResponse=await fetch(`/api/analysis-runs/${encodeURIComponent(runId)}`);
+        if(!statusResponse.ok) throw new Error('Could not check memo progress');
+        const run=await statusResponse.json();
+        if(run.status==='failed') throw new Error('Agent run failed. No memo saved; retry generation.');
+        if(run.status==='complete'){
+          const versions=await (await fetch(`/api/applications/${encodeURIComponent(id)}/memos`)).json();
+          const memo=versions.find(m=>m.run_id===runId);
+          if(!memo) throw new Error('Completed memo could not be loaded');
+          data={...memo,reply:memo.content,tool_calls:['compare_applicants'],agent_app:'grant_advisor'};break;
+        }
+      }
+      if(!data.reply) throw new Error('Memo is still running. Reload the dashboard to check saved reports.');
+    }
     const c = S.chats[id];
     const idx = c.indexOf(typing);
     if(idx !== -1) c.splice(idx, 1);
     if(!res.ok){
-      const errDetail = data.detail || `HTTP ${res.status}`;
+      const errDetail = typeof data.detail==='object' ? data.detail.message : (data.detail || `HTTP ${res.status}`);
       c.push({
         role:'ai',
         source:`Error (${chosenAgent})`,
@@ -1328,7 +1246,7 @@ async function send(text){
         chips:hint.chips
       });
       if(/memo|recommend|allocation/i.test(text) && data.reply){
-        makeLiveAdkArtifact(BY[id], data.reply, data.source, data.tool_calls);
+        makeLiveAdkArtifact(BY[id], data.reply, data.source, data.tool_calls, data.id);
       }
       log(`ADK (${data.agent_app || chosenAgent}) answered for ${BY[id].name}`);
     }
@@ -1348,19 +1266,21 @@ async function send(text){
   if(S.current===id) renderChat();
 }
 
-function makeLiveAdkArtifact(a, replyMd, source, tools){
+function makeLiveAdkArtifact(a, replyMd, source, tools, memoId){
   const list = S.arts[a.id] || (S.arts[a.id]=[]);
-  let art = list.find(x=>x.kind==='adk');
+  const artifactKind=memoId ? 'memo-'+memoId : 'adk';
+  let art = list.find(x=>x.kind===artifactKind);
   const toolLine = (tools && tools.length) ? ` · Tools: ${tools.join(', ')}` : '';
   const secs = [
     `<div class="kicker">${esc(source || 'CLOUD RUN ADK')} · #${esc(a.id)}${esc(toolLine)}</div><h1>${esc(a.name)}: Live Agent Analysis</h1>`,
     `<section id="R-adk-body">${formatAgentMarkdown(replyMd)}</section>`
   ];
-  if(!art){ art = {kind:'adk',title:'Live ADK Memo',secs:[]}; list.push(art); }
+  if(!art){ art = {kind:artifactKind,title:memoId ? 'Grant Memo v'+(list.filter(x=>x.memoId).length+1) : 'Live Agent Analysis',secs:[]}; list.push(art); }
   art.secs = secs;
   art.pending = null;
   art.created = timeLabel();
-  const u = ui(a.id); u.layout='2B'; u.art='adk';
+  if(memoId){ art.memoId=memoId; art.secs.push(`<p><a class="btn" href="/api/memos/${encodeURIComponent(memoId)}/download">Download Word memo</a></p>`); }
+  const u = ui(a.id); u.layout='2B'; u.art=artifactKind;
   if(S.current===a.id){
     const rv = $('#review'); if(rv) rv.classList.add('l2b');
     renderArt();
@@ -1379,21 +1299,6 @@ function recLine(a){
 
 function artSections(a, kind, tight){
   const total = sum(a.edges.out)+sum(a.edges.in), v = variance(a);
-  if(kind==='memo'){
-    const conds = tight
-      ? [`Upload ${a.missing.length?docName(a,a.missing[0]):'Q4 bank statement'} before disbursement`,`Written explanation of the ${(v*100).toFixed(1)}% revenue variance, within 14 days`,`Proof of stabilization / installation (invoice from ${a.fin.vendor}) within 90 days of award`]
-      : [a.missing.length?`Receipt of the ${docName(a,a.missing[0])}`:'Standard reporting at 6 and 12 months', v>.08?'Explanation of the revenue variance':'Invoice matching the quote on file', a.notes.lease?'Evidence of lease renewal or landlord consent':'Retain listed staff for 12 months'];
-    return [
-      `<div class="kicker">GRANT MEMO · #${a.id} · DRAFT ${tight?'v2':'v1'}</div><h1>${esc(a.name)}: ${fmt(a.ask)} request</h1>`,
-      `<section id="R-m-rec"><h2>1. Which business, by name and address, and how much</h2><div class="rec"><b>${recLine(a).replace(/^./,c=>c.toUpperCase())}</b><span class="mono" style="color:var(--muted)">Impact ${a.impact}/100</span></div><p><b>${esc(a.name)}</b> (<span class="mono">${esc(a.id)}</span>) at <b>${esc(a.address || 'Central Market, San Francisco, CA')}</b> · ${esc(a.cat)} run by ${esc(a.owner)} (${a.staff} staff). Recommended award: <b>${fmt(a.ask)}</b> from the ${fmt(ROUND_BUDGET)} round pool (${fmt(Math.max(0, ROUND_BUDGET - a.ask))} unallocated in single-award view) to ${esc(a.use.charAt(0).toLowerCase()+a.use.slice(1))} ${pill('L','docs','doc-quote','Quote')}.</p></section>`,
-      `<section id="R-m-sum"><h2>2. What it protects — the cascade, named</h2><p>${esc(a.parts[0][3])} (${fk(total)}/yr direct corridor trade) ${pill('L','overview','network','Network')}:</p><ul>${a.edges.out.map(e=>`<li><b>${esc(nodeName(e[0]))}</b> — <b>1 hop</b> (direct supplier) · link strength <b>0.${String(e[2]).padStart(2,'0')}</b> (${e[2]}% dependency · ${fk(e[1])}/yr)</li>`).join('')}${a.edges.in.map(e=>`<li><b>${esc(nodeName(e[0]))}</b> — <b>1 hop</b> (direct buyer) · link strength <b>0.${String(e[2]).padStart(2,'0')}</b> (${e[2]}% dependency · ${fk(e[1])}/yr)</li>`).join('')}${a.edges.spill.map(e=>`<li><b>${esc(nodeName(e[0]))}</b> — <b>2 hops</b> (indirect corridor partner) · link strength <b>0.${String(e[1]).padStart(2,'0')}</b> (${e[1]}% shared corridor overlap)</li>`).join('')}</ul></section>`,
-      `<section id="R-m-impact"><h2>3. The traversal itself, shown</h2><pre style="font-size:11px;padding:8px;background:var(--bg);border:1px solid var(--line);border-radius:6px;overflow-x:auto">GRAPH a4i_econ.CascadeEconomy\nMATCH p = ANY SHORTEST (seed:Business WHERE seed.business_id = '${esc(a.id)}')\n  -[e:Supplies WHERE e.intensity >= 0.01]->{1,2}(exposed:Business)\nRETURN exposed.business_id, exposed.name, TO_JSON(p) AS path</pre><ul>${[...a.edges.out,...a.edges.in].slice(0,3).map((e,i)=>{ const sp = a.edges.spill[i % a.edges.spill.length]; return `<li><span class="mono">${esc(a.name)}</span> → <b>[Hop 1 · w=0.${String(e[2]).padStart(2,'0')}]</b> → <span class="mono">${esc(nodeName(e[0]))}</span>${sp?` → <b>[Hop 2 · w=0.${String(sp[1]).padStart(2,'0')}]</b> → <span class="mono">${esc(nodeName(sp[0]))}</span>`:''}</li>`; }).join('')}</ul></section>`,
-      `<section id="R-m-runner"><h2>4. Why this one and not the runner-up</h2><p>Compared against runner-up <b>${esc(rival(a).name)}</b> (<span class="mono">#${esc(rival(a).id)}</span>, requesting ${fmt(rival(a).ask)}, Impact ${rival(a).impact}/100: ${esc(rival(a).parts[0][3])}; ${esc(rival(a).parts[1][3])}), <b>${esc(a.name)}</b> scores ${a.impact} vs. ${rival(a).impact} (${a.impact>=rival(a).impact?'+'+(a.impact-rival(a).impact):a.impact-rival(a).impact} pts) on verified cash-gap feasibility and deduplicated 2-hop exposure after removing weak links below the <code>0.01</code> intensity cutoff ${pill('L','overview','impact','Impact')}.</p></section>`,
-      `<section id="R-m-fin"><h2>5. What you are assuming</h2><p><b>A grant changes a survival probability, not a guaranteed outcome.</b> Assuming full gap funding (${fmt(a.ask)}) sustains operations over a <b>90-day horizon</b>, this award conditionally reduces disruption exposure across the named 1-hop and 2-hop network above (no proven jobs saved or closures prevented are claimed). Self-reported revenue of ${fmt(a.fin.appRev)} is ${(v*100).toFixed(1)}% ${v>=0?'above':'below'} the 2025 tax return ${pill('L','fin','rev','Revenue')}.</p><ul>${conds.map(c=>`<li>Pre-award check: ${esc(c)}</li>`).join('')}</ul></section>`,
-      `<section id="R-m-mod"><h2>6. Which parts of the evidence are modeled (in one honest line)</h2><p>Business locations/NAICS (SF Registry), Census tract demographics (ACS), and workplace block job counts (LEHD) are measured public records, whereas B2B <code>Supplies</code> edges (BEA industry coefficients × walking distance), proximity <code>DrawsFootfall</code> worker allocations, and UI demo cash-gap scenarios are modeled.</p></section>`,
-      `<section id="R-m-cond"><h2>7. Who the neighborhood is — tract demographics where the money lands</h2><p><b>${esc(a.parts[2][3])}</b> · <b>${esc(a.parts[3][3])}</b>. Demographic and worker-footfall figures describe the surrounding neighborhood and workplace blocks where the grant lands, kept distinct from the B2B network calculator ranking.</p></section>`
-    ];
-  }
   if(kind==='network'){
     const rows = [['Revenue out · 1st-degree suppliers','out',a.edges.out],['Revenue in · 1st-degree buyers','in',a.edges.in]];
     const max = Math.max(...a.edges.out.map(e=>e[1]),...a.edges.in.map(e=>e[1]));
@@ -1438,6 +1343,7 @@ function artSections(a, kind, tight){
 }
 
 function makeArtifact(a, kind, tight, silent){
+  if(kind==='memo'){ send('Generate Grant Memo');return; }
   const titles = {memo:'Grant Memo',network:'Network Impact',audit:'Discrepancy Report',adk:'Live ADK Memo'};
   const list = S.arts[a.id] || (S.arts[a.id]=[]);
   let art = list.find(x=>x.kind===kind);
@@ -1446,12 +1352,13 @@ function makeArtifact(a, kind, tight, silent){
   art.secs = []; art.pending = secs;
   const u = ui(a.id); u.layout='2B'; u.art=kind;
   art.created = timeLabel();
+  if(memoId){ art.memoId=memoId; art.secs.push(`<p><a class="btn" href="/api/memos/${encodeURIComponent(memoId)}/download">Download Word memo</a></p>`); }
   if(silent) { art.secs = secs; art.pending=null; return; }
   const rv = $('#review'); if(rv) rv.classList.add('l2b');
   renderArt();
   log(`Generated ${art.title} for ${a.name}`);
   const step = ()=>{
-    if(!art.pending || !art.pending.length){ art.pending=null; toast(`${art.title} ready · saved to Reports`); renderSidebar(); renderTop(); return; }
+    if(!art.pending || !art.pending.length){ art.pending=null; toast(`${art.title} preview ready · available this session`); renderSidebar(); renderTop(); return; }
     const s = art.pending.shift(); art.secs.push(s);
     if(S.current===a.id && ui(a.id).art===kind){
       const body = $('#art-doc'); if(body){ const d=document.createElement('div'); d.className='stream-in'; d.innerHTML=s; body.appendChild(d); }
@@ -1468,7 +1375,7 @@ function renderArt(){
   if(!art){ el.innerHTML = `<div class="empty">Ask for a memo, report or chart and it will open here.</div>`; return; }
   el.innerHTML = `<div class="art-h"><div class="tabs" role="tablist">${list.map(x=>`<button class="tab" role="tab" data-act="art-tab" data-v="${x.kind}" aria-selected="${x===art}">${x.title}</button>`).join('')}</div>
       <button class="icobtn" data-act="art-close" aria-label="Close artifact window" title="Back to two columns">✕</button></div>
-    <div class="art-body"><div class="doc-art" id="art-doc">${art.secs.map(s=>`<div>${s}</div>`).join('')}</div></div>`;
+    <div class="art-body"><div class="doc-art" id="art-doc">${art.memoId?'<p class="callout">Saved memo version. Later financial edits require a new memo; this report retains its original inputs.</p>':''}${art.secs.map(s=>`<div>${s}</div>`).join('')}</div></div>`;
 }
 
 /* ---------- Navigation ---------- */
@@ -1504,8 +1411,8 @@ document.addEventListener('click', e=>{
   if(!t){ if(S.pop && !e.target.closest('.mpop')){ S.pop=null; const p=$('#mpop'); if(p) p.innerHTML=''; } return; }
   const act = t.dataset.act;
   switch(act){
-    case 'demo-login': startSession(); break;
-    case 'logout': S.screen='login'; S.current=null; S.menu=null; render(); break;
+    case 'demo-login': loginReviewer(); break;
+    case 'logout': fetch('/api/logout',{method:'POST'}); S.screen='login'; S.current=null; S.menu=null; render(); break;
     case 'toggle-sidebar': S.sidebarOpen=!S.sidebarOpen; renderSidebar(); renderTop(); break;
     case 'toggle-theme': {
       S.theme = isDarkTheme() ? 'light' : 'dark';
@@ -1545,10 +1452,20 @@ document.addEventListener('click', e=>{
     case 'src': goSrc(t.dataset.src); break;
     case 'art-tab': ui(S.current).art=t.dataset.v; renderArt(); break;
     case 'art-close': ui(S.current).layout='2A'; $('#review').classList.remove('l2b'); break;
-    case 'award': { const a=BY[S.current];
-      if(S.awarded[a.id]){ delete S.awarded[a.id]; log(`Withdrew recommendation for ${a.name}`); toast('Recommendation withdrawn'); }
-      else { S.awarded[a.id]=a.ask; log(`Recommended ${fmt(a.ask)} for ${a.name}`); toast(`Recommended ${fmt(a.ask)} · pool now ${fmt(poolRemaining())}`); }
-      renderTop(); renderLeft(); break; }
+    case 'generate-memo': send('Generate Grant Memo'); break;
+    case 'edit-inputs': {
+      const a=BY[S.current];
+      const host=$('#lbody');
+      host.innerHTML=`<form id="financial-edit"><h3>Edit simulated application inputs</h3>
+        <label>Requested grant <input class="input" name="ask" type="number" min="0.01" step="0.01" value="${a.ask}" required></label>
+        <label>Cash gap <input class="input" name="cash_gap" type="number" min="0.01" step="0.01" value="${a.cash_gap}" required></label>
+        <label>Application annual revenue <input class="input" name="appRev" type="number" min="0" step="0.01" value="${a.fin.appRev}" required></label>
+        <label>Tax annual revenue <input class="input" name="taxRev" type="number" min="0" step="0.01" value="${a.fin.taxRev}" required></label>
+        <label>Reviewer note <textarea class="input" name="reviewer">${esc(a.notes.reviewer||'')}</textarea></label>
+        <button class="btn primary" type="submit">Save to database</button></form>`;
+      break;
+    }
+    case 'award': { saveRecommendation(); break; }
   }
 });
 document.addEventListener('input', e=>{
@@ -1564,7 +1481,8 @@ document.addEventListener('keydown', e=>{
 });
 document.addEventListener('submit', e=>{
   e.preventDefault();
-  if(e.target.id==='login-form'){ const em=$('#email'); startSession(em && em.value.trim() ? em.value.trim() : null); }
+  if(e.target.id==='login-form'){ loginReviewer(); }
+  if(e.target.id==='financial-edit'){ saveFinancials(e.target); }
   if(e.target.id==='composer'){ const i=$('#composer-in'); const v=i.value; i.value=''; send(v); }
 });
 document.addEventListener('change', e=>{
@@ -1573,7 +1491,47 @@ document.addEventListener('change', e=>{
 });
 window.addEventListener('resize', ()=>{ if(S.pop) showPop(S.pop); if(S.menu) renderMenu(); });
 
-render();
+async function saveFinancials(form){
+  const a=BY[S.current], fields=new FormData(form);
+  try{
+    const response=await fetch(`/api/applications/${encodeURIComponent(a.id)}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({version:a.version,ask:Number(fields.get('ask')),cash_gap:Number(fields.get('cash_gap')),fin:{...a.fin,appRev:Number(fields.get('appRev')),taxRev:Number(fields.get('taxRev'))},notes:{...a.notes,reviewer:fields.get('reviewer')}})});
+    const data=await response.json();if(!response.ok) throw new Error(typeof data.detail==='string'?data.detail:'Could not save inputs');
+    Object.assign(a,data);renderLeft();toast('Saved to database. Generate a new memo to use these inputs.');
+  }catch(error){toast(error.message);}
+}
+async function saveRecommendation(){
+  const id=S.current;
+  try{
+    const response=await fetch(`/api/applications/${encodeURIComponent(id)}/recommendation`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({recommended:!S.awarded[id]})});
+    const data=await response.json();if(!response.ok) throw new Error(data.detail||'Could not save recommendation');
+    S.awarded=data.recommendations;renderTop();renderLeft();toast('Reviewer recommendation saved');
+  }catch(error){toast(error.message);}
+}
+async function loginReviewer(){
+  try{
+    const response=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('#pw').value})});
+    if(!response.ok) throw new Error('Invalid reviewer password');
+    await bootstrapDashboard();startSession($('#email')?.value || null);
+  }catch(error){toast(error.message);}
+}
+async function bootstrapDashboard(){
+  const response=await fetch('/api/bootstrap');
+  if(response.status===401){render();return;}
+  if(!response.ok) throw new Error('Could not load the application database');
+  const data=await response.json();
+  APPS=data.applications; BY=Object.fromEntries(APPS.map(a=>[a.id,a]));
+  NODES=data.nodes; STD_DOCS=data.documents; ASSIGNED=data.assignments;
+  CORRIDOR=data.settings.corridor; POOL_TOTAL=data.settings.pool_total;
+  POOL_COMMITTED=data.settings.pool_committed; ROUND_BUDGET=data.settings.round_budget;
+  S.user=data.reviewer; S.notifs=data.notifications; S.activity=data.activity;
+  S.awarded=data.recommendations || {};
+  for(const r of (data.analysis_runs||[]).filter(r=>r.status==='running'||r.status==='queued')) S.activity.unshift({t:'Memo generation '+r.status+' for '+(BY[r.application_id]?.name||r.application_id),time:r.created_at});
+  for(const memo of [...data.memos].reverse()){
+    makeLiveAdkArtifact(BY[memo.application_id],memo.content,memo.source,[],memo.id);
+  }
+  render();
+}
+bootstrapDashboard().catch(error=>{document.body.innerHTML='<p style="padding:40px">'+esc(error.message)+'. Reload to retry.</p>';});
 })();
 </script>
 
