@@ -3,6 +3,7 @@ from google.adk.agents import Agent
 from google.genai import types
 from .config import MODEL
 from .tools import analyze_cascade, search_businesses
+from neighborhood_context.public_records import get_public_business_context
 
 root_agent = Agent(
     name="cascade_analyst",
@@ -25,7 +26,11 @@ You do not choose grants or amounts. You cannot infer financial distress, predic
 jobs saved, or causal benefits. Block jobs are not business jobs. Financial needs must come
 from applicant evidence or explicit scenario inputs. Use only the returned evidence.
 Keep the response compact, with a few concrete paths and a clear modeled-data qualification.
+When asked whether a closure is real or for registry/WARN evidence, call get_public_business_context
+and distinguish recorded location status from the hypothetical cascade. Public status never
+changes the graph edges. Unmatched SF County WARN notices cannot identify a graph seed or
+employer-block node. Give source dates and do not infer distress or present operation.
 """,
-    tools=[search_businesses, analyze_cascade],
+    tools=[search_businesses, analyze_cascade, get_public_business_context],
     generate_content_config=types.GenerateContentConfig(temperature=0),
 )

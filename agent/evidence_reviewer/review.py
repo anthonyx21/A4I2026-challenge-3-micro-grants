@@ -21,6 +21,11 @@ def audit_comparison(comparison: dict, memo_text: str = '') -> dict:
         if simulated and comparison.get('decision_scope') != 'simulated_scenario':
             flag('PROVENANCE_MISMATCH', 'error', 'Simulated applicants require simulated scenario scope')
         for a in applicants:
+            public = a.get('public_records')
+            if not public or public.get('status') != 'ok':
+                flag('PUBLIC_RECORDS_UNAVAILABLE', 'warning', 'Dated public status not checked; do not imply current operation was verified')
+            elif public.get('registry_status') in ('closure_recorded', 'mixed_registry_records', 'no_matching_record'):
+                flag('REGISTRY_STATUS_REVIEW', 'warning', 'Applicant registry status requires human verification: ' + public['registry_status'])
             if not a.get('evidence_note') or not a.get('operating_assumption'):
                 flag('MISSING_INPUT_EVIDENCE', 'error', 'Missing financial evidence note or intervention assumption')
             cascade = a['cascade']
@@ -71,6 +76,7 @@ def audit_comparison(comparison: dict, memo_text: str = '') -> dict:
             flag('MISSING_SIMULATION_LABEL', 'error', 'Memo must label synthetic financial inputs')
     flag('UNVERIFIED_DOCUMENTS', 'warning', 'Provenance labels and evidence notes are supplied; no documents were independently audited')
     flag('MODELED_RELATIONSHIPS', 'warning', 'Supply links are modeled; transaction validation, substitution and causal grant effects remain unknown')
+    flag('WARN_LINKAGE_UNVERIFIED', 'warning', 'County WARN notices are not linked to corridor businesses or workplace blocks; no anchor impact claimed')
     return {'status': 'blocked' if any(f['severity'] == 'error' for f in findings) else 'review_required',
             'approval_ready': False, 'consistency_checks_passed': not any(f['severity'] == 'error' for f in findings),
             'memo_screened': bool(memo_text), 'findings': findings,

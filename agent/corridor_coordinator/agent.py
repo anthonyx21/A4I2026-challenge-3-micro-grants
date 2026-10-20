@@ -18,6 +18,9 @@ Delegate substantive analysis using the specialist AgentTools:
 - grant_advisor: applicant comparisons, funding amounts, portfolios and grant memos.
 - evidence_reviewer: scenario or draft review, financial consistency, unsupported claims, missing evidence.
 - neighborhood_context: worker links, tract demographics, community and access context.
+- neighborhood_context also handles dated DataSF business status and SF County WARN notices.
+For public closure/layoff evidence use that specialist. Preserve dates and match limits;
+county WARN notices are not verified corridor employers and cannot define an anchor cascade.
 Route by the user's question, not by mentions in a supplied draft or UI context. For combined
 questions call the relevant specialists sequentially, then combine clearly attributed findings.
 Never calculate funding, exposure or demographics yourself. Preserve exact IDs, budget, amounts,

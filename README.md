@@ -1,5 +1,29 @@
 # Challenge 3—Community Economic Resilience & Micro-Grants
 
+## ReliefIQ — our team build
+
+**ReliefIQ** helps grant officers compare small-business relief cases using applicant evidence,
+named economic cascades, public context and transparent assumptions. Our build targets the
+Main Street relief track. Applications and cash gaps are supplied inputs; demo financial
+scenarios are simulated.
+
+### Technical blueprint
+
+![ReliefIQ multi-agent architecture on a dark background](docs/reliefiq-architecture-dark.png)
+
+Corridor Coordinator calls four specialists through ADK AgentTools. Python tools consume
+Google MCP Toolbox to query BigQuery tables and the `CascadeEconomy` property graph.
+Grant Advisor compares interventions; Cascade Analyst traces paths; Neighborhood Context
+adds worker, demographic, registry and WARN context; Evidence Reviewer checks consistency
+and unsupported claims. Structured evidence returns to the officer dashboard.
+
+The diagram also shows a **proposed MCP Memo / Report Service** for Word/PDF export;
+this component is a design extension, not a deployed service. The agents already return
+memo findings and text. See the [architecture notes](docs/reliefiq-architecture.md),
+[data ERD](docs/data-erd.md), and [public-data integration](docs/public-data-integration.md).
+
+The original challenge guide follows.
+
 **Agents for Impact 2026**
 
 ---
@@ -651,6 +675,57 @@ and that division is exactly what `CREATE PROPERTY GRAPH` expects:
 | `draws_footfall_from` | **edge** | Workers at a block spend at nearby businesses. `worker_share` is the block's job count divided equally across the nearby businesses—an allocated headcount, not a fraction |
 | `borrowed_from` | **edge** | Business borrowed from a named bank—**including whether the loan was charged off** |
 | `tract_demographics` | attributes | Poverty, vehicle access and assistance rates by census tract |
+
+### Public-record enrichment implemented by this team
+
+The [public data loader](scripts/load_public_records.py) adds two separate snapshot tables to `a4i_econ`, preserving the base tables and existing graphs.
+
+| Added table | Official source | Verified load on October 20, 2026 |
+|---|---|---|
+| `public_business_status` | [DataSF Registered Business Locations](https://data.sf.gov/resource/g8m3-pdis.json) | 4,571 Central Market registry-history records; all 232 existing business IDs match exactly. Source as-of October 20, 2026. |
+| `public_warn_notices` | [California EDD WARN workbook](https://edd.ca.gov/siteassets/files/jobs_and_training/warn/warn_report1.xlsx) | 12 San Francisco County notices covering processed dates July 1–October 14, 2026. No verified corridor-business or employer-block links. |
+
+From the **repository root**, in authenticated Cloud Shell using Python 3.11 or newer:
+
+```bash
+# Create the loader environment if agent/.venv does not already exist.
+python3 -m venv agent/.venv
+agent/.venv/bin/pip install -r agent/requirements.txt openpyxl==3.1.5
+
+# Fetch snapshots without writing to BigQuery.
+agent/.venv/bin/python scripts/load_public_records.py --output public-records-snapshot
+
+# Fetch again and load the two public snapshot tables.
+agent/.venv/bin/python scripts/load_public_records.py \
+  --project qwiklabs-gcp-04-029c15637557 --dataset a4i_econ \
+  --corridor 'Central Market' --output public-records-snapshot --load
+```
+
+The dataset and `businesses` must already exist. Cloud Shell supplies credentials; local use requires Application Default Credentials. Loading needs permission to create/replace these two tables and read `businesses` for matching. Runtime agents use dataset read access and BigQuery job creation. No API key or login password is required by the loader.
+
+Each refresh replaces **only the two public snapshot tables**. The ignored output directory contains raw JSON and `manifest.json`, with source dates/URLs, retrieval time, workbook SHA256, load job IDs, row counts and exact-ID overlap. Later refreshes may change counts and report periods. This is a point-in-time fetch, not a scheduled feed. `--corridor` changes the DataSF filter; WARN remains scoped to San Francisco County.
+
+**Agent integration:** Neighborhood Context exposes `get_public_business_context` through fixed read-only MCP Toolbox queries. Cascade Analyst checks dated registry evidence for closure questions. Grant Advisor includes public records in applicant comparisons; Evidence Reviewer flags unavailable, missing, mixed or closed registry records. Corridor Coordinator routes status and WARN questions to Neighborhood Context. Public records do not change the allocation objective.
+
+After loading, regenerate the MCP configuration and restart Toolbox for local use. From `agent/`:
+
+```bash
+.venv/bin/python setup.py --config-only
+# Restart the existing Toolbox process with the updated tools.yaml.
+bin/toolbox --config tools.yaml --address 127.0.0.1 --port 5000
+```
+
+For Cloud Run, deploy the updated agent source; container startup renders the MCP configuration. From `agent/`, verify live tool calls with an authenticated Google identity:
+
+```bash
+.venv/bin/python verify_public_records.py https://cascade-analyst-89073885580.us-central1.run.app
+.venv/bin/python verify_grants.py https://cascade-analyst-89073885580.us-central1.run.app
+```
+
+Public-record and full grant-comparison checks passed on revision `cascade-analyst-00008-wj4`; 42 local tests passed. Tool traces are saved under ignored `agent/reports/`. See [integration notes](docs/public-data-integration.md) for load jobs, provenance and limitations.
+
+**Interpretation:** multiple ownership records can refer to one location. No recorded closure does not verify current operation or financial health. WARN dates are announced dates, not confirmed outcomes; county notices cannot define a corridor anchor cascade without verified employer/location links. These sources contain **no grant applications or current cash gaps**. Officer inputs remain required, and demo financial inputs are simulated.
+
 
 ---
 

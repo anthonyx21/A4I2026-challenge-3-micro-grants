@@ -1,5 +1,15 @@
 # Verification — October 20, 2026
 
+## Public-data deployment update
+
+- Loaded `a4i_econ.public_business_status` with 4,571 dated DataSF Central Market registry records; all 232 existing business IDs match exactly.
+- Loaded `a4i_econ.public_warn_notices` with 12 San Francisco County notices from the official EDD workbook covering processed dates July 1–October 14, 2026. No inferred business or employer-block links.
+- Updated all specialist routing/instructions and Grant Advisor comparison evidence. Public records do not change the network allocation rule or establish financial need.
+- Forty-two local tests passed. Cloud Run revision `cascade-analyst-00008-wj4` is ready and serving traffic; retry succeeded after a Cloud Build INTERNAL_ERROR.
+- Live Gemini/MCP verification passed (`PUBLIC_RECORDS_VERIFIED 1026779-04-151 no_closure_recorded 2026-10-20 1 12`). Source dates and URLs appear in the answer; no recorded closure does not verify present operation.
+- See `docs/public-data-integration.md` for sources, load jobs, refresh instructions and match limits.
+- Full live Grant Advisor verification exited zero: comparison `ok`, evidence review `review_required`, and both demo applicants returned successful dated public records with 12 county notices. Financial inputs remain simulated.
+
 ## Corridor Coordinator and minimal frontend update
 
 - Added `corridor_coordinator`, delegating to the four existing agents with bounded structured tool receipts alongside prose. Evidence callbacks operate on copied agents, preserving standalone behavior. API LLM-call limit is 16.

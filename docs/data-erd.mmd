@@ -1,0 +1,57 @@
+erDiagram
+    businesses ||--o{ supplies : "supplier_id — modeled"
+    businesses ||--o{ supplies : "buyer_id — modeled"
+    businesses ||--o{ draws_footfall_from : "business_id — modeled"
+    employer_blocks ||--o{ draws_footfall_from : "block_id — modeled"
+    businesses ||--o{ borrowed_from : "business_id — matched SBA records"
+    tract_demographics o|--o{ employer_blocks : "geo_id = tract — logical join"
+
+    businesses {
+        STRING business_id PK
+        STRING name
+        STRING legal_name
+        STRING address
+        STRING zip
+        STRING naics
+        STRING naics4
+        STRING corridor
+        FLOAT64 latitude
+        FLOAT64 longitude
+    }
+    supplies {
+        STRING edge_id PK "supplier_id|buyer_id"
+        STRING supplier_id FK
+        STRING buyer_id FK
+        FLOAT64 intensity
+        FLOAT64 metres
+    }
+    employer_blocks {
+        STRING block_id PK
+        STRING tract FK "11-digit census tract ID"
+        INT64 jobs
+        FLOAT64 lat
+        FLOAT64 lon
+    }
+    draws_footfall_from {
+        STRING edge_id PK "block_id|business_id"
+        STRING block_id FK
+        STRING business_id FK
+        FLOAT64 worker_share
+        FLOAT64 metres
+    }
+    borrowed_from {
+        STRING business_id FK
+        STRING bank_name
+        FLOAT64 gross_approval
+        STRING approval_date
+        STRING loan_status
+        BOOL charged_off
+    }
+    tract_demographics {
+        STRING geo_id PK "11-digit census tract ID"
+        FLOAT64 total_pop
+        FLOAT64 median_income
+        FLOAT64 poverty_rate
+        FLOAT64 no_vehicle_rate
+        FLOAT64 assistance_rate
+    }

@@ -1,0 +1,18 @@
+%%{init: {'theme':'dark','themeVariables': {'background':'#070b12','primaryColor':'#101a28','primaryTextColor':'#f0f5ff','primaryBorderColor':'#51d9e8','lineColor':'#8597ae'}}}%%
+flowchart TD
+    UI[ReliefIQ Officer Dashboard] --> API[Authenticated Backend / ADK API]
+    API --> C[Corridor Coordinator]
+    C -->|ADK AgentTool| G[Grant Advisor]
+    C -->|ADK AgentTool| A[Cascade Analyst]
+    C -->|ADK AgentTool| N[Neighborhood Context]
+    C -->|ADK AgentTool| R[Evidence Reviewer]
+    G --> T[Shared Python Tools]
+    A --> T
+    N --> T
+    R --> T
+    T -->|MCP Streamable HTTP| M[Google MCP Toolbox]
+    M --> B[BigQuery Tables + Property Graph]
+    G -.->|Proposed MCP document tool| P[MCP Memo / Report Service]
+    P -.-> D[Word / PDF Grant Memo + Traversal]
+    D -.-> UI
+    C -->|Evidence + Memo Findings| UI

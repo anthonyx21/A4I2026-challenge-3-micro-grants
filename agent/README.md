@@ -1,4 +1,9 @@
-# `agent/` — Main Street Relief: Corridor Grant Agents
+# `agent/` — ReliefIQ: Main Street Relief Agents
+
+![ReliefIQ technical blueprint](../docs/reliefiq-architecture-dark.png)
+
+See [architecture notes](../docs/reliefiq-architecture.md) for ADK/MCP communication and
+the proposed MCP reporting extension. The reporting service in the diagram is not deployed.
 
 This directory contains the **Google Agent Development Kit (`google-adk`)** multi-agent implementation for **Challenge 3 — Community Economic Resilience & Micro-Grants (🏢 Main Street Relief Track)**, pre-configured for:
 
@@ -10,6 +15,28 @@ This directory contains the **Google Agent Development Kit (`google-adk`)** mult
 - **Deployed Cloud Run Service URL**: [https://cascade-analyst-89073885580.us-central1.run.app](https://cascade-analyst-89073885580.us-central1.run.app)
 
 For detailed operational instructions, Cloud Run proxy usage, and decision policy details, see [`RUNBOOK.md`](./RUNBOOK.md) and [`VERIFICATION.md`](./VERIFICATION.md).
+
+## Public business-status and WARN data
+
+The [public loader](../scripts/load_public_records.py) adds `public_business_status` and
+`public_warn_notices` to `a4i_econ`. See the [root README](../README.md#public-record-enrichment-implemented-by-this-team)
+for environment setup, fetch-only/load commands, permissions and refresh behavior.
+The verified snapshot includes 4,571 registry-history records (matching all 232 businesses)
+and 12 SF County WARN notices. Record counts are dated, not a live feed.
+
+Neighborhood Context and Cascade Analyst expose `get_public_business_context`. Grant comparisons
+include public records, and Evidence Reviewer flags missing, mixed or closed registry evidence.
+WARN notices remain county context without verified corridor-business or workplace-block links.
+Neither source supplies applications, financial need or proven grant effects.
+
+From `agent/`, verify actual deployed Gemini/MCP retrieval:
+
+```bash
+.venv/bin/python verify_public_records.py https://cascade-analyst-89073885580.us-central1.run.app
+```
+
+This requires Google authentication and saves a tool trace under ignored `reports/`.
+See [source and deployment details](../docs/public-data-integration.md).
 
 ---
 
@@ -105,7 +132,7 @@ Then open **`http://localhost:8081/dev-ui/`** (or use Cloud Shell **Web Preview*
 ### 5. Calling the Deployed App via CLI / API
 You can also invoke and verify the live Cloud Run service directly from the terminal using your authenticated `gcloud` identity:
 ```bash
-# Check service and MCP health (lists all 4 agents)
+# Check service and MCP health (coordinator plus four specialists)
 curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
   https://cascade-analyst-89073885580.us-central1.run.app/api/health
 
@@ -113,6 +140,7 @@ curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
 .venv/bin/python verify_deployment.py https://cascade-analyst-89073885580.us-central1.run.app
 .venv/bin/python verify_grants.py https://cascade-analyst-89073885580.us-central1.run.app
 .venv/bin/python verify_specialists.py https://cascade-analyst-89073885580.us-central1.run.app
+.venv/bin/python verify_public_records.py https://cascade-analyst-89073885580.us-central1.run.app
 ```
 
 ---
@@ -147,7 +175,7 @@ curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
 - [`install_toolbox.py`](./install_toolbox.py): Downloads Google's MCP Toolbox binary (`v1.14.0`) to `bin/toolbox` and verifies its SHA256 checksum.
 - [`service.py`](./service.py) & [`start_service.py`](./start_service.py): Supervises `bin/toolbox` and FastAPI (`get_fast_api_app` + `/api/health`) in the container.
 - [`Dockerfile`](./Dockerfile) & [`deploy.sh`](./deploy.sh): Packages and deploys the authenticated `cascade-analyst` Cloud Run service.
-- [`tests/test_evidence.py`](./tests/test_evidence.py), [`tests/test_grants.py`](./tests/test_grants.py), & [`tests/test_review_context.py`](./tests/test_review_context.py): 34-test unit suite.
+- [`tests/`](./tests/): 42 tests passed after public-data integration, including registry history, exact-ID validation, and WARN county filtering.
 
 ---
 

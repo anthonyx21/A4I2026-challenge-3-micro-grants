@@ -8,5 +8,7 @@ bin/
 __pycache__/
 **/__pycache__/
 reports/
+public-records-snapshot/
+load_public_records.py
 .pytest_cache/
 .adk/

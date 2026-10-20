@@ -1,5 +1,24 @@
 # scripts/
 
+## `load_public_records.py`
+
+Fetches official DataSF Central Market registry history and California EDD San Francisco County WARN notices. With `--load`, it replaces only `public_business_status` and `public_warn_notices` in BigQuery; base tables and graphs are preserved.
+
+From the repository root, with Python 3.11+ and Google credentials for loading:
+
+```bash
+python3 -m venv agent/.venv
+agent/.venv/bin/pip install -r agent/requirements.txt openpyxl==3.1.5
+agent/.venv/bin/python scripts/load_public_records.py --output public-records-snapshot
+agent/.venv/bin/python scripts/load_public_records.py --load --output public-records-snapshot
+```
+
+Without `--load`, no BigQuery writes occur. Options: `--project`, `--dataset`, `--corridor`, `--output`, and `--load`. Defaults target `qwiklabs-gcp-04-029c15637557.a4i_econ`, Central Market, and the ignored `public-records-snapshot/` directory. The dataset and `businesses` must already exist. `--corridor` filters DataSF only; WARN remains SF County context.
+
+Raw JSON and `manifest.json` preserve source scope/dates, retrieval time, workbook SHA256, row counts, load job IDs and exact registry-ID overlap. Unexpected WARN columns, invalid dates/counts, empty snapshots and duplicate registry keys stop the loader rather than silently publishing a guessed schema. Refreshing fetches the current published report; no schedule is installed.
+
+Registry records do not verify current operation. WARN employers are not matched to corridor businesses or workplace blocks. Neither source provides applications or funding needs. See [integration notes](../docs/public-data-integration.md) and [README instructions](../README.md#public-record-enrichment-implemented-by-this-team).
+
 ## `load.sh`
 
 A headless fallback that reaches the same end state as `notebooks/c3_01_load_explore.ipynb`,

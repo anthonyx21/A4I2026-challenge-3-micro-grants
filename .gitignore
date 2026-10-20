@@ -18,6 +18,7 @@ agent/bin/
 agent/tools.yaml
 agent/*.log
 agent/reports/
+public-records-snapshot/
 .pytest_cache/
 
 # OS noise

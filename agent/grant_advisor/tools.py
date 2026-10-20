@@ -6,6 +6,7 @@ from cascade_analyst.config import CORRIDOR
 from cascade_analyst.queries import cascade_sql
 from neighborhood_context.tools import get_neighborhood_context
 from .decision import allocate, validate
+from neighborhood_context.public_records import get_public_business_context
 
 
 async def compare_applicants(budget: float, applicants: list[dict], horizon_days: int,
@@ -35,9 +36,10 @@ async def compare_applicants(budget: float, applicants: list[dict], horizon_days
                 if evidence['status'] != 'ok':
                     return {'status': 'incomplete', 'business_id': applicant['business_id'], 'cause': evidence,
                             'message': 'Cannot compare the complete shortlist. No funding recommendation issued.'}
+                public = await get_public_business_context(applicant['business_id'])
                 results.append({**applicant, 'name': evidence['seed']['name'],
                                 'address': evidence['seed'].get('address'),
-                                'cascade': evidence,
+                                'cascade': evidence, 'public_records': public,
                                 'baseline_ids': [b['business_id'] for b in evidence['baseline']['exposed_businesses']],
                                 'filtered_ids': [b['business_id'] for b in evidence['filtered']['exposed_businesses']]})
     except TimeoutError:

@@ -6,6 +6,7 @@ from google.cloud import bigquery
 from cascade_analyst.config import CORRIDOR, DATASET, LOCATION, PROJECT
 from cascade_analyst.queries import GRAPH_DDL, SEARCH_SQL, cascade_sql
 from neighborhood_context.queries import FOOTFALL_SQL, DEMOGRAPHICS_SQL
+from neighborhood_context.public_queries import STATUS_SQL, WARN_SQL
 
 
 def validate(client):
@@ -52,6 +53,12 @@ def render(path):
     docs.append({**common, 'name': 'dataset_tract_context',
                  'description': 'Per-tract public context for the configured single-corridor dataset; rates are fractions.',
                  'statement': DEMOGRAPHICS_SQL, 'parameters': []})
+    docs.append({**common, 'name': 'public_business_status',
+                 'description': 'Dated official DataSF records matched by exact registry location ID; no closure recorded does not prove operation.',
+                 'statement': STATUS_SQL, 'parameters': [param('business_id', 'string', 'Exact ID'), param('corridor', 'string', 'Selected corridor')]})
+    docs.append({**common, 'name': 'public_warn_context',
+                 'description': 'Official SF County WARN snapshot; no verified corridor/business linkage.',
+                 'statement': WARN_SQL, 'parameters': []})
     path.write_text(yaml.safe_dump_all(docs, sort_keys=False))
     print(f"Rendered {path}")
 

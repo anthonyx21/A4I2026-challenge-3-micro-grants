@@ -65,6 +65,8 @@ def test_comparison_fails_closed_on_missing_graph(monkeypatch):
 
 
 def test_comparison_preserves_simulated_scope_and_exact_amounts(monkeypatch):
+    async def public(id): return {'status': 'ok', 'business_id': id, 'registry_status': 'no_closure_recorded'}
+    monkeypatch.setattr(tools, 'get_public_business_context', public)
     async def evidence(id, *args):
         ids = ['x', 'y'] if id == 'a' else ['y']
         return {'status': 'ok', 'seed': {'name': id},
