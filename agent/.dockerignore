@@ -9,6 +9,8 @@
 !evidence_reviewer/*.py
 !neighborhood_context/
 !neighborhood_context/*.py
+!corridor_coordinator/
+!corridor_coordinator/*.py
 !setup.py
 !service.py
 !start_service.py

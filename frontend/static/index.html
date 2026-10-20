@@ -72,7 +72,7 @@
       <div class="p-3.5 border-b border-slate-200 flex items-center justify-between">
         <div>
           <h2 class="font-bold text-sm text-slate-900">Applicant Queue</h2>
-          <p class="text-[11px] text-slate-500">Select a Central Market business to query</p>
+          <p class="text-[11px] text-slate-500">Demo shortlist · financial inputs and queue allocations are simulated</p>
         </div>
         <div class="flex gap-1">
           <button data-filter="ALL" class="queue-filter-btn text-[11px] font-semibold px-2 py-1 rounded bg-slate-900 text-white">All</button>
@@ -98,8 +98,11 @@
             class="bg-slate-800 text-emerald-300 font-mono text-[11px] px-2 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer"
             title="Select Cloud Run ADK Agent"
           >
+            <option value="corridor_coordinator">Auto-route: Corridor Coordinator</option>
             <option value="grant_advisor">Agent: grant_advisor (Portfolio & Memo)</option>
             <option value="cascade_analyst">Agent: cascade_analyst (Graph Specialist)</option>
+            <option value="evidence_reviewer">Agent: Evidence Reviewer</option>
+            <option value="neighborhood_context">Agent: Neighborhood Context</option>
           </select>
         </div>
 
@@ -161,12 +164,12 @@
       <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
         <div class="bg-slate-100 border border-slate-200 rounded-xl p-3.5 text-slate-800 space-y-1.5">
           <div class="text-[10px] font-mono text-emerald-700 font-semibold">
-            🟢 Connected to Cloud Run ADK · https://cascade-analyst-89073885580.us-central1.run.app
+            Live chat via Corridor Coordinator · Cloud Run ADK · https://cascade-analyst-89073885580.us-central1.run.app
           </div>
           <p class="leading-relaxed">
-            Connected to live agents <code>grant_advisor</code> and <code>cascade_analyst</code> querying
+            Corridor Coordinator routes questions to our four specialists querying
             <code>qwiklabs-gcp-04-029c15637557.a4i_econ.CascadeEconomy</code> in <strong>Central Market</strong>.
-            Select an applicant on the left and click any recommended question above, or type a prompt below.
+            Select a demo applicant and ask a question. Queue allocations are simulated previews; chat results come from live specialists.
           </p>
         </div>
       </div>
@@ -176,7 +179,7 @@
         <input
           id="chat-input"
           type="text"
-          placeholder="Ask grant_advisor or cascade_analyst about Central Market applicants, cascades, or memos..."
+          placeholder="Ask about applicants, cascades, evidence, or neighborhood context..."
           class="flex-1 bg-white text-xs px-3.5 py-2.5 rounded-lg border border-slate-300 focus:border-blue-500 focus:outline-none"
         />
         <button

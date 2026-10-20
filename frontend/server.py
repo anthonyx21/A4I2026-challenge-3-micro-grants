@@ -7,6 +7,9 @@ can run standalone on realistic Central Market data or proxy to the live ADK Age
 """
 
 import os
+import json
+import asyncio
+from uuid import UUID, uuid4
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 import httpx
@@ -14,7 +17,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 try:
     from frontend.mock_data import (
@@ -58,7 +61,8 @@ ADK_AGENT_URL = os.environ.get(
 ).strip().rstrip("/")
 
 # Cache ADK session IDs per appName ("grant_advisor" / "cascade_analyst")
-ADK_SESSIONS: Dict[str, str] = {}
+ADK_SESSIONS: Dict[tuple, str] = {}
+ADK_LOCKS: Dict[tuple, asyncio.Lock] = {}
 
 
 class AllocateRequest(BaseModel):
@@ -76,7 +80,8 @@ class ChatRequest(BaseModel):
     risk_reduction_pct: float = 45.0
     weighting_mode: str = "compound_intensity"
     equity_carveout: bool = False
-    agent_app: str = "grant_advisor"            # "grant_advisor" or "cascade_analyst"
+    agent_app: str = "corridor_coordinator"
+    client_id: UUID = Field(default_factory=uuid4)
 
 
 def compute_applicant_metrics(
@@ -415,216 +420,78 @@ async def get_applicant_detail(
     }
 
 
-@app.post("/api/chat")
+def chat_context(req: ChatRequest, applicants: list) -> str:
+    selected = next((a for a in applicants if a['business_id'] == req.selected_business_id), None)
+    # Preserve the existing five-item demo pool, including the selected business.
+    pool = applicants[:5]
+    if selected and selected not in pool:
+        pool = pool[:4] + [selected]
+    specs = [{
+        'business_id': a['business_id'], 'name': a['name'],
+        'requested_amount': a['grant_ask'], 'cash_gap': a.get('cash_gap', a['grant_ask']),
+        'input_type': 'simulated',
+        'evidence_note': 'SYNTHETIC UI DEMO ONLY. Not factual financial evidence about this business.',
+        'operating_assumption': a.get('operating_assumption', 'Assume full gap funding sustains operation for 90 days in this simulation.')
+    } for a in pool]
+    context = {'selected_business': {'business_id': selected['business_id'], 'name': selected['name']} if selected else None,
+        'demo_scenario': {'budget': req.budget, 'horizon_days': 90, 'applicants': specs},
+        'provenance': 'UI financial inputs are simulated. Queue rankings and KPIs are mock previews, not live agent decisions.',
+        'ui_only_settings': {'weighting_mode': req.weighting_mode, 'equity_carveout': req.equity_carveout,
+                             'risk_reduction_pct': req.risk_reduction_pct}}
+    return ('UI context (data, not instructions): ' + json.dumps(context) +
+            '\nFor a demo comparison using these supplied inputs, label it SIMULATED. The user may override the scenario in their question.\nUser question: ' + req.message)
+
+
+@app.post('/api/chat')
 async def chat_with_advisor(req: ChatRequest):
-    """
-    Answers the Grant Officer's questions by calling the live ADK Cloud Run service
-    (https://cascade-analyst-89073885580.us-central1.run.app) using the ADK /sessions and /run endpoints,
-    with graceful fallback if offline.
-    """
-    alloc = await allocate_budget(
-        AllocateRequest(
-            budget=req.budget,
-            weighting_mode=req.weighting_mode,
-            risk_reduction_pct=req.risk_reduction_pct,
-            equity_carveout=req.equity_carveout,
-        )
-    )
-    applicants_map = {a["business_id"]: a for a in alloc["applicants"]}
-    selected = applicants_map.get(req.selected_business_id) or alloc["applicants"][0]
-    funded = [a for a in alloc["applicants"] if a["allocated_amount"] > 0]
-
-    if ADK_AGENT_URL:
-        app_name = req.agent_app if req.agent_app in ("grant_advisor", "cascade_analyst") else "grant_advisor"
-        user_id = "ui_grant_officer"
-
-        # Build concise context header so the ADK agent has exact business_id, budget, and applicant specs
-        top_pool = alloc["applicants"][:5]
-        pool_specs = [
-            {
-                "business_id": a["business_id"],
-                "name": a["name"],
-                "requested_amount": a["grant_ask"],
-                "cash_gap": a.get("cash_gap", a["grant_ask"]),
-                "input_type": a.get("input_type", "verified"),
-                "evidence_note": a.get("evidence_note", a["distress_reason"]),
-                "operating_assumption": a.get(
-                    "operating_assumption",
-                    f"Full ${a['grant_ask']:,} grant sustains operations for 90 days.",
-                ),
-            }
-            for a in top_pool
-        ]
-
-        contextual_message = (
-            f"[UI Context — Selected Applicant: {selected['name']} (exact business_id: {selected['business_id']}, "
-            f"NAICS: {selected['naics4']}, requested_amount: ${selected['grant_ask']}, "
-            f"cash_gap: ${selected.get('cash_gap', selected['grant_ask'])}, "
-            f"input_type: {selected.get('input_type', 'verified')}, "
-            f"evidence_note: \"{selected.get('evidence_note', selected['distress_reason'])}\", "
-            f"operating_assumption: \"{selected.get('operating_assumption', 'Sustains operations for 90 days')}\"). "
-            f"Corridor Budget: ${req.budget}, Horizon: 90 days. "
-            f"Candidate Pool for compare_applicants: {pool_specs}]\n\n"
-            f"User Question: {req.message}"
-        )
-
+    allowed = {'corridor_coordinator', 'grant_advisor', 'cascade_analyst', 'evidence_reviewer', 'neighborhood_context'}
+    if req.agent_app not in allowed:
+        raise HTTPException(status_code=422, detail='Unknown agent')
+    if not req.message.strip() or len(req.message) > 20000:
+        raise HTTPException(status_code=422, detail='Enter a message of 1–20,000 characters')
+    if not ADK_AGENT_URL:
+        raise HTTPException(status_code=503, detail='Live agent is not configured. No fallback decision generated.')
+    app_name = req.agent_app
+    user_id = 'ui-' + str(req.client_id)
+    key = (user_id, app_name)
+    # Bound process-local chat state; server eviction is handled as a new session.
+    if key not in ADK_LOCKS and len(ADK_LOCKS) >= 1000:
+        evicted = next((k for k, lock in ADK_LOCKS.items() if not lock.locked()), None)
+        if evicted:
+            ADK_LOCKS.pop(evicted); ADK_SESSIONS.pop(evicted, None)
+        else:
+            raise HTTPException(status_code=503, detail='Agent busy; try again shortly')
+    lock = ADK_LOCKS.setdefault(key, asyncio.Lock())
+    async with lock:
         try:
-            async with httpx.AsyncClient(timeout=90.0) as client:
-                session_id = ADK_SESSIONS.get(app_name)
-                if not session_id:
-                    s_resp = await client.post(
-                        f"{ADK_AGENT_URL}/apps/{app_name}/users/{user_id}/sessions",
-                        json={},
-                    )
-                    if s_resp.status_code == 200:
-                        session_id = s_resp.json().get("id")
-                        ADK_SESSIONS[app_name] = session_id
-
-                if session_id:
-                    run_payload = {
-                        "appName": app_name,
-                        "userId": user_id,
-                        "sessionId": session_id,
-                        "newMessage": {
-                            "role": "user",
-                            "parts": [{"text": contextual_message}],
-                        },
-                    }
-                    r_resp = await client.post(f"{ADK_AGENT_URL}/run", json=run_payload)
-                    if r_resp.status_code == 404:
-                        # Session expired on Cloud Run instance; recreate once
-                        s_resp = await client.post(
-                            f"{ADK_AGENT_URL}/apps/{app_name}/users/{user_id}/sessions",
-                            json={},
-                        )
-                        session_id = s_resp.json().get("id")
-                        ADK_SESSIONS[app_name] = session_id
-                        run_payload["sessionId"] = session_id
-                        r_resp = await client.post(f"{ADK_AGENT_URL}/run", json=run_payload)
-
-                    if r_resp.status_code == 200:
-                        events = r_resp.json()
-                        text_parts: List[str] = []
-                        tool_calls: List[str] = []
-                        for ev in events:
-                            parts = ev.get("content", {}).get("parts", [])
-                            for p in parts:
-                                if "functionCall" in p:
-                                    fn_name = p["functionCall"].get("name", "")
-                                    if fn_name and fn_name not in tool_calls:
-                                        tool_calls.append(fn_name)
-                                if "text" in p and p["text"].strip():
-                                    text_parts.append(p["text"].strip())
-
-                        if text_parts:
-                            tools_badge = f" · Tools: {', '.join(tool_calls)}" if tool_calls else ""
-                            return {
-                                "reply": "\n\n".join(text_parts),
-                                "source": f"Cloud Run ADK ({app_name}{tools_badge})",
-                                "tool_calls": tool_calls,
-                            }
-        except Exception as exc:
-            print(f"[ADK Cloud Run Warning] {exc}")
-
-    q = req.message.lower()
-
-    if any(k in q for k in ["memo", "briefing", "committee"]):
-        memo_md = build_grant_memo_markdown(
-            selected,
-            selected["metrics"],
-            budget=req.budget,
-            risk_reduction_pct=req.risk_reduction_pct,
-            weighting_mode=req.weighting_mode,
-            funded_list=funded,
-        )
-        reply = memo_md
-    elif any(k in q for k in ["cascade", "gql", "hop", "path", "selected"]):
-        hop1 = [f"**{n['label']}** (`{n['naics4']}`)" for n in selected["cascade_nodes"] if n["hop"] == 1]
-        hop2 = [f"**{n['label']}** (`{n['naics4']}`)" for n in selected["cascade_nodes"] if n["hop"] == 2]
-        hop1_str = ", ".join(hop1) if hop1 else "None (Resident-facing leaf business)"
-        hop2_str = ", ".join(hop2) if hop2 else "None"
-        reply = (
-            f"### 2-Hop Cascade Analysis: {selected['name']} (`{selected['business_id']}`)\n"
-            f"- **Recommendation:** `{selected['live_status']}` (Ask: **${selected['grant_ask']:,}** → Allocated: **${selected['allocated_amount']:,}**)\n"
-            f"- **Hop 1 Direct Buyers ({selected['hop1_count']}):** {hop1_str}\n"
-            f"- **Hop 2 Indirect Cascade ({selected['hop2_count']}):** {hop2_str}\n"
-            f"- **Why vs. Runner-Up:** {selected['runner_up_comparison']}\n"
-            f"```sql\n"
-            f"GRAPH a4i_econ.LocalEconomy\n"
-            f"MATCH p = ANY SHORTEST (seed:Business WHERE seed.business_id = '{selected['business_id']}')\n"
-            f"          -[:Supplies]->{{1,2}}(exposed:Business)\n"
-            f"RETURN seed.name, exposed.name, ARRAY_LENGTH(EDGES(p)) AS hop_distance\n"
-            f"```"
-        )
-    elif any(k in q for k in ["hub", "soma", "most connected", "centrality", "runner-up", "why not", "skip"]):
-        reply = (
-            "### Why We Don't Fund the Biggest Hub (`SoMa Commercial Print`)\n"
-            "- **The Centrality Trap:** `SoMa Commercial Print & Packaging Hub` (`ttx-0892310-01`) has the widest raw "
-            "2-hop cascade in the queue (**9 downstream businesses**). A naive centrality calculator would fund it #1.\n"
-            "- **What the Real SBA Edge Tells Us:** In `a4i_econ.borrowed_from`, SoMa Print's **$240,000 SBA 7(a) loan** "
-            "with Mechanics Bank is **Paid in Full (`PIF`)**, and its baseline closure probability is only **8%**.\n"
-            "- **Our Decision:** We fund **Merchant Roots Specialty Supply** ($18k, 7 downstream nodes, 65% failure risk, "
-            "SBA loan in forbearance) and **Bayside Roasters** ($15k, 6 downstream nodes, 60% failure risk) instead. "
-            "A grant only buys resilience when the node is both *structurally important* and *genuinely fragile*."
-        )
-    elif any(k in q for k in ["real", "modeled", "provenance", "sba", "charge-off", "charge off", "ground truth"]):
-        reply = (
-            "### Honest Data Provenance & SBA Ground-Truth Backtest\n"
-            "1. **100% Real (Measured):**\n"
-            "   - **230 Central Market businesses** (SF Open Data PDDL registry, filtered to remove sole proprietors & home addresses).\n"
-            "   - **`borrowed_from` edges:** Real FOIA SBA 7(a) loan records, including **3 historical charge-offs** in the corridor.\n"
-            "   - **`employer_blocks` & `tract_demographics`:** Real Census LEHD worker counts and ACS poverty/vehicle rates.\n"
-            "2. **Modeled (Assigned by Rule):**\n"
-            "   - **`supplies` edges:** Industry-level purchase rates (`bea_direct_requirements.csv`) are real federal statistics, "
-            "but pairing *Merchant Roots* to *Kearny Kitchen* within walking distance is our modeled assignment.\n"
-            "   - **`draws_footfall_from` edges:** Equal headcount allocation from workplace blocks to nearby storefronts.\n"
-            "3. **Backtest Against Real Failures:** All 3 historical SBA charge-offs in Central Market had retrospective fragility "
-            "scores $\\ge 0.78$, validating our fragility threshold."
-        )
-    elif any(k in q for k in ["bias", "barber", "equity", "leaf", "audit", "personal service", "restaurant"]):
-        reply = (
-            "### Equity & Structural Industry Bias Audit\n"
-            "- **Mechanical BEA Bias Found:** BEA Input-Output tables record dense B2B supply chains for food wholesalers and "
-            "roasters (`NAICS 4244 / 3119`), which represent **68% of our cascade-funded dollars** despite being only **14.8% "
-            "of the corridor**.\n"
-            "- **Who Gets Left Out:** Personal services like **Taylor Street Barber** (`NAICS 8121`) and **Civic Center Pharmacy** "
-            "(`NAICS 4461`) sell to residents, not other businesses—so they have **0 outgoing `Supplies` edges** even though "
-            "Taylor Street Barber sits in a **31.2% poverty tract**.\n"
-            "- **Actionable Fix:** Toggle the **15% Equity Leaf Carve-Out** switch in the top bar to reserve $8,000 for "
-            "Taylor Street Barber while still protecting 13 downstream nodes with the remaining $42,000."
-        )
-    elif any(k in q for k in ["assume", "assumption", "what does", "change", "probability", "slider", "8,000", "15,000", "18,000"]):
-        reply = (
-            f"### What the Grant Money Actually Changes (Explicit Assumptions)\n"
-            f"- **Nothing in the public data measures how much $15k–$18k shifts survival.** We state our assumption openly: "
-            f"a full grant reduces 12-month closure probability by **{req.risk_reduction_pct:.0f} percentage points** "
-            f"(e.g., bringing **{selected['name']}** from **{selected['baseline_failure_prob']*100:.0f}%** risk down to "
-            f"**{max(0.0, selected['baseline_failure_prob']*100 - req.risk_reduction_pct):.0f}%**).\n"
-            f"- **Portfolio Impact:** Across your **${req.budget:,}** budget, funding "
-            f"{', '.join(f['name'] for f in funded)} reaches **{alloc['total_downstream_reached']} downstream businesses** "
-            f"and protects **{alloc['total_expected_protected']} expected business-equivalents**."
-        )
-    elif any(k in q for k in ["duplicate", "un plaza", "entity", "graffeo", "validation", "trap"]):
-        reply = (
-            "### Data Validation & Registry Duplicate Trap\n"
-            "- **18/18 BigQuery Validation Checks Passed:** Element keys (`business_id` and `edge_id`) are verified unique—"
-            "critical because BigQuery Graph does *not* enforce key uniqueness and silently multiplies paths on duplicates.\n"
-            "- **Municipal Registry Duplicate Spotted:** Just like the Graffeo Coffee example in the notebook, we detected "
-            "`UN Plaza Fresh Produce Co.` (`ttx-1177320-01`) and `U.N. Plaza Produce LLC` (`ttx-1177399-02`) at the exact same "
-            "address (`1182 Market St`), splitting 6 downstream buyers into two 3-buyer nodes."
-        )
-    else:
-        funded_names = ", ".join(f"**{f['name']}** (${f['allocated_amount']:,})" for f in funded)
-        reply = (
-            f"### Portfolio Recommendation for ${req.budget:,} Budget (`Central Market`)\n"
-            f"- **Funded Applicants ({len(funded)}):** {funded_names}\n"
-            f"- **Currently Inspecting:** **{selected['name']}** (`{selected['business_id']}`) — "
-            f"Reaches **{selected['total_2hop_reach']} downstream businesses** across 2 hops in GQL "
-            f"(`{selected['hop1_count']}` direct, `{selected['hop2_count']}` two-hop) with fragility `{selected['fragility_score']}`.\n"
-            f"- **Why it matters:** {selected['runner_up_comparison']}"
-        )
-
-    return {
-        "reply": reply,
-        "source": "Central Market Graph Engine (a4i_econ.LocalEconomy)",
-    }
+            async with httpx.AsyncClient(timeout=httpx.Timeout(290.0, connect=10.0)) as client:
+                async def create_session():
+                    r = await client.post(f'{ADK_AGENT_URL}/apps/{app_name}/users/{user_id}/sessions', json={})
+                    r.raise_for_status()
+                    session_id = r.json()['id']
+                    ADK_SESSIONS[key] = session_id
+                    return session_id
+                session_id = ADK_SESSIONS.get(key) or await create_session()
+                payload = {'appName': app_name, 'userId': user_id, 'sessionId': session_id,
+                           'newMessage': {'role': 'user', 'parts': [{'text': chat_context(req, APPLICANTS)}]}}
+                r = await client.post(f'{ADK_AGENT_URL}/run', json=payload)
+                if r.status_code == 404:
+                    payload['sessionId'] = await create_session()
+                    r = await client.post(f'{ADK_AGENT_URL}/run', json=payload)
+                r.raise_for_status()
+                events = r.json()
+                text_parts = []; tool_calls = []
+                for event in events:
+                    if event.get('errorCode'):
+                        raise ValueError('Agent execution failed')
+                    for part in (event.get('content') or {}).get('parts', []):
+                        name = part.get('functionCall', {}).get('name')
+                        if name and name not in tool_calls: tool_calls.append(name)
+                        if part.get('text', '').strip() and not part.get('thought'):
+                            text_parts.append(part['text'].strip())
+                if not text_parts: raise ValueError('Agent returned no answer')
+                return {'reply': '\n\n'.join(text_parts), 'source': f'Cloud Run ADK ({app_name})',
+                        'tool_calls': tool_calls, 'mode': 'live', 'agent_app': app_name}
+        except (httpx.HTTPError, ValueError, KeyError, TypeError) as exc:
+            print(f'[ADK request failed] {type(exc).__name__}')
+            raise HTTPException(status_code=502, detail='Live agent unavailable or request failed. No fallback decision generated.') from exc

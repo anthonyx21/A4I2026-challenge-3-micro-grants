@@ -11,11 +11,13 @@ const state = {
   secondOrderShock: false,
   queueFilter: "ALL",
   selectedBusinessId: "0111663-06-001",
-  agentApp: "grant_advisor",
+  agentApp: "corridor_coordinator",
+  clientId: sessionStorage.getItem("officer-client-id") || crypto.randomUUID(),
   allocationData: null,
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
+  sessionStorage.setItem("officer-client-id", state.clientId);
   bindUIEvents();
   await refreshAllocationAndSelection();
 });
@@ -57,7 +59,7 @@ function bindUIEvents() {
   document.querySelectorAll(".preset-prompt-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       if (btn.dataset.agent) {
-        state.agentApp = btn.dataset.agent;
+        state.agentApp = "corridor_coordinator";
         const sel = document.getElementById("agent-app-select");
         if (sel) sel.value = state.agentApp;
       }
@@ -229,9 +231,11 @@ async function sendChatMessage(messageText) {
         weighting_mode: state.weightingMode,
         equity_carveout: state.equityCarveout,
         agent_app: state.agentApp,
+        client_id: state.clientId,
       }),
     });
     const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Agent request failed");
     loadingBubble.remove();
 
     const botBubble = document.createElement("div");
@@ -259,7 +263,7 @@ async function sendChatMessage(messageText) {
 }
 
 function formatMarkdown(md) {
-  return md
+  return escapeHtml(md)
     .replace(/```(?:sql|json)?([\s\S]*?)```/g, '<pre class="bg-slate-900 text-emerald-300 font-mono text-[11px] p-2.5 rounded-lg my-2 overflow-x-auto">$1</pre>')
     .replace(/^# (.*$)/gm, '<div class="font-bold text-slate-900 text-sm border-b border-slate-300 pb-1 mb-1">$1</div>')
     .replace(/^## (.*$)/gm, '<div class="font-bold text-slate-900 text-xs mt-2.5 mb-1">$1</div>')

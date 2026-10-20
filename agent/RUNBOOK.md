@@ -1,5 +1,29 @@
 # Corridor grant agents
 
+`corridor_coordinator` is the default officer chat entry point. It calls the four existing
+specialists as ADK AgentTools: Cascade Analyst for graph questions, Grant Advisor for funding,
+Evidence Reviewer for reviews, and Neighborhood Context for worker/tract questions. Combined
+requests call relevant specialists sequentially. Required inputs, tool errors, provenance and
+simulation labels remain the specialists' responsibility and are preserved by the coordinator.
+The API permits at most 16 LLM calls per request to accommodate specialist routing.
+
+The custom frontend keeps its two-panel layout and demo allocation preview. Chat and preset
+questions now default to the coordinator; direct specialist selection remains available.
+Queue allocations are explicitly simulated previews and are not synchronized with live grant
+decisions. UI financial context is always labeled synthetic; users can supply another scenario
+in chat. UI-only risk/equity/weight settings do not change the live allocator. Chat sessions are
+isolated by a per-tab client UUID; these are demo session identifiers, not user authentication.
+Agent errors return an explicit HTTP failure, without a canned grant decision. Model text is
+escaped before lightweight Markdown rendering.
+
+`verify_router.py URL` checks all four specialist routes, a combined request, missing funding
+inputs, ambiguous name resolution and an unknown ID using structured specialist tool receipts. It uses
+the currently public demo API; if IAM authentication is enabled, use an authenticated proxy URL.
+
+ADK AgentTool hides nested tool events. The coordinator wrapper records bounded structured
+receipts through each specialist's tool callback and returns them alongside its explanation.
+The coordinator uses receipt counts/statuses over conflicting prose and retains failure status.
+
 A Python ADK specialist that resolves real corridor businesses, calls Google's MCP Toolbox
 over Streamable HTTP, traverses a BigQuery property graph, and summarizes modeled cascade
 evidence. It runs alone and is also available as a specialist tool to Grant Advisor.

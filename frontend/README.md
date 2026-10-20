@@ -2,6 +2,13 @@
 
 Clean 2-panel web UI for **Challenge 3 (Track 1: Main Street Relief)** connected to the live Cloud Run ADK agents (`grant_advisor` and `cascade_analyst`) at `https://cascade-analyst-89073885580.us-central1.run.app/`.
 
+Chat defaults to `corridor_coordinator`, which routes to the four specialists; all remain
+available in the selector. Preset questions also use automatic routing. The applicant queue
+and allocation KPIs remain a **simulated preview**, while chat uses live specialist evidence.
+Mock financial inputs are sent as simulated, never verified financial facts. No canned fallback
+answer is generated when the live API fails. Sessions are separated per browser tab and agent;
+the client UUID is a demo session identifier, not an authentication mechanism.
+
 ---
 
 ## 1. Run Locally

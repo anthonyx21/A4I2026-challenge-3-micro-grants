@@ -1,5 +1,15 @@
 # Verification — October 20, 2026
 
+## Corridor Coordinator and minimal frontend update
+
+- Added `corridor_coordinator`, delegating to the four existing agents with bounded structured tool receipts alongside prose. Evidence callbacks operate on copied agents, preserving standalone behavior. API LLM-call limit is 16.
+- Forty local tests passed, including routing configuration, receipt/failure propagation, UI demo labels, selected-applicant inclusion, distinct user sessions and explicit failure without fallback. JavaScript syntax and Git whitespace checks passed.
+- Agent revision: `cascade-analyst-00007-zxt`. Frontend revision: `micro-grant-ui-00002-rtd`, URL https://micro-grant-ui-89073885580.us-central1.run.app .
+- Eight live routing cases passed: cascade, neighborhood, grant, review, combined cascade/context, missing funding inputs, ambiguous name and unknown ID. `verify_router.py` inspected actual structured tool receipts and completed `ROUTER_VERIFIED`. Traces are saved in ignored `agent/reports/router-*.json`.
+- Browser DOM verified coordinator default, five agent options, existing 11-item queue and two-panel layout, simulated-preview notice and escaped HTML rendering. Frontend-to-router-to-Neighborhood Context call passed for the selected Orpheum applicant; unknown selected UI IDs trigger clarification.
+- Chat uses per-tab UUIDs and per-session locks. UUIDs separate demo state, not authenticated users. API failures return 502/503 without canned decisions; mock financial context is always labeled simulated, with UI-only settings identified.
+- Allocator/KPIs and detail/memo endpoints remain mock previews. This task did not redesign the UI or replace its allocator. Current demo services accept unauthenticated requests; durable session storage and IAM identity support remain future work.
+
 - Local Python 3.12: seven evidence/MCP/query tests passed; dependency check and syntax checks passed.
 - ADK tool declarations successfully generated for `search_businesses` and `analyze_cascade`.
 - Live setup validated 232 unique business keys and 994 unique supply edge keys/references in Central Market.
