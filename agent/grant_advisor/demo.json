@@ -1,0 +1,24 @@
+{
+  "budget": 5000,
+  "horizon_days": 30,
+  "direction": "supply_disruption",
+  "min_intensity": 0.01,
+  "applicants": [
+    {
+      "business_id": "1026779-04-151",
+      "requested_amount": 5000,
+      "cash_gap": 5000,
+      "input_type": "simulated",
+      "evidence_note": "Synthetic demo only. No actual financial distress or request is known for Steel + Lacquer.",
+      "operating_assumption": "For this simulation, assume full gap funding sustains operation for 30 days; no benefit from partial funding."
+    },
+    {
+      "business_id": "1056704-02-161",
+      "requested_amount": 5000,
+      "cash_gap": 5000,
+      "input_type": "simulated",
+      "evidence_note": "Synthetic demo only. No actual financial distress or request is known for Impark 0314.",
+      "operating_assumption": "For this simulation, assume full gap funding sustains operation for 30 days; no benefit from partial funding."
+    }
+  ]
+}

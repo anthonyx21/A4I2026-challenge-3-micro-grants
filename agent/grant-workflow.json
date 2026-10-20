@@ -1,0 +1,16 @@
+{
+  "name": "grant-advisor",
+  "pattern": "specialist-tools",
+  "entry_agent": "grant_advisor",
+  "specialist_agent_tool": "cascade_analyst",
+  "decision_tool": "compare_applicants",
+  "inputs": ["budget_usd", "horizon_days", "2_to_6_applicants_with_financial_needs_provenance_and_operating_assumptions"],
+  "evidence_contract": "Structured live analyze_cascade results for every applicant; same mechanism, two hops, same threshold",
+  "objective": "Unique filtered exposed businesses, conditional on full-gap funding feasibility",
+  "ties": ["lower_spending", "business_id"],
+  "sensitivity": "Repeat portfolio ranking with unfiltered exposure and identify choice changes",
+  "retry": {"max_attempts": 1},
+  "timeout_seconds": 240,
+  "on_failure": "No recommendation when any applicant evidence is incomplete",
+  "output": ["recommended_portfolio", "amounts_usd", "unallocated_budget", "runner_up", "baseline_choice", "named_paths", "limitations", "provenance"]
+}

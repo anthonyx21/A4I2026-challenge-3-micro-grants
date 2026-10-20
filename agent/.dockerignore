@@ -1,0 +1,11 @@
+*
+!requirements.txt
+!install_toolbox.py
+!cascade_analyst/
+!cascade_analyst/*.py
+!grant_advisor/
+!grant_advisor/*.py
+!setup.py
+!service.py
+!start_service.py
+!Dockerfile

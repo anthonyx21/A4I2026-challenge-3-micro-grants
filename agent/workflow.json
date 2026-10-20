@@ -1,0 +1,33 @@
+{
+  "name": "cascade-analyst",
+  "pattern": "sequential",
+  "steps": [
+    {
+      "id": "resolve",
+      "agent": "cascade_analyst",
+      "tool": "search_businesses",
+      "output": ["business_id", "name", "corridor"],
+      "on_ambiguity": "request_business_selection",
+      "next": "traverse"
+    },
+    {
+      "id": "traverse",
+      "agent": "cascade_analyst",
+      "tool": "analyze_cascade",
+      "output": ["seed", "baseline", "filtered", "sensitivity", "warnings"],
+      "next": "report"
+    },
+    {
+      "id": "report",
+      "agent": "cascade_analyst",
+      "output": "evidence_for_grant_advisor",
+      "next": null
+    }
+  ],
+  "retry": {
+    "max_attempts": 1,
+    "backoff_seconds": 2
+  },
+  "timeouts": {"search_seconds": 90, "analysis_seconds": 180},
+  "on_failure": "return_unavailable_without_fabricating_evidence"
+}

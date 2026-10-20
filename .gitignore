@@ -14,6 +14,11 @@ env/
 service-account*.json
 credentials.json
 .env
+agent/bin/
+agent/tools.yaml
+agent/*.log
+agent/reports/
+.pytest_cache/
 
 # OS noise
 .DS_Store

@@ -1,6 +1,9 @@
 # Your agent goes here
 
-This folder is empty on purpose.
+**Implemented agents:** [Cascade Analyst and Grant Advisor setup and usage](RUNBOOK.md). The original
+challenge requirements below remain the specification for the complete submission.
+
+The challenge's original design guidance follows.
 
 We built the on-ramp: a real commercial corridor, real businesses, one fully real
 business-to-business relationship, two modeled ones built on published federal rates, a
