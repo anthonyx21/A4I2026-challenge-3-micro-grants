@@ -1,12 +1,13 @@
 """Persistent application snapshots and auditable runs. PostgreSQL in Cloud Run; SQLite locally."""
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from uuid import uuid4
-from sqlalchemy import create_engine, MetaData, Table, Column, String, Integer, JSON, Text, ForeignKey, select, update
+from sqlalchemy import create_engine, MetaData, Table, Column, String, Integer, JSON, Text, ForeignKey, select, update, text
 
 metadata = MetaData()
+schema_versions = Table('schema_versions',metadata,Column('version',Integer,primary_key=True),Column('applied_at',String,nullable=False))
 applications = Table('applications', metadata, Column('id', String, primary_key=True),
                      Column('version', Integer, nullable=False), Column('payload', JSON, nullable=False))
 workspace = Table('workspace', metadata, Column('id', String, primary_key=True), Column('payload', JSON, nullable=False))
@@ -30,12 +31,16 @@ class Store:
             directory=Path(os.getenv('RELIEFIQ_DATA_DIR',str(Path.home()/'.reliefiq')));directory.mkdir(parents=True,exist_ok=True)
             url='sqlite:///'+str(directory/'applications.db')
         self.engine=create_engine(url,pool_pre_ping=True,connect_args={'check_same_thread':False} if url.startswith('sqlite') else {})
-        metadata.create_all(self.engine)
+        with self.engine.begin() as c:
+            if self.engine.dialect.name=='postgresql': c.execute(text('SELECT pg_advisory_xact_lock(4812025)'))
+            metadata.create_all(c)
+            if not c.execute(select(schema_versions).where(schema_versions.c.version==1)).first():
+                c.execute(schema_versions.insert().values(version=1,applied_at=now()))
 
     def seed(self, path=None):
         data=json.loads((path or Path(__file__).with_name('seed_data.json')).read_text())
         with self.engine.begin() as c:
-            if self.engine.dialect.name=='postgresql': c.execute(__import__('sqlalchemy').text('SELECT pg_advisory_xact_lock(4812026)'))
+            if self.engine.dialect.name=='postgresql': c.execute(text('SELECT pg_advisory_xact_lock(4812026)'))
             if c.execute(select(workspace.c.id).where(workspace.c.id=='default')).first(): return
             for original in data['applications']:
                 a={**original,'input_type':'simulated','cash_gap':original.get('cash_gap',original['ask']),
@@ -72,7 +77,7 @@ class Store:
         run_id=str(uuid4())
         with self.engine.begin() as c:
             if self.engine.dialect.name=='postgresql':
-                c.execute(__import__('sqlalchemy').text('SELECT pg_advisory_xact_lock(4812027)'))
+                c.execute(text('SELECT pg_advisory_xact_lock(4812027)'))
             active=c.execute(select(runs).where(runs.c.application_id==id,runs.c.status.in_(['queued','running']))).mappings().all()
             for row in active:
                 if row['input_snapshot']==snapshot: return row['id']
@@ -96,7 +101,10 @@ class Store:
         return dict(r) if r else None
 
     def run(self,id):
-        with self.engine.connect() as c:r=c.execute(select(runs).where(runs.c.id==id)).mappings().first()
+        with self.engine.begin() as c:
+            cutoff=(datetime.now(timezone.utc)-timedelta(minutes=30)).isoformat()
+            c.execute(update(runs).where(runs.c.id==id,runs.c.status.in_(['queued','running']),runs.c.created_at<cutoff).values(status='failed',error='Job exceeded its 30-minute recovery deadline; generate a new memo'))
+            r=c.execute(select(runs).where(runs.c.id==id)).mappings().first()
         return dict(r) if r else None
 
     def recommend(self,id,amount):

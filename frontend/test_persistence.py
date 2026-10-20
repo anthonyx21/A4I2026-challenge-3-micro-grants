@@ -94,3 +94,15 @@ def test_repeated_click_reuses_active_snapshot(client):
 def test_internal_worker_requires_task_auth(client):
     run_id=api.store().create_run('1026779-04-151',{})
     assert client.post('/api/internal/memo-runs/'+run_id,json={}).status_code==401
+
+def test_interrupted_job_recovers_as_failure(client):
+    from sqlalchemy import update
+    id=api.store().create_run('1026779-04-151',{})
+    with api.store().engine.begin() as connection:
+        connection.execute(update(runs).where(runs.c.id==id).values(created_at='2020-01-01T00:00:00+00:00'))
+    assert client.get('/api/analysis-runs/'+id).json()['status']=='failed'
+
+def test_note_route_updates_same_application(client):
+    response=client.post('/api/applications/1026779-04-151/notes',json={'version':1,'text':'Verify landlord evidence'})
+    assert response.status_code==200
+    assert client.get('/api/applications/1026779-04-151').json()['notes']['reviewer']=='Verify landlord evidence'

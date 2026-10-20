@@ -9,7 +9,7 @@ pip install -r frontend/requirements.txt
 RELIEFIQ_DATA_DIR=./.local-data python -m uvicorn frontend.server:app --port 8080 --reload
 ```
 
-SQLite persists locally. Set `DATABASE_URL` to a SQLAlchemy PostgreSQL URL to use PostgreSQL. Cloud Run requires an explicit database URL. Initial schema creation and seeding happen on first database access; reseeding preserves edits. The application JSON retains the original financial summaries, document metadata, network previews and notes. Analysis runs and memo versions are separate records with application references.
+SQLite persists locally. Set `DATABASE_URL` to a SQLAlchemy PostgreSQL URL to use PostgreSQL. Cloud Run requires an explicit database URL. Run `python -m frontend.migrate --seed` to apply the initial versioned schema explicitly. Schema version 1 is also applied on first database access; reseeding preserves edits. The application JSON retains the original financial summaries, document metadata, network previews and notes. Analysis runs and memo versions are separate records with application references.
 
 The challenge reviewer password defaults to `demopassword`; enable signed-cookie enforcement locally with `REQUIRE_REVIEWER_LOGIN=true` and set `REVIEWER_PASSWORD`. This shared reviewer account is intended for the challenge demonstration, not municipal production authentication.
 

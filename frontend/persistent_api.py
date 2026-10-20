@@ -221,3 +221,20 @@ class BudgetEdit(BaseModel):
 def budget(req: BudgetEdit):
     try: return store().update_budget(req.round_budget)
     except ValueError as exc: raise HTTPException(409,str(exc))
+
+
+class NoteRequest(BaseModel):
+    version: int = Field(ge=1)
+    text: str = Field(min_length=1,max_length=5000)
+
+@router.post('/applications/{id}/notes')
+def note(id: str,req: NoteRequest):
+    row=application(id)
+    return edit(id,ApplicationEdit(version=req.version,notes={**row['notes'],'reviewer':req.text}))
+
+class AnalysisRequest(MemoRequest):
+    application_id: str
+
+@router.post('/analysis-runs')
+async def start_analysis(req: AnalysisRequest):
+    return await generate_memo(req.application_id,MemoRequest(applicant_ids=req.applicant_ids,horizon_days=req.horizon_days))
