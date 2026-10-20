@@ -68,15 +68,46 @@ button{cursor:pointer}
 .login small{color:var(--faint);font-size:12px;text-align:center}
 
 /* Shell */
-#app{height:100%;display:flex;flex-direction:column}
-.topbar{flex:0 0 48px;height:48px;display:flex;align-items:center;gap:16px;background:var(--surface);border-bottom:1px solid var(--line);min-width:0}
-.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 0}
+#app{height:100%;display:flex;flex-direction:row;overflow:hidden}
+.app-main{flex:1 1 auto;min-width:0;height:100%;display:flex;flex-direction:column;overflow:hidden}
+.sidebar{flex:0 0 232px;width:232px;height:100%;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:12px;gap:14px;overflow-y:auto;overflow-x:hidden;transition:width .24s cubic-bezier(.2,.7,.2,1),flex-basis .24s cubic-bezier(.2,.7,.2,1),padding .24s cubic-bezier(.2,.7,.2,1),border-color .24s}
+.sidebar.collapsed{flex:0 0 0px;width:0;padding-left:0;padding-right:0;border-right-color:transparent;overflow:hidden}
+.sb-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 2px 0}
+.sb-brand{display:flex;align-items:center;gap:9px;border:0;background:none;padding:2px;font-weight:700;font-size:15px;letter-spacing:-.02em;color:var(--ink);white-space:nowrap}
+.sb-logo{width:26px;height:26px;border-radius:6px;background:var(--ink);color:var(--bg);display:grid;place-items:center;flex:none}
+.sb-logo svg{width:16px;height:16px;display:block}
+.sb-corridor{border:1px solid var(--line-2);border-radius:8px;padding:10px 12px;background:var(--surface);display:flex;flex-direction:column;gap:2px}
+.sb-corridor b{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-corridor span{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-nav{display:flex;flex-direction:column;gap:14px;flex:1;min-height:0}
+.sb-group{display:flex;flex-direction:column;gap:2px}
+.sb-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600;padding:0 8px 4px}
+.sb-item{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;padding:7px 10px;border-radius:7px;font-size:13px;font-weight:500;color:var(--muted);text-align:left;white-space:nowrap}
+.sb-item svg{width:15px;height:15px;flex:none;color:var(--muted)}
+.sb-item:hover{background:var(--sunk);color:var(--ink)}
+.sb-item:hover svg{color:var(--ink)}
+.sb-item[aria-current="page"]{background:var(--sunk);color:var(--ink);font-weight:600}
+.sb-item[aria-current="page"] svg{color:var(--app)}
+.sb-ct{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--faint);font-weight:400}
+.sb-ct.open{color:var(--app);font-weight:500}
+.sb-foot{margin-top:auto;padding-top:10px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:6px}
+.sb-user{display:flex;align-items:center;gap:9px;border:0;background:none;padding:4px 6px;border-radius:7px;text-align:left;min-width:0;flex:1}
+.sb-user:hover{background:var(--sunk)}
+.sb-user .u-info{min-width:0;display:flex;flex-direction:column}
+.sb-user .u-name{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user .u-role{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.theme-btn{height:30px;border:1px solid var(--line-2);border-radius:999px;background:var(--sunk);padding:0 10px;font-size:12px;font-weight:500;color:var(--ink);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+.theme-btn svg{width:14px;height:14px;flex:none}
+.topbar{flex:0 0 48px;height:48px;display:flex;align-items:center;gap:14px;background:var(--surface);border-bottom:1px solid var(--line);min-width:0}
+.tb-left{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 0}
 .brand{font-weight:700;letter-spacing:-.01em;white-space:nowrap}
 .brand i{font-style:normal;color:var(--app)}
-.crumb{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.crumb button{border:0;background:none;padding:0;color:var(--muted);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px}
-.crumb button:hover{color:var(--ink)}
-.crumb b{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.tb-crumb{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-crumb button{border:0;background:none;padding:0;color:var(--muted);font-size:13px}
+.tb-crumb button:hover{color:var(--ink);text-decoration:underline}
+.tb-crumb .sep{color:var(--faint)}
+.tb-crumb b{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis}
 .tb-center{flex:0 1 auto;display:flex;justify-content:center}
 .switcher{height:30px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--bg);padding:0 8px;max-width:260px}
 .tb-right{flex:1 1 0;display:flex;justify-content:flex-end;align-items:center;gap:10px}
@@ -535,9 +566,10 @@ const nodeName = k => NODES[k] ? NODES[k].name : k;
 /* ---------- State ---------- */
 const S = {
   screen:'login', map:'expanded', pinned:false, current:null,
+  sidebarOpen:true,
   layers:{out:true,in:true,spill:true},
   awarded:{}, ui:{}, chats:{}, arts:{}, animSel:null, pop:null,
-  menu:null, q:'', aq:'', filter:'all', theme:'system', seeded:false,
+  menu:null, q:'', aq:'', filter:'all', theme:'light', seeded:false,
   agentApp:'corridor_coordinator',
   clientId:(window.crypto && crypto.randomUUID) ? crypto.randomUUID() : '00000000-0000-4000-8000-' + String(Date.now()).padStart(12,'0').slice(-12),
   prefs:{emailDocs:true, digest:false, keepMap:false},
@@ -571,6 +603,11 @@ const bc = items => `<nav class="bc" aria-label="Breadcrumb">${items.map(([k,l])
 function log(t){ S.activity.unshift({t,time:timeLabel()}); S.activity.length = Math.min(S.activity.length, 20); }
 let toastT;
 function toast(msg){ const t=$('#toast'); if(!t) return; t.innerHTML=`<div class="toast" role="status">${esc(msg)}</div>`; clearTimeout(toastT); toastT=setTimeout(()=>{ t.innerHTML=''; }, 2800); }
+function isDarkTheme(){
+  if(S.theme==='dark') return true;
+  if(S.theme==='light') return false;
+  return !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+}
 function applyTheme(){
   if(S.theme==='system') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', S.theme);
@@ -592,6 +629,16 @@ function startSession(email){
 
 /* ---------- Icons ---------- */
 const IC = {
+  logo:'<svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6.2" r="3" fill="var(--app)"/><path d="M3.5 13h11M5.5 10.5h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  sidebar:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2.5" width="12" height="11" rx="1.8"/><path d="M6.2 2.5v11"/></svg>',
+  menu:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/></svg>',
+  grid:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.2" y="2.2" width="4.6" height="4.6" rx="1"/><rect x="9.2" y="2.2" width="4.6" height="4.6" rx="1"/><rect x="2.2" y="9.2" width="4.6" height="4.6" rx="1"/><rect x="9.2" y="9.2" width="4.6" height="4.6" rx="1"/></svg>',
+  inbox:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 9.5h3.2l1.1 1.6h2.4l1.1-1.6h3.2"/><path d="M3.6 3h8.8l1.6 6.5v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-3z"/></svg>',
+  doc:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2.2h5.5L12.5 5.2v8.6a.8.8 0 0 1-.8.8H4a.8.8 0 0 1-.8-.8V3a.8.8 0 0 1 .8-.8z"/><path d="M9.2 2.2v3.2h3.2M5.5 8.5h5M5.5 11h3.5"/></svg>',
+  map:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3.6 6 2.2l4 1.4 4-1.4v10.2l-4 1.4-4-1.4-4 1.4z"/><path d="M6 2.2v10.2M10 3.6v10.2"/></svg>',
+  user:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.4" r="2.6"/><path d="M3.2 13.4c.7-2.3 2.5-3.6 4.8-3.6s4.1 1.3 4.8 3.6"/></svg>',
+  sun:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M12.6 3.4l-1.3 1.3M4.7 11.3l-1.3 1.3"/></svg>',
+  moon:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12.8 9.8A5.2 5.2 0 0 1 6.2 3.2a5.3 5.3 0 1 0 6.6 6.6z"/></svg>',
   collapse:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h10"/></svg>',
   split:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/><path d="M2.5 8h11"/></svg>',
   max:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2.5H2.5V6M10 2.5h3.5V6M6 13.5H2.5V10M10 13.5h3.5V10"/></svg>',
@@ -604,12 +651,23 @@ const IC = {
 function render(){
   const app = $('#app');
   if(S.screen==='login'){ app.innerHTML = loginView(); return; }
-  app.innerHTML = `<header class="topbar gut" id="topbar"></header><section class="drawer" id="drawer"></section><main class="ws" id="ws"></main><div id="menu"></div><div id="toast" aria-live="polite"></div>`;
-  renderTop(); renderDrawer(); renderWS(); renderMenu();
+  app.innerHTML = `<aside class="sidebar ${S.sidebarOpen?'':'collapsed'}" id="sidebar" aria-label="CorridorGrants navigation"></aside><div class="app-main"><header class="topbar gut" id="topbar"></header><section class="drawer" id="drawer"></section><main class="ws" id="ws"></main></div><div id="menu"></div><div id="toast" aria-live="polite"></div>`;
+  renderSidebar(); renderTop(); renderDrawer(); renderWS(); renderMenu();
 }
 
 function loginView(){
-  return `<div class="login gut"><div class="login-card">
+  const dark = isDarkTheme();
+  return `<div class="login gut" style="width:100%;position:relative">
+    <div style="position:fixed;top:16px;right:16px">
+      <button class="theme-btn" type="button" data-act="toggle-theme" aria-label="Toggle dark and light mode" title="Switch to ${dark?'Light':'Dark'} mode">
+        ${dark ? IC.sun + '<span>Light mode</span>' : IC.moon + '<span>Dark mode</span>'}
+      </button>
+    </div>
+    <div class="login-card">
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px">
+      <span class="sb-logo">${IC.logo}</span>
+      <span style="font-weight:700;font-size:17px;letter-spacing:-.02em">CorridorGrants</span>
+    </div>
     <h1>Corridor Grant Intelligence Portal</h1>
     <form id="login-form" autocomplete="off">
       <h2>Sign in to Reviewer Workspace</h2>
@@ -626,22 +684,86 @@ function loginView(){
 function poolRemaining(){ return POOL_TOTAL - POOL_COMMITTED - Object.values(S.awarded).reduce((s,v)=>s+v,0); }
 
 const reportCount = () => Object.values(S.arts).reduce((s,l)=>s+l.length,0);
+
+function renderSidebar(){
+  const sb = $('#sidebar'); if(!sb) return;
+  sb.classList.toggle('collapsed', !S.sidebarOpen);
+  const cur = S.screen==='review' ? 'apps' : S.screen;
+  const rpt = reportCount();
+  sb.innerHTML = `
+    <div class="sb-head">
+      <button class="sb-brand" data-act="go" data-v="triage" aria-label="CorridorGrants, go to dashboard">
+        <span class="sb-logo">${IC.logo}</span>
+        <span>CorridorGrants</span>
+      </button>
+      <button class="icobtn" data-act="toggle-sidebar" aria-label="Collapse sidebar" title="Collapse sidebar">${IC.sidebar}</button>
+    </div>
+    <div class="sb-corridor">
+      <b>${CORRIDOR}</b>
+      <span>Round 2 · closes Nov 14</span>
+    </div>
+    <nav class="sb-nav" aria-label="Primary sidebar">
+      <div class="sb-group">
+        <div class="sb-label">Review</div>
+        <button class="sb-item" data-act="go" data-v="triage" ${cur==='triage'&&S.map!=='max'?'aria-current="page"':''}>
+          ${IC.grid}<span>Dashboard</span>
+        </button>
+        <button class="sb-item" data-act="go" data-v="apps" ${cur==='apps'&&S.map!=='max'?'aria-current="page"':''}>
+          ${IC.inbox}<span>Applications</span><span class="sb-ct open">${APPS.length} open</span>
+        </button>
+        <button class="sb-item" data-act="go" data-v="reports" ${cur==='reports'&&S.map!=='max'?'aria-current="page"':''}>
+          ${IC.doc}<span>Reports</span><span class="sb-ct">${rpt}</span>
+        </button>
+      </div>
+      <div class="sb-group">
+        <div class="sb-label">Corridor</div>
+        <button class="sb-item" data-act="full-map" ${S.map==='max'?'aria-current="page"':''}>
+          ${IC.map}<span>Full corridor map</span>
+        </button>
+      </div>
+      <div class="sb-group">
+        <div class="sb-label">Account</div>
+        <button class="sb-item" data-act="go" data-v="profile" ${cur==='profile'&&S.map!=='max'?'aria-current="page"':''}>
+          ${IC.user}<span>Profile &amp; preferences</span>
+        </button>
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <button class="sb-user" data-act="menu" data-v="profile" aria-label="Account menu" aria-expanded="${S.menu==='profile'}">
+        <span class="avatar">${S.user.initials}</span>
+        <span class="u-info">
+          <span class="u-name">${esc(S.user.name)}</span>
+          <span class="u-role">${esc(S.user.title)}</span>
+        </span>
+      </button>
+    </div>`;
+}
+
 function renderTop(){
+  const tb = $('#topbar'); if(!tb) return;
   const rem = poolRemaining();
   const unread = S.notifs.filter(n=>n.unread).length;
-  const cur = S.screen==='review' ? 'apps' : S.screen;
+  const dark = isDarkTheme();
+  const pageTitle = {triage:'Dashboard',apps:'Applications',reports:'Reports',profile:'Profile & preferences'}[S.screen] || 'Dashboard';
+  const crumbHTML = S.screen==='review' && BY[S.current]
+    ? `<button data-act="go" data-v="triage">${CORRIDOR}</button><span class="sep">›</span><button data-act="go" data-v="apps">Applications</button><span class="sep">›</span><b>#${esc(S.current)} · ${esc(BY[S.current].name)}</b>`
+    : `<button data-act="go" data-v="triage">${CORRIDOR}</button><span class="sep">›</span><b>${S.map==='max'?'Full corridor map':esc(pageTitle)}</b>`;
   const switcher = S.screen==='review'
     ? `<select class="switcher" id="switcher" aria-label="Switch applicant">${APPS.map(x=>`<option value="${x.id}" ${x.id===S.current?'selected':''}>${x.id} · ${esc(x.name)}</option>`).join('')}</select>`
     : '';
-  $('#topbar').innerHTML = `
-    <div class="tb-left"><button class="brand" data-act="go" data-v="triage" aria-label="Corridor Grants, go to dashboard">Corridor<i>·</i>Grants</button>
-      <nav class="nav" aria-label="Primary">${NAV.map(([k,l])=>`<button class="navlink" data-act="go" data-v="${k}" ${cur===k?'aria-current="page"':''}>${l}${k==='reports'&&reportCount()?`<span class="ct">${reportCount()}</span>`:''}</button>`).join('')}</nav></div>
+  tb.innerHTML = `
+    <div class="tb-left">
+      <button class="icobtn" data-act="toggle-sidebar" aria-label="Toggle sidebar" title="${S.sidebarOpen?'Hide sidebar':'Show sidebar'}">${IC.menu}</button>
+      <div class="tb-crumb">${crumbHTML}</div>
+    </div>
     <div class="tb-center">${switcher}</div>
     <div class="tb-right">
       <div class="search">${IC.search}<input id="q" type="search" placeholder="Search applications" value="${esc(S.q)}" autocomplete="off" aria-label="Search applications"></div>
       <span class="pool" title="Grant pool remaining this round"><span class="lbl">Pool remaining</span> ${fmt(rem)} / ${fmt(POOL_TOTAL)} <span class="bar"><span style="width:${Math.max(0,rem/POOL_TOTAL*100)}%"></span></span></span>
+      <button class="theme-btn" data-act="toggle-theme" aria-label="Switch to ${dark?'light':'dark'} mode" title="Switch to ${dark?'Light':'Dark'} mode">
+        ${dark ? IC.sun + '<span>Light</span>' : IC.moon + '<span>Dark</span>'}
+      </button>
       <button class="icobtn bell" data-act="menu" data-v="notif" aria-label="Notifications, ${unread} unread" aria-expanded="${S.menu==='notif'}">${IC.bell}${unread?`<span class="badge">${unread}</span>`:''}</button>
-      <button class="profbtn" data-act="menu" data-v="profile" aria-label="Account menu" aria-expanded="${S.menu==='profile'}"><span class="avatar">${S.user.initials}</span><span class="nm">${esc(S.user.name.split(' ')[0])}</span><span class="car">▾</span></button>
     </div>`;
 }
 
@@ -675,6 +797,11 @@ function renderMenu(){
   }
   const r = anchor.getBoundingClientRect();
   const width = Math.min(w, innerWidth - 16);
+  if(r.top > innerHeight / 2){
+    const left = Math.max(8, Math.min(r.left, innerWidth - width - 8));
+    m.innerHTML = `<div class="menu" style="bottom:${innerHeight - r.top + 6}px;left:${left}px;width:${width}px" role="menu">${html}</div>`;
+    return;
+  }
   let left = S.menu==='search' ? r.left : r.right - width;
   left = Math.max(8, Math.min(left, innerWidth - width - 8));
   m.innerHTML = `<div class="menu" style="top:${r.bottom+6}px;left:${left}px;width:${width}px" role="menu">${html}</div>`;
@@ -772,7 +899,7 @@ function setMap(state){
   d.dataset.state = state;
   document.querySelectorAll('.ov-ctrl [data-act="map"]').forEach(b=>{ if(b.dataset.v!=='collapsed') b.setAttribute('aria-pressed', b.dataset.v===state); });
   $('#mpop').innerHTML='';
-  renderWS();
+  renderSidebar(); renderTop(); renderWS();
 }
 
 /* map popover */
@@ -926,8 +1053,7 @@ function triageView(){
     </button>`).join('');
   const req = APPS.reduce((s,a)=>s+a.ask,0);
   return `<div class="triage gut">
-    ${bc([[null,CORRIDOR],[null,'Triage Dashboard']]).replace('<span aria-current="page">'+CORRIDOR+'</span>','<span>'+CORRIDOR+'</span>')}
-    <div class="triage-head" style="margin-top:6px"><h1>${(h=>h<12?'Good morning':h<18?'Good afternoon':'Good evening')(new Date().getHours())}, ${esc(S.user.name.split(' ')[0])}</h1>
+    <div class="triage-head"><h1>${(h=>h<12?'Good morning':h<18?'Good afternoon':'Good evening')(new Date().getHours())}, ${esc(S.user.name.split(' ')[0])}</h1>
       <div class="stats"><span><b>${APPS.length}</b> open</span><span><b>${fmt(req)}</b> requested</span><span><b>${fmt(poolRemaining())}</b> available</span></div></div>
     <div class="triage-grid">
       <section class="panel"><div class="panel-h"><h2>Help-desk queue</h2><span class="label">Sorted by readiness · BigQuery CascadeEconomy</span></div>
@@ -1238,6 +1364,7 @@ function makeLiveAdkArtifact(a, replyMd, source, tools){
   if(S.current===a.id){
     const rv = $('#review'); if(rv) rv.classList.add('l2b');
     renderArt();
+    renderSidebar();
     renderTop();
   }
 }
@@ -1322,7 +1449,7 @@ function makeArtifact(a, kind, tight, silent){
   renderArt();
   log(`Generated ${art.title} for ${a.name}`);
   const step = ()=>{
-    if(!art.pending || !art.pending.length){ art.pending=null; toast(`${art.title} ready · saved to Reports`); renderTop(); return; }
+    if(!art.pending || !art.pending.length){ art.pending=null; toast(`${art.title} ready · saved to Reports`); renderSidebar(); renderTop(); return; }
     const s = art.pending.shift(); art.secs.push(s);
     if(S.current===a.id && ui(a.id).art===kind){
       const body = $('#art-doc'); if(body){ const d=document.createElement('div'); d.className='stream-in'; d.innerHTML=s; body.appendChild(d); }
@@ -1377,9 +1504,23 @@ document.addEventListener('click', e=>{
   switch(act){
     case 'demo-login': startSession(); break;
     case 'logout': S.screen='login'; S.current=null; S.menu=null; render(); break;
-    case 'go': S.screen=t.dataset.v; S.current=null; S.menu=null; S.pop=null; if(S.screen==='triage'&&S.map==='collapsed'&&!S.pinned) S.map='expanded'; render(); break;
+    case 'toggle-sidebar': S.sidebarOpen=!S.sidebarOpen; renderSidebar(); renderTop(); break;
+    case 'toggle-theme': {
+      S.theme = isDarkTheme() ? 'light' : 'dark';
+      applyTheme();
+      if(S.screen==='login'){ render(); }
+      else { renderSidebar(); renderTop(); renderMenu(); if(S.screen==='profile') renderWS(); }
+      toast(`Switched to ${S.theme==='dark'?'Dark':'Light'} mode`);
+      break;
+    }
+    case 'full-map': {
+      const next = S.map==='max' ? 'expanded' : 'max';
+      setMap(next);
+      break;
+    }
+    case 'go': S.screen=t.dataset.v; S.current=null; S.menu=null; S.pop=null; if(S.map==='max') S.map='expanded'; if(S.screen==='triage'&&S.map==='collapsed'&&!S.pinned) S.map='expanded'; render(); break;
     case 'menu': S.menu = S.menu===t.dataset.v ? null : t.dataset.v; renderMenu(); break;
-    case 'theme': S.theme=t.dataset.v; applyTheme(); renderMenu(); if(S.screen==='profile') renderWS(); break;
+    case 'theme': S.theme=t.dataset.v; applyTheme(); renderSidebar(); renderTop(); renderMenu(); if(S.screen==='profile') renderWS(); break;
     case 'mark-read': S.notifs.forEach(n=>n.unread=false); renderTop(); renderMenu(); break;
     case 'notif': { const n=S.notifs[+t.dataset.i]; n.unread=false; S.menu=null; if(n.app) openBiz(n.app,'search'); else { renderTop(); renderMenu(); } break; }
     case 'filter': S.filter=t.dataset.v; renderWS(); break;
