@@ -1,6 +1,6 @@
 # Your agent goes here
 
-**Implemented agents:** [Cascade Analyst and Grant Advisor setup and usage](RUNBOOK.md). The original
+**Implemented agents:** [Cascade Analyst, Grant Advisor, Evidence Reviewer and Neighborhood Context](RUNBOOK.md). The original
 challenge requirements below remain the specification for the complete submission.
 
 The challenge's original design guidance follows.

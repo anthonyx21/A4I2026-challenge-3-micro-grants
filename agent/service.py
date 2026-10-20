@@ -18,6 +18,6 @@ async def health():
         async with streamablehttp_client("http://127.0.0.1:5000/mcp") as (read, write, _):
             async with ClientSession(read, write) as session:
                 await session.initialize()
-        return {"status": "ok", "agents": ["cascade_analyst", "grant_advisor"], "mcp": "ready"}
+        return {"status": "ok", "agents": ["cascade_analyst", "grant_advisor", "evidence_reviewer", "neighborhood_context"], "mcp": "ready"}
     except Exception as exc:
         raise HTTPException(status_code=503, detail="MCP Toolbox unavailable") from exc

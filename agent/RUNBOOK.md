@@ -1,4 +1,4 @@
-# Cascade Analyst and Grant Advisor
+# Corridor grant agents
 
 A Python ADK specialist that resolves real corridor businesses, calls Google's MCP Toolbox
 over Streamable HTTP, traverses a BigQuery property graph, and summarizes modeled cascade
@@ -136,3 +136,54 @@ Verify the deployed agent with an authenticated Google identity:
 
 The check requires successful live comparison/MCP evidence, budget-consistent allocation, and
 simulation labeling. It saves the tool trace and memo under ignored `reports/`.
+
+## Evidence Reviewer
+
+Select `evidence_reviewer` for a review of a scenario and optional draft memo. Supply the same
+financial inputs required by Grant Advisor; add `memo_text` for wording review. Its custom
+`review_grant_scenario` recomputes the live comparison and checks money reconciliation,
+recipient identities, full-gap amounts, deduplicated exposure, simulated provenance and
+sensitivity. Draft text is screened conservatively for causal, probability and approval language.
+Phrase hits require contextual inspection and may include negated statements. The agent also
+reads the draft qualitatively; this is distinct from deterministic calculator checks.
+
+Successful consistency checks return `review_required`, never grant approval. Invalid or
+incomplete evidence returns `blocked`. Financial documents and supplied "verified" labels
+have not been independently audited. Outstanding evidence includes actual financial gaps,
+operating plans, observed commercial links/substitutes, and community access/value.
+
+Every Grant Advisor comparison now includes an automatic `evidence_review`. The standalone
+Reviewer additionally handles draft wording. Grant Advisor can call it as a specialist agent.
+
+## Neighborhood Context
+
+Select `neighborhood_context` and enter a business name or ID. `get_neighborhood_context`
+resolves the ID through MCP, then queries modeled footfall links and employer blocks grouped
+by workplace tract, plus all public demographic rows in the configured single-corridor dataset.
+No new graph or source data is created. The existing supply graph remains the multi-hop component.
+
+Worker allocation remains fractional and represents modeled nearby demand, not observed visits
+or employment at a business. Linked-block jobs belong to workplace census blocks. Coordinates
+are approximated to tract internal points, and workers were allocated equally among nearby
+consumer businesses within 500 metres. Independent business allocations share workers and cannot
+be added as unique people.
+
+Demographics describe tract populations, not verified customers or a business location. Poverty
+uses people with determined poverty status; no-vehicle and assistance rates use households.
+The stored rates are fractions. Missing demographic matches and absent modeled footfall are
+explicit. Median incomes are not averaged and corridor rates are not inferred from missing
+denominators. Source vintage metadata is unavailable in the loaded tables. The agent produces
+context and evidence questions, without a demographic ranking or changes to the grant objective.
+
+Grant Advisor can call Neighborhood Context for community/worker questions while keeping its
+findings separate from supply-chain exposure and allocation.
+
+Verify both deployed specialists:
+
+```bash
+.venv/bin/python verify_specialists.py https://cascade-analyst-89073885580.us-central1.run.app
+```
+
+This runs real Gemini tool calls and read-only MCP queries, checks nonempty worker links and
+tract context, and requires simulated-input, sensitivity, causal-language and approval-language
+review findings. Traces are saved in ignored `reports/`.

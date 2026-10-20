@@ -45,7 +45,7 @@ async def compare_applicants(budget: float, applicants: list[dict], horizon_days
         r['eligibility'] = 'eligible' if r['gap_cents'] <= min(r['request_cents'], fund) else 'gap_exceeds_request_or_budget'
         r.pop('gap_cents'); r.pop('request_cents'); r.pop('baseline_ids'); r.pop('filtered_ids')
     simulated = any(a['input_type'] == 'simulated' for a in clean)
-    return {'status': 'ok', 'decision_scope': 'simulated_scenario' if simulated else 'conditional_decision_support',
+    report = {'status': 'ok', 'decision_scope': 'simulated_scenario' if simulated else 'conditional_decision_support',
             'corridor': CORRIDOR, 'budget': fund / 100, 'horizon_days': horizon_days,
             'direction': direction, 'min_intensity': min_intensity, 'applicants': results, **decision,
             'limitations': ['Financial need and operating assumptions are supplied inputs; not inferred from BigQuery.',
@@ -54,3 +54,6 @@ async def compare_applicants(budget: float, applicants: list[dict], horizon_days
                            'This policy compares network exposure conditional on need and operation assumptions; it does not evaluate replacement suppliers, cultural value or neighborhood equity.',
                            'Reported or verified labels describe user-supplied provenance; the agent has not independently audited documents.']
                           + (['SIMULATED: Financial scenarios attached to real names are not facts about these businesses.'] if simulated else [])}
+    from evidence_reviewer.review import audit_comparison
+    report['evidence_review'] = audit_comparison(report)
+    return report

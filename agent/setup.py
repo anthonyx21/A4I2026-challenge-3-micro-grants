@@ -5,6 +5,7 @@ import yaml
 from google.cloud import bigquery
 from cascade_analyst.config import CORRIDOR, DATASET, LOCATION, PROJECT
 from cascade_analyst.queries import GRAPH_DDL, SEARCH_SQL, cascade_sql
+from neighborhood_context.queries import FOOTFALL_SQL, DEMOGRAPHICS_SQL
 
 
 def validate(client):
@@ -45,6 +46,12 @@ def render(path):
                          "parameters": [param("business_id", "string", "Exact seed ID"),
                                         param("corridor", "string", "Selected corridor"),
                                         param("min_intensity", "float", "Minimum coefficient on every traversed edge")]})
+    docs.append({**common, 'name': 'business_footfall_context',
+                 'description': 'Modeled nearby worker allocation grouped by workplace tract; not business jobs.',
+                 'statement': FOOTFALL_SQL, 'parameters': [param('business_id', 'string', 'Exact ID'), param('corridor', 'string', 'Selected corridor')]})
+    docs.append({**common, 'name': 'dataset_tract_context',
+                 'description': 'Per-tract public context for the configured single-corridor dataset; rates are fractions.',
+                 'statement': DEMOGRAPHICS_SQL, 'parameters': []})
     path.write_text(yaml.safe_dump_all(docs, sort_keys=False))
     print(f"Rendered {path}")
 

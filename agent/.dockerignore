@@ -5,6 +5,10 @@
 !cascade_analyst/*.py
 !grant_advisor/
 !grant_advisor/*.py
+!evidence_reviewer/
+!evidence_reviewer/*.py
+!neighborhood_context/
+!neighborhood_context/*.py
 !setup.py
 !service.py
 !start_service.py
