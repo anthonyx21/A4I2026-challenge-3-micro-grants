@@ -1,0 +1,74 @@
+/* Custom styles for SF OEWD Micro-Grant Cascade Workbench */
+
+:root {
+  --bg-slate: #0f172a;
+  --card-slate: #1e293b;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animated SVG Cascade Edges */
+@keyframes flowDash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.edge-modeled-supplies {
+  stroke-dasharray: 6 4;
+  animation: flowDash 1.6s linear infinite;
+}
+
+.edge-modeled-footfall {
+  stroke-dasharray: 4 4;
+  animation: flowDash 2.2s linear infinite;
+}
+
+.edge-real-sba {
+  stroke-dasharray: none;
+}
+
+.graph-node-group {
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.graph-node-group:hover {
+  filter: drop-shadow(0 4px 10px rgba(37, 99, 235, 0.28));
+}
+
+/* Print stylesheet for the Friday Grant Memo */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  #memo-print-container {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+}

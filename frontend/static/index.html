@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SF OEWD · Micro-Grant Advisor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body class="bg-slate-50 text-slate-900 h-screen flex flex-col overflow-hidden">
+
+  <!-- TOP HEADER -->
+  <header class="bg-slate-900 text-white px-5 py-3 border-b border-slate-800 shrink-0">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-sm">
+          SF
+        </div>
+        <div>
+          <h1 class="font-bold text-sm">Central Market Micro-Grant Relief Advisor</h1>
+          <p class="text-[11px] text-slate-400">
+            Track 1: Main Street Relief · Live Cloud Run ADK (<code class="text-emerald-300">a4i_econ.CascadeEconomy</code>)
+          </p>
+        </div>
+      </div>
+
+      <!-- Compact Budget & KPI Bar -->
+      <div class="flex flex-wrap items-center gap-4 text-xs">
+        <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1">
+          <span class="text-slate-400">Budget:</span>
+          <input
+            id="budget-input"
+            type="number"
+            step="5000"
+            min="10000"
+            max="150000"
+            value="50000"
+            class="w-20 bg-slate-900 text-white font-mono text-xs font-semibold px-2 py-0.5 rounded border border-slate-600 focus:border-blue-400 focus:outline-none"
+          />
+          <button
+            id="recompute-btn"
+            class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-semibold px-2.5 py-0.5 rounded transition"
+          >
+            Allocate
+          </button>
+        </div>
+
+        <label class="flex items-center gap-1.5 cursor-pointer select-none bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1" title="Reserves $8k for high-poverty retail leaf businesses (1010 Market LLC)">
+          <input id="equity-carveout-toggle" type="checkbox" class="accent-amber-500 cursor-pointer" />
+          <span class="text-[11px] text-amber-300 font-medium">15% Equity Leaf Carve-Out</span>
+        </label>
+
+        <div class="hidden md:flex items-center gap-3 bg-slate-800/70 px-3 py-1 rounded-lg border border-slate-700/70 font-mono text-[11px]">
+          <span>Allocated: <strong id="kpi-allocated" class="text-white">$50,000</strong></span>
+          <span class="text-slate-600">|</span>
+          <span>Funded: <strong id="kpi-funded-count" class="text-emerald-400">3</strong></span>
+          <span class="text-slate-600">|</span>
+          <span>2-Hop Reach: <strong id="kpi-downstream-reach" class="text-blue-300">18 biz</strong></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CLEAN 2-PANEL LAYOUT: LEFT APPLICANT QUEUE (4 COLS) + RIGHT AGENT PROMPT (8 COLS) -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 overflow-hidden">
+
+    <!-- LEFT PANEL: APPLICANT QUEUE (4 COLS) -->
+    <aside class="lg:col-span-4 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col overflow-hidden">
+      <div class="p-3.5 border-b border-slate-200 flex items-center justify-between">
+        <div>
+          <h2 class="font-bold text-sm text-slate-900">Applicant Queue</h2>
+          <p class="text-[11px] text-slate-500">Select a Central Market business to query</p>
+        </div>
+        <div class="flex gap-1">
+          <button data-filter="ALL" class="queue-filter-btn text-[11px] font-semibold px-2 py-1 rounded bg-slate-900 text-white">All</button>
+          <button data-filter="FUNDED" class="queue-filter-btn text-[11px] font-semibold px-2 py-1 rounded bg-slate-100 text-slate-600 hover:bg-slate-200">Funded</button>
+          <button data-filter="ALERTS" class="queue-filter-btn text-[11px] font-semibold px-2 py-1 rounded bg-slate-100 text-slate-600 hover:bg-slate-200">Hub / Bias</button>
+        </div>
+      </div>
+
+      <div id="applicant-queue-list" class="flex-1 overflow-y-auto p-2.5 space-y-2">
+        <!-- Populated by app.js -->
+      </div>
+    </aside>
+
+    <!-- RIGHT PANEL: CLEAN AGENT CHAT WITH PROMPT TAB & RECOMMENDED QUESTIONS (8 COLS) -->
+    <section class="lg:col-span-8 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col overflow-hidden">
+
+      <!-- Clean Header with Single Prompt Tab, Live Agent Selector & Active Applicant Context -->
+      <div class="bg-slate-900 text-white px-4 pt-2.5 pb-0 border-b border-slate-800 shrink-0 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-3 border-b-2 border-blue-400 pb-2">
+          <span class="text-xs font-semibold text-white">💬 Agent Prompt</span>
+          <select
+            id="agent-app-select"
+            class="bg-slate-800 text-emerald-300 font-mono text-[11px] px-2 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer"
+            title="Select Cloud Run ADK Agent"
+          >
+            <option value="grant_advisor">Agent: grant_advisor (Portfolio & Memo)</option>
+            <option value="cascade_analyst">Agent: cascade_analyst (Graph Specialist)</option>
+          </select>
+        </div>
+
+        <div id="selected-applicant-banner" class="pb-2 text-xs">
+          <!-- Active applicant context pill populated by app.js -->
+        </div>
+      </div>
+
+      <!-- Recommended Questions to the Agents -->
+      <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 shrink-0">
+        <div class="text-[11px] font-semibold text-slate-500 mb-2">Recommended Questions to the Agents:</div>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button
+            data-agent="cascade_analyst"
+            data-prompt="Trace the 2-hop supply_disruption cascade for the selected business using analyze_cascade and report direct, multi-hop, and sensitivity results."
+            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
+          >
+            🕸️ Analyze 2-hop supply_disruption
+          </button>
+          <button
+            data-agent="cascade_analyst"
+            data-prompt="Run analyze_cascade with direction='customer_loss' for the selected business and explain upstream supplier exposure."
+            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
+          >
+            🔄 Analyze upstream customer_loss
+          </button>
+          <button
+            data-agent="grant_advisor"
+            data-prompt="Call compare_applicants for the candidate pool using the current budget and 90-day horizon, and write the full conditional GRANT MEMO."
+            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
+          >
+            📄 Compare applicants & write Grant Memo
+          </button>
+          <button
+            data-agent="grant_advisor"
+            data-prompt="Why shouldn't we recommend A & A Legal Service, Inc. (1188036-05-181) solely because it has the largest 22-business centrality?"
+            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
+          >
+            🛑 Why skip the biggest hub?
+          </button>
+          <button
+            data-agent="cascade_analyst"
+            data-prompt="Analyze 1010 Market LLC (1373515-10-241) and explain why a resident-facing grocery store has 0 supply_disruption paths in the BEA model."
+            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
+          >
+            ⚖️ Retail leaf & industry bias audit
+          </button>
+          <button
+            data-agent="grant_advisor"
+            data-prompt="What edges in this graph are modeled vs real, and what operating assumptions and limitations must the grant officer verify before approving?"
+            class="preset-prompt-btn text-xs bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition shadow-2xs"
+          >
+            🔍 Real vs. Modeled & assumptions
+          </button>
+        </div>
+      </div>
+
+      <!-- Clean Chat Messages Area -->
+      <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
+        <div class="bg-slate-100 border border-slate-200 rounded-xl p-3.5 text-slate-800 space-y-1.5">
+          <div class="text-[10px] font-mono text-emerald-700 font-semibold">
+            🟢 Connected to Cloud Run ADK · https://cascade-analyst-89073885580.us-central1.run.app
+          </div>
+          <p class="leading-relaxed">
+            Connected to live agents <code>grant_advisor</code> and <code>cascade_analyst</code> querying
+            <code>qwiklabs-gcp-04-029c15637557.a4i_econ.CascadeEconomy</code> in <strong>Central Market</strong>.
+            Select an applicant on the left and click any recommended question above, or type a prompt below.
+          </p>
+        </div>
+      </div>
+
+      <!-- Prompt Input Bar -->
+      <form id="chat-form" class="p-3 border-t border-slate-200 flex gap-2 bg-slate-50 shrink-0">
+        <input
+          id="chat-input"
+          type="text"
+          placeholder="Ask grant_advisor or cascade_analyst about Central Market applicants, cascades, or memos..."
+          class="flex-1 bg-white text-xs px-3.5 py-2.5 rounded-lg border border-slate-300 focus:border-blue-500 focus:outline-none"
+        />
+        <button
+          id="chat-submit-btn"
+          type="submit"
+          class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition"
+        >
+          Send
+        </button>
+      </form>
+
+    </section>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
