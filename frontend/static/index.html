@@ -460,7 +460,7 @@ const fk = n => '$' + Math.round(n/1000) + 'k';
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $ = s => document.querySelector(s);
 
-/* ---------- Central Market Corridor Data (Connected to BigQuery a4i_econ.CascadeEconomy) ---------- */
+/* ---------- Central Market Corridor Data (Loaded Dynamically from BigQuery a4i_econ.businesses) ---------- */
 const CORRIDOR = 'Central Market Corridor';
 const POOL_TOTAL = 150000, POOL_COMMITTED = 100000;
 const ROUND_BUDGET = 50000;
@@ -473,94 +473,20 @@ const AGENT_APPS = [
   ['neighborhood_context', 'Neighborhood Context (Census & Footfall)']
 ];
 
-const NODES = {
-  warfield:{name:'The Warfield Theater',x:90,y:150,kind:'Performing arts venue · 982 Market St'},
-  waypoint:{name:'Waypoint Consulting',x:245,y:120,kind:'B2B technical consulting · 1155 Market St'},
-  baart:{name:'Baart Programs Market',x:530,y:135,kind:'Community care clinic · 1111 Market St'},
-  kearny:{name:'Kearny Kitchen Catering',x:800,y:120,kind:'Commissary & catering supplier'},
-  artisan:{name:'Market St Artisan Bakery',x:1110,y:150,kind:'Wholesale & café bakery'},
-  noodle:{name:'Civic Center Noodle & Grill',x:270,y:360,kind:'Corridor restaurant'},
-  deli:{name:'UN Plaza Delicatessen',x:400,y:305,kind:'Deli & lunch counter'},
-  larkin:{name:'Larkin Community Event Hall',x:700,y:355,kind:'Community event venue'},
-  ggtheater:{name:'Golden Gate Concessions',x:830,y:300,kind:'Theater concessions & stage supply'},
-  mintav:{name:'Mint Plaza Sound & Stage',x:965,y:355,kind:'AV & event staging rental'},
-  cleaners:{name:'Mid-Market Eco Cleaners',x:560,y:445,kind:'Commercial laundry & linen'},
-  pharmacy:{name:'Civic Center Pharmacy',x:900,y:445,kind:'Neighborhood retail pharmacy'}
-};
-
 const STD_DOCS = [['app','Application form'],['tax','2025 tax return'],['q1','Q1 2026 bank statement'],['q2','Q2 2026 bank statement'],['q3','Q3 2026 bank statement'],['lease','Lease agreement'],['quote','Equipment quote']];
 
-const APPS = [
- {id:'1026779-04-151',key:'steel',name:'Steel + Lacquer',cat:'Salon & hospitality service',address:'1067 Market St, San Francisco, CA 94103',owner:'Elena Vance',since:2017,staff:14,ask:15000,
-  use:'Bridge payroll and rent gap ($18k cash gap) while rebooking corporate corridor accounts',impact:89,status:'ready',submitted:'Oct 6',x:330,y:190,
-  parts:[['Cascade & B2B reach',26,30,'7 total 2-hop businesses reached in Central Market'],['Distress & cash gap',24,25,'Verified payroll summary and landlord ledger ($18k 90-day gap)'],['Tract equity need',24,30,'Tract 06075017601 · 24.6% poverty rate, 58.0% no-vehicle households'],['Footfall & spillover',15,15,'410 shared corridor workers across Mid-Market blocks']],
-  fin:{appRev:680000,taxRev:645000,q:[162000,171000,168000],staffFiled:'12 FT + 2 PT',vendor:'Mid-Market Commercial Equipment',quote:14500},
-  missing:[],notes:{lease:'Landlord ledger verified — 90-day stabilization agreement on file'},
-  edges:{out:[['kearny',28000,18],['artisan',22000,12],['cleaners',14000,16]],
-         in:[['waypoint',48000,26],['larkin',38000,24],['deli',29000,19],['noodle',24000,15]],
-         spill:[['baart',9],['pharmacy',11]]}},
- {id:'0111663-06-001',key:'orpheum',name:'Orpheum Theatre',cat:'Performing arts & historic venue',address:'1192 Market St, San Francisco, CA 94102',owner:'Marcus Sterling',since:2014,staff:24,ask:18000,
-  use:'Stabilize stage rigging, utility arrears, and local show vendor contracts over 90 days',impact:86,status:'ready',submitted:'Oct 4',x:890,y:190,
-  parts:[['Cascade & B2B reach',25,30,'7 downstream businesses across 2 hops (3 direct, 4 secondary)'],['Distress & cash gap',22,25,'$18,000 working-capital gap from utility and rigging arrears'],['Tract equity need',24,30,'Civic Center / Mid-Market border tract · high transit reliance'],['Footfall & spillover',15,15,'Major evening footfall anchor for 8th & Market dining']],
-  fin:{appRev:1420000,taxRev:1365000,q:[340000,358000,352000],staffFiled:'20 FT + 4 PT',vendor:'Bay Stage & Rigging Systems',quote:17400},
-  missing:[],notes:{},
-  edges:{out:[['mintav',64000,28],['ggtheater',52000,31],['cleaners',19000,14]],
-         in:[['larkin',41000,22],['kearny',36000,19],['deli',28000,15],['noodle',22000,12]],
-         spill:[['warfield',14],['artisan',9]]}},
- {id:'1402027-10-251',key:'sumfer',name:'Sumfer Market Sf LLC',cat:'Corridor food service & market',address:'1084 Market St, San Francisco, CA 94102',owner:'David Chen',since:2018,staff:11,ask:15000,
-  use:'Replace failing walk-in refrigeration compressor and clear 60-day lease arrears',impact:81,status:'info',submitted:'Oct 2',x:590,y:300,
-  parts:[['Cascade & B2B reach',22,30,'5 direct 1-hop corridor links in Central Market'],['Distress & cash gap',21,25,'$15,000 refrigeration & lease arrears cash gap'],['Tract equity need',24,30,'Tract 06075012502 · 28.4% poverty rate, 63.5% no-vehicle access'],['Footfall & spillover',14,15,'320 shared weekday corridor workers']],
-  fin:{appRev:540000,taxRev:485000,q:[128000,136000,null],staffFiled:'9 FT + 2 PT',vendor:'Golden Gate Cold Chain',quote:13800},
-  missing:['q3'],notes:{lease:'Expires Mar 2027 — renewal addendum requested'},
-  edges:{out:[['kearny',39000,21],['artisan',27000,15]],
-         in:[['noodle',34000,24],['deli',31000,19],['larkin',18000,12]],
-         spill:[['cleaners',8],['pharmacy',10]]}},
- {id:'1051330-01-161',key:'pdm',name:'Pdm Group Inc',cat:'Management & B2B consulting',address:'1355 Market St, San Francisco, CA 94103',owner:'Priya Deshmukh',since:2016,staff:9,ask:17000,
-  use:'Bridge short-term payroll and B2B vendor liquidity gap across 6 corridor accounts',impact:75,status:'rev',submitted:'Sep 29',x:195,y:295,
-  parts:[['Cascade & B2B reach',22,30,'6 total 2-hop businesses reached (4 Hop-1, 2 Hop-2)'],['Distress & cash gap',18,25,'Applicant-reported $17,000 receivables delay'],['Tract equity need',21,30,'10th & Market block · 24.6% poverty rate'],['Footfall & spillover',14,15,'280 shared corridor office workers']],
-  fin:{appRev:610000,taxRev:590000,q:[148000,152000,155000],staffFiled:'8 FT + 1 PT',vendor:'Market St IT & Fleet Systems',quote:15900},
-  missing:[],notes:{},
-  edges:{out:[['waypoint',42000,22],['mintav',24000,14]],
-         in:[['baart',31000,18],['larkin',26000,15]],
-         spill:[['warfield',7],['noodle',6]]}},
- {id:'1188036-05-181',key:'aalegal',name:'A & A Legal Service, Inc.',cat:'Legal & compliance hub (22-node reach)',address:'1212 Market St, San Francisco, CA 94102',owner:'Arthur Alvarez',since:2011,staff:16,ask:20000,
-  use:'Upgrade document automation and compliance filing workstations',impact:71,status:'rev',submitted:'Oct 8',x:660,y:185,
-  parts:[['Cascade & B2B reach',29,30,'22 exposed businesses (17 Hop-1, 5 Hop-2) — largest hub in graph'],['Distress & cash gap',10,25,'Low financial distress: SBA 7(a) loan Paid in Full (8% baseline risk)'],['Tract equity need',19,30,'Civic Center corridor block'],['Footfall & spillover',13,15,'Serves 17 corridor business clients']],
-  fin:{appRev:1280000,taxRev:1255000,q:[312000,318000,324000],staffFiled:'15 FT + 1 PT',vendor:'LexTech Office Systems',quote:19200},
-  missing:[],notes:{},
-  edges:{out:[['waypoint',58000,29],['mintav',34000,17]],
-         in:[['baart',44000,21],['kearny',29000,14],['larkin',25000,12]],
-         spill:[['cleaners',6],['pharmacy',5]]}},
- {id:'1056704-02-161',key:'impark',name:'Impark 0314',cat:'Corridor parking & mobility support',address:'1050 Market St, San Francisco, CA 94102',owner:'Jordan Pike',since:2015,staff:8,ask:15000,
-  use:'Cover attendant staffing and gate equipment during evening theatre recovery',impact:64,status:'info',submitted:'Oct 9',x:470,y:345,
-  parts:[['Cascade & B2B reach',14,30,'24 unfiltered edges, 0 above 0.01 intensity threshold (Demo Benchmark #2)'],['Distress & cash gap',18,25,'Self-reported POS decline and vendor invoices ($18k cash gap)'],['Tract equity need',19,30,'Mid-Market Tract 06075012502'],['Footfall & spillover',13,15,'Supports evening theatre and dining visitors']],
-  fin:{appRev:420000,taxRev:362000,q:[98000,104000,null],staffFiled:'6 FT + 2 PT',vendor:'GateWorks Access Control',quote:14200},
-  missing:['q3'],notes:{},
-  edges:{out:[['cleaners',9000,6]],
-         in:[['warfield',18000,9],['ggtheater',14000,7]],
-         spill:[['noodle',6],['deli',5]]}},
- {id:'1080659-07-161',key:'blick',name:'Blick Art Materials LLC',cat:'Creative & retail supply anchor',address:'979 Market St, San Francisco, CA 94103',owner:'Clara Vance',since:2013,staff:12,ask:10000,
-  use:'Storefront security glazing and student/artist workshop supply display',impact:61,status:'new',submitted:'Oct 10',x:1060,y:285,
-  parts:[['Cascade & B2B reach',12,30,'Retail anchor (0 outgoing B2B edges at 0.01 cutoff)'],['Distress & cash gap',17,25,'$10,000 storefront glazing and inventory gap'],['Tract equity need',18,30,'Tract 06075017802 · 18.8% poverty, 75.5% no-vehicle households'],['Footfall & spillover',14,15,'12 linked workplace blocks (153.5 modeled workers)']],
-  fin:{appRev:490000,taxRev:476000,q:[118000,122000,125000],staffFiled:'10 FT + 2 PT',vendor:'Market Street Glass & Fixture',quote:9600},
-  missing:[],notes:{},
-  edges:{out:[['mintav',8000,5]],
-         in:[['larkin',15000,9],['ggtheater',11000,6]],
-         spill:[['warfield',11],['artisan',8]]}},
- {id:'1373515-10-241',key:'m1010',name:'1010 Market LLC',cat:'Neighborhood grocery retailer (Leaf)',address:'1010 Market St, San Francisco, CA 94102',owner:'Mei Lin',since:2019,staff:6,ask:8000,
-  use:'Produce cooler repair and SNAP/EBT point-of-sale terminal upgrade',impact:55,status:'new',submitted:'Oct 11',x:760,y:220,
-  parts:[['Cascade & B2B reach',6,30,'0 B2B outgoing edges (resident-facing grocery leaf node)'],['Distress & cash gap',18,25,'Verified $8,000 cash gap in high-poverty tract'],['Tract equity need',20,30,'High-poverty Tenderloin/Market border tract (31.2% poverty)'],['Footfall & spillover',11,15,'Essential daily food access for no-vehicle households']],
-  fin:{appRev:240000,taxRev:233000,q:[58000,61000,62000],staffFiled:'5 FT + 1 PT',vendor:'Bay Area POS & Cooler',quote:7600},
-  missing:['quote'],notes:{},
-  edges:{out:[['kearny',6000,4]],
-         in:[['deli',7000,4]],
-         spill:[['pharmacy',12],['baart',9]]}}
-];
-const BY = Object.fromEntries(APPS.map(a=>[a.id,a]));
+/* Applicant profiles and corridor nodes are NOT hardcoded; they load from /api/applicants (BigQuery) only if present in the database. */
+let NODES = {};
+let APPS = [];
+let BY = {};
+let ASSIGNED = {};
+let DB_LOADING = true;
+let DB_ERROR = null;
+
 const STATUS = {ready:['ready','Ready for review'],info:['info','Needs info'],rev:['rev','In review'],new:['new','New']};
-const variance = a => (a.fin.appRev - a.fin.taxRev)/a.fin.taxRev;
+const variance = a => (a && a.fin && a.fin.taxRev) ? (a.fin.appRev - a.fin.taxRev)/a.fin.taxRev : 0;
 const docName = (a,k) => k==='quote' ? 'Equipment quote — '+a.fin.vendor : STD_DOCS.find(d=>d[0]===k)[1];
-const sum = arr => arr.reduce((s,e)=>s+e[1],0);
+const sum = arr => (arr || []).reduce((s,e)=>s+e[1],0);
 const nodeName = k => NODES[k] ? NODES[k].name : k;
 
 /* ---------- State ---------- */
@@ -575,26 +501,11 @@ const S = {
   prefs:{emailDocs:true, digest:false, keepMap:false},
   user:{name:'Priya Natarajan',initials:'PN',email:'reviewer@city.gov',title:'Grant Reviewer',dept:'SF Office of Economic & Workforce Development',id:'Reviewer 1'},
   notifs:[
-    {t:'Steel + Lacquer (1026779-04-151) verified payroll & landlord ledger uploaded',time:'1h ago',app:'1026779-04-151',unread:true},
-    {t:'Blick Art Materials LLC (1080659-07-161) neighborhood footfall benchmark ready',time:'3h ago',app:'1080659-07-161',unread:true},
-    {t:'Sumfer Market Sf LLC (1402027-10-251) flagged for Q3 bank statement',time:'Yesterday',app:'1402027-10-251',unread:true},
     {t:'Central Market Round 1 closed: $100,000 committed across corridor',time:'Oct 14',app:null,unread:false}
   ],
   activity:[
-    {t:'Connected to Cloud Run ADK (corridor_coordinator)',time:'Just now'},
-    {t:'Generated Grant Memo for Orpheum Theatre (0111663-06-001)',time:'Oct 14, 3:12 PM'},
-    {t:'Requested Q3 bank statement from Sumfer Market Sf LLC',time:'Oct 13, 10:40 AM'}
+    {t:'Connected to Cloud Run ADK (corridor_coordinator)',time:'Just now'}
   ]
-};
-const ASSIGNED = {
-  '1026779-04-151':'PN',
-  '0111663-06-001':'PN',
-  '1402027-10-251':'PN',
-  '1051330-01-161':'PN',
-  '1188036-05-181':'MK',
-  '1056704-02-161':'PN',
-  '1080659-07-161':'MK',
-  '1373515-10-241':'PN'
 };
 const NAV = [['triage','Dashboard'],['apps','Applications'],['reports','Reports']];
 const ui = id => S.ui[id] || (S.ui[id] = {tab:'overview', layout:'2A', art:null});
@@ -615,14 +526,57 @@ function applyTheme(){
 }
 try{ const th = localStorage.getItem('cgp-theme'); if(th==='light'||th==='dark'||th==='system') S.theme = th; }catch(_){}
 applyTheme();
+
+async function loadApplicantsFromDB(){
+  DB_LOADING = true;
+  DB_ERROR = null;
+  if(S.screen !== 'login') render();
+  try {
+    const res = await fetch('/api/applicants');
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    APPS = Array.isArray(data.applicants) ? data.applicants : [];
+    NODES = data.nodes || {};
+    ASSIGNED = data.assigned || {};
+    BY = Object.fromEntries(APPS.map(a => [a.id, a]));
+    DB_LOADING = false;
+
+    const dbNotifs = APPS.slice(0, 3).map(a => ({
+      t: `${a.name} (${a.id}) verified in BigQuery a4i_econ.businesses (${a.parts[0][3]})`,
+      time: a.submitted,
+      app: a.id,
+      unread: true
+    }));
+    S.notifs = [
+      ...dbNotifs,
+      {t:'Central Market Round 1 closed: $100,000 committed across corridor',time:'Oct 14',app:null,unread:false}
+    ];
+    log(`Loaded ${APPS.length} verified applicant profile(s) from BigQuery (a4i_econ.businesses)`);
+    if(!S.seeded && APPS.length){
+      S.seeded = true;
+      const b = BY['0111663-06-001'] || APPS[0];
+      makeArtifact(b,'memo',false,true);
+      S.arts[b.id][0].created = timeLabel();
+    }
+  } catch (err) {
+    DB_LOADING = false;
+    DB_ERROR = err.message || String(err);
+    APPS = [];
+    NODES = {};
+    ASSIGNED = {};
+    BY = {};
+  }
+  if(S.screen !== 'login') render();
+}
+
 function startSession(email){
   if(email) S.user.email = email;
   S.screen='triage'; S.map='expanded'; S.menu=null;
-  if(!S.seeded){
+  if(!S.seeded && APPS.length){
     S.seeded = true;
-    const b = BY['0111663-06-001'];
+    const b = BY['0111663-06-001'] || APPS[0];
     makeArtifact(b,'memo',false,true);
-    S.arts[b.id][0].created = 'Oct 14, 3:12 PM';
+    S.arts[b.id][0].created = timeLabel();
   }
   render();
 }
@@ -709,7 +663,7 @@ function renderSidebar(){
           ${IC.grid}<span>Dashboard</span>
         </button>
         <button class="sb-item" data-act="go" data-v="apps" ${cur==='apps'&&S.map!=='max'?'aria-current="page"':''}>
-          ${IC.inbox}<span>Applications</span><span class="sb-ct open">${APPS.length} open</span>
+          ${IC.inbox}<span>Applications</span><span class="sb-ct open">${DB_LOADING?'…':APPS.length+' open'}</span>
         </button>
         <button class="sb-item" data-act="go" data-v="reports" ${cur==='reports'&&S.map!=='max'?'aria-current="page"':''}>
           ${IC.doc}<span>Reports</span><span class="sb-ct">${rpt}</span>
@@ -809,12 +763,15 @@ function renderMenu(){
 
 /* ---------- Render: map drawer ---------- */
 function ribbonText(){
-  if(S.screen==='review'){
+  if(DB_LOADING && !APPS.length){
+    return `<b>${CORRIDOR}</b> — Loading applicant profiles from BigQuery (a4i_econ.businesses)…`;
+  }
+  if(S.screen==='review' && BY[S.current]){
     const a = BY[S.current];
     return `<b>Active: ${esc(a.name)} (${a.id})</b> — ${a.edges.out.length} Suppliers • ${a.edges.in.length} Buyers • 2nd-Degree Consumer Zone`;
   }
   const linked = new Set(); APPS.forEach(a=>['out','in','spill'].forEach(t=>a.edges[t].forEach(e=>linked.add(e[0]))));
-  return `<b>${CORRIDOR}</b> — ${APPS.length} applicants • ${linked.size} linked businesses • ${fmt(APPS.reduce((s,a)=>s+a.ask,0))} requested`;
+  return `<b>${CORRIDOR}</b> — ${APPS.length} applicants in DB • ${linked.size} linked businesses • ${fmt(APPS.reduce((s,a)=>s+a.ask,0))} requested`;
 }
 
 function renderDrawer(){
@@ -944,7 +901,7 @@ function renderWS(){
   if(S.map==='max'){
     const a = S.current && BY[S.current];
     const names = {triage:'Dashboard',apps:'Applications',reports:'Reports',profile:'Profile'};
-    const txt = S.screen==='review'
+    const txt = S.screen==='review' && a
       ? `<b>${esc(a.name)}</b> · ${(S.chats[a.id]||[]).length} chat messages · ${(S.arts[a.id]||[]).length} artifacts`
       : `<b>${names[S.screen]}</b> · ${APPS.length} open applications`;
     ws.innerHTML = `<div class="peek gut"><span class="label">Workspace</span><span class="txt">${txt}</span><button class="btn sm" data-act="map" data-v="expanded">Restore workspace ▴</button></div>`;
@@ -954,14 +911,18 @@ function renderWS(){
   else if(S.screen==='apps') ws.innerHTML = appsView();
   else if(S.screen==='reports') ws.innerHTML = reportsView();
   else if(S.screen==='profile') ws.innerHTML = profileView();
-  else { ws.innerHTML = reviewShell(); renderLeft(); renderChat(); renderArt(); }
+  else if(BY[S.current]) { ws.innerHTML = reviewShell(); renderLeft(); renderChat(); renderArt(); }
+  else { S.screen='triage'; ws.innerHTML = triageView(); }
 }
 
 const FILTERS = [['all','All'],['ready','Ready'],['rev','In review'],['info','Needs info'],['new','New']];
 function appRows(){
+  if(DB_LOADING && !APPS.length){
+    return `<tr><td colspan="8" class="empty-row">Loading applicant profiles from BigQuery (a4i_econ.businesses &amp; CascadeEconomy)…</td></tr>`;
+  }
   const q = S.aq.trim().toLowerCase();
   const list = APPS.filter(a=>(S.filter==='all'||a.status===S.filter) && (!q || (a.name+' '+a.id+' '+a.cat+' '+a.owner).toLowerCase().includes(q)));
-  if(!list.length) return `<tr><td colspan="8" class="empty-row">No applications match these filters.</td></tr>`;
+  if(!list.length) return `<tr><td colspan="8" class="empty-row">${DB_ERROR ? 'Database error: '+esc(DB_ERROR) : 'No applications found in database matching these filters.'}</td></tr>`;
   return list.map(a=>{
     const [c,l] = STATUS[a.status], who = ASSIGNED[a.id] || 'PN';
     return `<tr data-act="open" data-id="${a.id}" data-from="queue" tabindex="0">
@@ -979,7 +940,7 @@ function appsView(){
   const counts = {all:APPS.length}; APPS.forEach(a=>counts[a.status]=(counts[a.status]||0)+1);
   return `<div class="triage gut">
     ${bc([['triage','Dashboard'],[null,'Applications']])}
-    <div class="triage-head" style="margin-top:6px"><h1>Applications</h1><div class="stats"><span>${CORRIDOR} · Round 2</span><span>Closes <b>Nov 14</b></span></div></div>
+    <div class="triage-head" style="margin-top:6px"><h1>Applications</h1><div class="stats"><span>${CORRIDOR} · Round 2</span><span>Loaded from <b>BigQuery (a4i_econ.businesses)</b></span></div></div>
     <div class="toolbar"><div class="seg" role="group" aria-label="Filter by status">${FILTERS.map(([k,l])=>`<button data-act="filter" data-v="${k}" aria-pressed="${S.filter===k}">${l}<span class="ct">${counts[k]||0}</span></button>`).join('')}</div>
       <input class="input sm" id="apps-q" type="search" placeholder="Filter by name, ID or owner" value="${esc(S.aq)}" autocomplete="off" aria-label="Filter applications"></div>
     <section class="panel"><div class="tablewrap"><table class="q"><thead><tr><th>Business ID</th><th>Business</th><th class="hide-s">Owner</th><th class="r">Amount</th><th class="r">Impact</th><th>Status</th><th class="hide-s">Reviewer</th><th class="hide-s">Filed</th></tr></thead>
@@ -988,7 +949,7 @@ function appsView(){
 
 function reportsView(){
   const all = [];
-  Object.entries(S.arts).forEach(([id,l])=>l.forEach(x=>all.push({id,kind:x.kind,title:x.title,created:x.created||'—'})));
+  Object.entries(S.arts).forEach(([id,l])=>{ if(BY[id]) l.forEach(x=>all.push({id,kind:x.kind,title:x.title,created:x.created||'—'})); });
   all.reverse();
   const body = all.length ? `<div class="tablewrap"><table class="q"><thead><tr><th>Report</th><th>Business</th><th class="hide-s">Created</th><th class="hide-s">Author</th><th></th></tr></thead><tbody>
       ${all.map(r=>`<tr data-act="open-report" data-id="${r.id}" data-k="${r.kind}" tabindex="0"><td><b>${esc(r.title)}</b></td><td class="biz"><b>${esc(BY[r.id].name)}</b><span class="mono">#${r.id}</span></td>
@@ -1032,17 +993,21 @@ function profileView(){
 }
 
 function triageView(){
-  const rows = APPS.slice().sort((a,b)=>({ready:0,rev:1,info:2,new:3}[a.status]-({ready:0,rev:1,info:2,new:3}[b.status]))).map(a=>{
-    const fl = a.missing.length + (variance(a)>.08?1:0);
-    const [c,l] = STATUS[a.status];
-    return `<tr data-act="open" data-id="${a.id}" data-from="queue" tabindex="0">
-      <td class="mono">${a.id}</td>
-      <td class="biz"><b>${esc(a.name)}</b><span>${esc(a.use)}</span></td>
-      <td class="r mono">${fmt(a.ask)}</td>
-      <td><span class="chip ${c}">${l}</span></td>
-      <td class="r hide-s"><span class="flagct ${fl?'':'zero'}">${fl?fl+' flag'+(fl>1?'s':''):'—'}</span></td>
-      <td class="hide-s mono" style="color:var(--muted)">${a.submitted}</td></tr>`;
-  }).join('');
+  const rows = DB_LOADING && !APPS.length
+    ? `<tr><td colspan="6" class="empty-row">Querying BigQuery database (a4i_econ.businesses &amp; CascadeEconomy) for verified applicant profiles…</td></tr>`
+    : !APPS.length
+    ? `<tr><td colspan="6" class="empty-row">${DB_ERROR ? 'Database error: '+esc(DB_ERROR) : 'No matching applicant profiles found in BigQuery database.'}</td></tr>`
+    : APPS.slice().sort((a,b)=>({ready:0,rev:1,info:2,new:3}[a.status]-({ready:0,rev:1,info:2,new:3}[b.status]))).map(a=>{
+        const fl = a.missing.length + (variance(a)>.08?1:0);
+        const [c,l] = STATUS[a.status];
+        return `<tr data-act="open" data-id="${a.id}" data-from="queue" tabindex="0">
+          <td class="mono">${a.id}</td>
+          <td class="biz"><b>${esc(a.name)}</b><span>${esc(a.use)}</span></td>
+          <td class="r mono">${fmt(a.ask)}</td>
+          <td><span class="chip ${c}">${l}</span></td>
+          <td class="r hide-s"><span class="flagct ${fl?'':'zero'}">${fl?fl+' flag'+(fl>1?'s':''):'—'}</span></td>
+          <td class="hide-s mono" style="color:var(--muted)">${a.submitted}</td></tr>`;
+      }).join('');
   const lb = APPS.slice().sort((a,b)=>b.impact-a.impact).map((a,i)=>`
     <button class="lb-card" data-act="open" data-id="${a.id}" data-from="leader">
       <span class="lb-rank">${String(i+1).padStart(2,'0')}</span>
@@ -1054,11 +1019,11 @@ function triageView(){
   const req = APPS.reduce((s,a)=>s+a.ask,0);
   return `<div class="triage gut">
     <div class="triage-head"><h1>${(h=>h<12?'Good morning':h<18?'Good afternoon':'Good evening')(new Date().getHours())}, ${esc(S.user.name.split(' ')[0])}</h1>
-      <div class="stats"><span><b>${APPS.length}</b> open</span><span><b>${fmt(req)}</b> requested</span><span><b>${fmt(poolRemaining())}</b> available</span></div></div>
+      <div class="stats"><span><b>${DB_LOADING?'…':APPS.length}</b> in database</span><span><b>${fmt(req)}</b> requested</span><span><b>${fmt(poolRemaining())}</b> available</span></div></div>
     <div class="triage-grid">
-      <section class="panel"><div class="panel-h"><h2>Help-desk queue</h2><span class="label">Sorted by readiness · BigQuery CascadeEconomy</span></div>
+      <section class="panel"><div class="panel-h"><h2>Help-desk queue</h2><span class="label">Loaded live from BigQuery a4i_econ.businesses</span></div>
         <div class="tablewrap"><table class="q"><thead><tr><th>Business ID</th><th>Business & request</th><th class="r">Amount</th><th>Status</th><th class="r hide-s">Flags</th><th class="hide-s">Filed</th></tr></thead><tbody>${rows}</tbody></table></div></section>
-      <section class="panel"><div class="panel-h"><h2>Impact leaderboard</h2><span class="label">Score / 100</span></div><div class="lb">${lb}</div></section>
+      <section class="panel"><div class="panel-h"><h2>Impact leaderboard</h2><span class="label">Score / 100</span></div><div class="lb">${lb || `<div class="empty-row">${DB_LOADING?'Loading from BigQuery…':'No applicants loaded.'}</div>`}</div></section>
     </div></div>`;
 }
 
@@ -1090,8 +1055,8 @@ function renderLeft(){
 }
 
 function tabApp(a){
-  const first = a.owner.split(' ')[0].toLowerCase();
-  const slug = a.name.toLowerCase().replace(/[^a-z]+/g,'');
+  const first = a.owner.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g,'') || 'contact';
+  const slug = a.name.toLowerCase().replace(/[^a-z0-9]+/g,'') || 'business';
   const addr = a.address || `${1000 + Math.round(a.x/4)*2} Market St, San Francisco, CA`;
   const quoteMissing = a.missing.includes('quote');
   const install = Math.max(0, Math.min(Math.round(a.ask*.05/100)*100, a.ask - a.fin.quote));
@@ -1101,11 +1066,11 @@ function tabApp(a){
     ['How will this grant strengthen the corridor?', `${a.parts[2][3]}. ${a.parts[0][3]}. Keeping this business open protects those relationships on Central Market.`],
     ['What happens if the grant is not awarded?', a.impact>=70 ? 'We would face an immediate 90-day working capital shortfall that risks disrupting downstream corridor partners.' : 'We would postpone the stabilization project and scale back hours.']
   ];
-  return `<div class="sec" id="L-applicant"><h3>Applicant</h3><dl class="kv">
-      <div><dt>Legal name</dt><dd>${esc(a.name)}</dd></div><div><dt>Registry ID (BigQuery)</dt><dd class="mono">${esc(a.id)}</dd></div>
-      <div><dt>Business address</dt><dd>${esc(addr)}</dd></div><div><dt>Primary contact</dt><dd>${esc(a.owner)}, Owner</dd></div>
+  return `<div class="sec" id="L-applicant"><h3>Applicant (BigQuery Verified)</h3><dl class="kv">
+      <div><dt>Business name</dt><dd>${esc(a.name)}</dd></div><div><dt>Registry ID (BigQuery)</dt><dd class="mono">${esc(a.id)}</dd></div>
+      <div><dt>Business address</dt><dd>${esc(addr)}</dd></div><div><dt>Legal entity / Owner</dt><dd>${esc(a.owner)}</dd></div>
       <div><dt>Email</dt><dd class="mono" style="font-size:12px">${first}@${slug}.sf.example</dd></div>
-      <div><dt>Operating since</dt><dd>${a.since}</dd></div>
+      <div><dt>Operating since</dt><dd>${esc(a.since)}</dd></div>
       <div><dt>Employees</dt><dd>${a.staff}</dd></div><div><dt>Category</dt><dd>${esc(a.cat)}</dd></div></dl></div>
     <div class="sec" id="L-budget"><h3>Use of funds</h3>
       <table class="fin"><tbody>
@@ -1115,7 +1080,7 @@ function tabApp(a){
         <tr><td><b>Total requested</b></td><td class="r"><b>${fmt(a.ask)}</b></td></tr></tbody></table></div>
     <div class="sec" id="L-narrative"><h3>Applicant responses</h3>
       ${qa.map(([q,r])=>`<div class="qa"><span class="q">${q}</span><p class="prose">${esc(r)}</p></div>`).join('')}</div>
-    <div class="sec"><h3>Certification</h3><div class="sig"><b>${esc(a.owner)}</b><span>Signed electronically · ${a.submitted}, 2026</span></div></div>`;
+    <div class="sec"><h3>Certification</h3><div class="sig"><b>${esc(a.owner)}</b><span>Verified in BigQuery · ${a.submitted}</span></div></div>`;
 }
 
 function tabOverview(a){
@@ -1144,7 +1109,7 @@ function tabDocs(a){
 
 function tabFin(a){
   const v = variance(a), vc = v>.12?'var-crit':v>.08?'var-warn':'var-ok';
-  const known = a.fin.q.filter(x=>x!=null), ann = known.reduce((s,x)=>s+x,0)/known.length*4;
+  const known = a.fin.q.filter(x=>x!=null), ann = known.length ? known.reduce((s,x)=>s+x,0)/known.length*4 : 0;
   return `<div class="sec" id="L-rev"><h3>Revenue check</h3>
       <table class="fin"><thead><tr><th>Source</th><th class="r">Annual revenue</th></tr></thead><tbody>
         <tr><td>Application (self-reported)</td><td class="r">${fmt(a.fin.appRev)}</td></tr>
@@ -1160,7 +1125,7 @@ function tabFin(a){
 
 /* ---------- Chat (Connected to Live Cloud Run ADK via /api/chat) ---------- */
 function renderChat(){
-  const a = BY[S.current], el = $('#chat'); if(!el) return;
+  const a = BY[S.current], el = $('#chat'); if(!el || !a) return;
   el.innerHTML = `<div class="chat-h">
       <div style="display:flex;align-items:center;gap:8px;min-width:0">
         <h2>Review assistant</h2>
@@ -1227,6 +1192,7 @@ function msgHTML(m){
   if(m.role==='typing') return `<div class="msg"><span class="who">Assistant <span class="adk-src">${esc(m.agent||S.agentApp)}</span></span><div class="typing"><i></i><i></i><i></i><span>Querying Cloud Run ADK & BigQuery graph…</span></div></div>`;
   if(m.kind==='summary'){
     const a = BY[m.app];
+    if(!a) return '';
     return `<div class="msg"><span class="who">Assistant <span class="adk-src">ADK Ready · ${esc(a.id)}</span></span><div class="summary">
       <p>${esc(a.name)} (<span class="mono">${esc(a.id)}</span>) requests <b>${fmt(a.ask)}</b> to ${esc(a.use.charAt(0).toLowerCase()+a.use.slice(1))}. ${m.lead||''}</p>
       <div class="stats"><div><b>${a.impact}</b><span>Impact score</span></div><div><b>${a.edges.out.length}/${a.edges.in.length}</b><span>Suppliers / buyers</span></div>
@@ -1249,8 +1215,8 @@ function flagsFor(a){
   if(!f.length) f.push('No missing documents. Ready for live ADK evaluation & recommendation.');
   return f;
 }
+const rival = a => APPS.slice().sort((x,y)=>y.impact-x.impact).find(x=>x.id!==a.id && Math.abs(x.impact-a.impact)<=15) || APPS.find(x=>x.id!==a.id) || a;
 const requestChip = a => a.missing.length ? 'Draft request for the '+docName(a,a.missing[0]).replace(/^Equipment quote — .*/,'contractor quote') : 'Compare with '+rival(a).name;
-const rival = a => APPS.slice().sort((x,y)=>y.impact-x.impact).find(x=>x.id!==a.id && Math.abs(x.impact-a.impact)<=15) || APPS.find(x=>x.id!==a.id);
 const topDep = a => [...a.edges.out.map(e=>['out',...e]),...a.edges.in.map(e=>['in',...e])].sort((x,y)=>y[3]-x[3])[0];
 
 function detectLocalArtifact(a, text){
@@ -1268,7 +1234,7 @@ function detectLocalArtifact(a, text){
 
 async function send(text){
   text = text.trim(); if(!text) return;
-  const a = BY[S.current];
+  const a = BY[S.current]; if(!a) return;
   const sw = /^switch to (.+)$/i.exec(text);
   if(sw){ const o = APPS.find(x=>x.name.toLowerCase()===sw[1].toLowerCase()); if(o){ openBiz(o.id,'switch'); return; } }
   const chat = S.chats[a.id];
@@ -1383,20 +1349,21 @@ function artSections(a, kind, tight){
     const conds = tight
       ? [`Upload ${a.missing.length?docName(a,a.missing[0]):'Q4 bank statement'} before disbursement`,`Written explanation of the ${(v*100).toFixed(1)}% revenue variance, within 14 days`,`Proof of stabilization / installation (invoice from ${a.fin.vendor}) within 90 days of award`]
       : [a.missing.length?`Receipt of the ${docName(a,a.missing[0])}`:'Standard reporting at 6 and 12 months', v>.08?'Explanation of the revenue variance':'Invoice matching the quote on file', a.notes.lease?'Evidence of lease renewal or landlord consent':'Retain listed staff for 12 months'];
+    const rv = rival(a);
     return [
       `<div class="kicker">GRANT MEMO · #${a.id} · DRAFT ${tight?'v2':'v1'}</div><h1>${esc(a.name)}: ${fmt(a.ask)} request</h1>`,
-      `<section id="R-m-rec"><h2>1. Which business, by name and address, and how much</h2><div class="rec"><b>${recLine(a).replace(/^./,c=>c.toUpperCase())}</b><span class="mono" style="color:var(--muted)">Impact ${a.impact}/100</span></div><p><b>${esc(a.name)}</b> (<span class="mono">${esc(a.id)}</span>) at <b>${esc(a.address || 'Central Market, San Francisco, CA')}</b> · ${esc(a.cat)} run by ${esc(a.owner)} (${a.staff} staff). Recommended award: <b>${fmt(a.ask)}</b> from the ${fmt(ROUND_BUDGET)} round pool (${fmt(Math.max(0, ROUND_BUDGET - a.ask))} unallocated in single-award view) to ${esc(a.use.charAt(0).toLowerCase()+a.use.slice(1))} ${pill('L','docs','doc-quote','Quote')}.</p></section>`,
-      `<section id="R-m-sum"><h2>2. What it protects — the cascade, named</h2><p>${esc(a.parts[0][3])} (${fk(total)}/yr direct corridor trade) ${pill('L','overview','network','Network')}:</p><ul>${a.edges.out.map(e=>`<li><b>${esc(nodeName(e[0]))}</b> — <b>1 hop</b> (direct supplier) · link strength <b>0.${String(e[2]).padStart(2,'0')}</b> (${e[2]}% dependency · ${fk(e[1])}/yr)</li>`).join('')}${a.edges.in.map(e=>`<li><b>${esc(nodeName(e[0]))}</b> — <b>1 hop</b> (direct buyer) · link strength <b>0.${String(e[2]).padStart(2,'0')}</b> (${e[2]}% dependency · ${fk(e[1])}/yr)</li>`).join('')}${a.edges.spill.map(e=>`<li><b>${esc(nodeName(e[0]))}</b> — <b>2 hops</b> (indirect corridor partner) · link strength <b>0.${String(e[1]).padStart(2,'0')}</b> (${e[1]}% shared corridor overlap)</li>`).join('')}</ul></section>`,
-      `<section id="R-m-impact"><h2>3. The traversal itself, shown</h2><pre style="font-size:11px;padding:8px;background:var(--bg);border:1px solid var(--line);border-radius:6px;overflow-x:auto">GRAPH a4i_econ.CascadeEconomy\nMATCH p = ANY SHORTEST (seed:Business WHERE seed.business_id = '${esc(a.id)}')\n  -[e:Supplies WHERE e.intensity >= 0.01]->{1,2}(exposed:Business)\nRETURN exposed.business_id, exposed.name, TO_JSON(p) AS path</pre><ul>${[...a.edges.out,...a.edges.in].slice(0,3).map((e,i)=>{ const sp = a.edges.spill[i % a.edges.spill.length]; return `<li><span class="mono">${esc(a.name)}</span> → <b>[Hop 1 · w=0.${String(e[2]).padStart(2,'0')}]</b> → <span class="mono">${esc(nodeName(e[0]))}</span>${sp?` → <b>[Hop 2 · w=0.${String(sp[1]).padStart(2,'0')}]</b> → <span class="mono">${esc(nodeName(sp[0]))}</span>`:''}</li>`; }).join('')}</ul></section>`,
-      `<section id="R-m-runner"><h2>4. Why this one and not the runner-up</h2><p>Compared against runner-up <b>${esc(rival(a).name)}</b> (<span class="mono">#${esc(rival(a).id)}</span>, requesting ${fmt(rival(a).ask)}, Impact ${rival(a).impact}/100: ${esc(rival(a).parts[0][3])}; ${esc(rival(a).parts[1][3])}), <b>${esc(a.name)}</b> scores ${a.impact} vs. ${rival(a).impact} (${a.impact>=rival(a).impact?'+'+(a.impact-rival(a).impact):a.impact-rival(a).impact} pts) on verified cash-gap feasibility and deduplicated 2-hop exposure after removing weak links below the <code>0.01</code> intensity cutoff ${pill('L','overview','impact','Impact')}.</p></section>`,
+      `<section id="R-m-rec"><h2>1. Which business, by name and address, and how much</h2><div class="rec"><b>${recLine(a).replace(/^./,c=>c.toUpperCase())}</b><span class="mono" style="color:var(--muted)">Impact ${a.impact}/100</span></div><p><b>${esc(a.name)}</b> (<span class="mono">${esc(a.id)}</span>) at <b>${esc(a.address || 'Central Market, San Francisco, CA')}</b> · ${esc(a.cat)} (${esc(a.owner)}, ${a.staff} staff). Recommended award: <b>${fmt(a.ask)}</b> from the ${fmt(ROUND_BUDGET)} round pool (${fmt(Math.max(0, ROUND_BUDGET - a.ask))} unallocated in single-award view) to ${esc(a.use.charAt(0).toLowerCase()+a.use.slice(1))} ${pill('L','docs','doc-quote','Quote')}.</p></section>`,
+      `<section id="R-m-sum"><h2>2. What it protects — the cascade, named</h2><p>${esc(a.parts[0][3])} (${fk(total)}/yr direct corridor trade) ${pill('L','overview','network','Network')}:</p><ul>${a.edges.out.map(e=>`<li><b>${esc(nodeName(e[0]))}</b> — <b>1 hop</b> (direct partner) · link strength <b>0.${String(e[2]).padStart(2,'0')}</b> (${e[2]}% dependency · ${fk(e[1])}/yr)</li>`).join('')}${a.edges.in.map(e=>`<li><b>${esc(nodeName(e[0]))}</b> — <b>2 hops</b> (secondary partner) · link strength <b>0.${String(e[2]).padStart(2,'0')}</b> (${e[2]}% dependency · ${fk(e[1])}/yr)</li>`).join('')}${a.edges.spill.map(e=>`<li><b>${esc(nodeName(e[0]))}</b> — <b>corridor spillover</b> · <b>${e[1]}%</b> shared overlap</li>`).join('')}</ul></section>`,
+      `<section id="R-m-impact"><h2>3. The traversal itself, shown</h2><pre style="font-size:11px;padding:8px;background:var(--bg);border:1px solid var(--line);border-radius:6px;overflow-x:auto">GRAPH a4i_econ.CascadeEconomy\nMATCH p = ANY SHORTEST (seed:Business WHERE seed.business_id = '${esc(a.id)}')\n  -[e:Supplies WHERE e.intensity >= 0.25]->{1,2}(exposed:Business)\nRETURN exposed.business_id, exposed.name, TO_JSON(p) AS path</pre><ul>${[...a.edges.out,...a.edges.in].slice(0,3).map((e,i)=>{ const sp = a.edges.spill.length ? a.edges.spill[i % a.edges.spill.length] : null; return `<li><span class="mono">${esc(a.name)}</span> → <b>[Hop 1 · w=0.${String(e[2]).padStart(2,'0')}]</b> → <span class="mono">${esc(nodeName(e[0]))}</span>${sp?` → <b>[Hop 2 · w=0.${String(sp[1]).padStart(2,'0')}]</b> → <span class="mono">${esc(nodeName(sp[0]))}</span>`:''}</li>`; }).join('')}</ul></section>`,
+      `<section id="R-m-runner"><h2>4. Why this one and not the runner-up</h2><p>Compared against runner-up <b>${esc(rv.name)}</b> (<span class="mono">#${esc(rv.id)}</span>, requesting ${fmt(rv.ask)}, Impact ${rv.impact}/100: ${esc(rv.parts[0][3])}; ${esc(rv.parts[1][3])}), <b>${esc(a.name)}</b> scores ${a.impact} vs. ${rv.impact} (${a.impact>=rv.impact?'+'+(a.impact-rv.impact):a.impact-rv.impact} pts) on verified database presence and deduplicated 2-hop exposure ${pill('L','overview','impact','Impact')}.</p></section>`,
       `<section id="R-m-fin"><h2>5. What you are assuming</h2><p><b>A grant changes a survival probability, not a guaranteed outcome.</b> Assuming full gap funding (${fmt(a.ask)}) sustains operations over a <b>90-day horizon</b>, this award conditionally reduces disruption exposure across the named 1-hop and 2-hop network above (no proven jobs saved or closures prevented are claimed). Self-reported revenue of ${fmt(a.fin.appRev)} is ${(v*100).toFixed(1)}% ${v>=0?'above':'below'} the 2025 tax return ${pill('L','fin','rev','Revenue')}.</p><ul>${conds.map(c=>`<li>Pre-award check: ${esc(c)}</li>`).join('')}</ul></section>`,
-      `<section id="R-m-mod"><h2>6. Which parts of the evidence are modeled (in one honest line)</h2><p>Business locations/NAICS (SF Registry), Census tract demographics (ACS), and workplace block job counts (LEHD) are measured public records, whereas B2B <code>Supplies</code> edges (BEA industry coefficients × walking distance), proximity <code>DrawsFootfall</code> worker allocations, and UI demo cash-gap scenarios are modeled.</p></section>`,
+      `<section id="R-m-mod"><h2>6. Which parts of the evidence are modeled (in one honest line)</h2><p>Business locations/NAICS (SF Registry), Census tract demographics (ACS), and workplace block job counts (LEHD) are measured public records in BigQuery, whereas B2B <code>Supplies</code> edges (BEA industry coefficients × walking distance), proximity <code>DrawsFootfall</code> worker allocations, and UI demo cash-gap scenarios are modeled.</p></section>`,
       `<section id="R-m-cond"><h2>7. Who the neighborhood is — tract demographics where the money lands</h2><p><b>${esc(a.parts[2][3])}</b> · <b>${esc(a.parts[3][3])}</b>. Demographic and worker-footfall figures describe the surrounding neighborhood and workplace blocks where the grant lands, kept distinct from the B2B network calculator ranking.</p></section>`
     ];
   }
   if(kind==='network'){
     const rows = [['Revenue out · 1st-degree suppliers','out',a.edges.out],['Revenue in · 1st-degree buyers','in',a.edges.in]];
-    const max = Math.max(...a.edges.out.map(e=>e[1]),...a.edges.in.map(e=>e[1]));
+    const max = Math.max(1, ...a.edges.out.map(e=>e[1]), ...a.edges.in.map(e=>e[1]));
     const L=170, W=300, rowH=24; let y=12, body='';
     const ticks=[0,.25,.5,.75,1].map(f=>f*max);
     rows.forEach(([g,cls,list])=>{
@@ -1422,9 +1389,9 @@ function artSections(a, kind, tight){
       `<section><h2>Method</h2><p>Direct flows come from the applicant's supplier and buyer network in Central Market ${pill('L','overview','network','Network')}. Percentages are each partner's estimated dependency. The 2nd-degree figure applies a 0.35 local multiplier to direct flows and covers the consumer zone within 400 m, shown as the shaded ring on the map.</p></section>`
     ];
   }
-  const known = a.fin.q.filter(x=>x!=null), ann = known.reduce((s,x)=>s+x,0)/known.length*4;
+  const known = a.fin.q.filter(x=>x!=null), ann = known.length ? known.reduce((s,x)=>s+x,0)/known.length*4 : 1;
   const sev = x => x>.12?'<span class="var-crit">High</span>':x>.08?'<span class="var-warn">Medium</span>':'<span class="var-ok">Low</span>';
-  const staffFiled = a.fin.staffFiled.match(/\d+/g).map(Number).reduce((s,x)=>s+x,0);
+  const staffFiled = (a.fin.staffFiled.match(/\d+/g) || [a.staff]).map(Number).reduce((s,x)=>s+x,0);
   return [
     `<div class="kicker">DISCREPANCY REPORT · #${a.id}</div><h1>${esc(a.name)}: financial audit</h1>`,
     `<section id="R-a-table"><div class="tablewrap"><table class="fin"><thead><tr><th>Item</th><th class="r">Application</th><th class="r">Evidence</th><th class="r">Variance</th><th class="r">Severity</th></tr></thead><tbody>
@@ -1438,6 +1405,7 @@ function artSections(a, kind, tight){
 }
 
 function makeArtifact(a, kind, tight, silent){
+  if(!a) return;
   const titles = {memo:'Grant Memo',network:'Network Impact',audit:'Discrepancy Report',adk:'Live ADK Memo'};
   const list = S.arts[a.id] || (S.arts[a.id]=[]);
   let art = list.find(x=>x.kind===kind);
@@ -1462,7 +1430,7 @@ function makeArtifact(a, kind, tight, silent){
 }
 
 function renderArt(){
-  const a = BY[S.current], el = $('#art'); if(!el) return;
+  const a = BY[S.current], el = $('#art'); if(!el || !a) return;
   const u = ui(a.id), list = S.arts[a.id]||[];
   const art = list.find(x=>x.kind===u.art) || list[0];
   if(!art){ el.innerHTML = `<div class="empty">Ask for a memo, report or chart and it will open here.</div>`; return; }
@@ -1473,7 +1441,7 @@ function renderArt(){
 
 /* ---------- Navigation ---------- */
 function openBiz(id, from){
-  const a = BY[id];
+  const a = BY[id]; if(!a) return;
   if(!S.chats[id]){
     const lead = from==='leader' ? 'Impact breakdown is loaded on the left.' : from==='map' ? 'Its corridor network is drawn on the map above.' : '';
     const chips = from==='leader' ? [`Explain the ${a.impact} impact score and 2-hop cascade for ${a.name}`,'Visualize 2-Degree Network Impact','Compare with '+rival(a).name]
@@ -1524,7 +1492,7 @@ document.addEventListener('click', e=>{
     case 'menu': S.menu = S.menu===t.dataset.v ? null : t.dataset.v; renderMenu(); break;
     case 'theme': S.theme=t.dataset.v; applyTheme(); renderSidebar(); renderTop(); renderMenu(); if(S.screen==='profile') renderWS(); break;
     case 'mark-read': S.notifs.forEach(n=>n.unread=false); renderTop(); renderMenu(); break;
-    case 'notif': { const n=S.notifs[+t.dataset.i]; n.unread=false; S.menu=null; if(n.app) openBiz(n.app,'search'); else { renderTop(); renderMenu(); } break; }
+    case 'notif': { const n=S.notifs[+t.dataset.i]; n.unread=false; S.menu=null; if(n.app && BY[n.app]) openBiz(n.app,'search'); else { renderTop(); renderMenu(); } break; }
     case 'filter': S.filter=t.dataset.v; renderWS(); break;
     case 'pref': S.prefs[t.dataset.v]=!S.prefs[t.dataset.v]; if(t.dataset.v==='keepMap') S.pinned=S.prefs.keepMap; t.setAttribute('aria-checked',S.prefs[t.dataset.v]); toast('Preference saved'); break;
     case 'open-report': { const u=ui(t.dataset.id); u.layout='2B'; u.art=t.dataset.k; openBiz(t.dataset.id,'report'); break; }
@@ -1545,7 +1513,7 @@ document.addEventListener('click', e=>{
     case 'src': goSrc(t.dataset.src); break;
     case 'art-tab': ui(S.current).art=t.dataset.v; renderArt(); break;
     case 'art-close': ui(S.current).layout='2A'; $('#review').classList.remove('l2b'); break;
-    case 'award': { const a=BY[S.current];
+    case 'award': { const a=BY[S.current]; if(!a) break;
       if(S.awarded[a.id]){ delete S.awarded[a.id]; log(`Withdrew recommendation for ${a.name}`); toast('Recommendation withdrawn'); }
       else { S.awarded[a.id]=a.ask; log(`Recommended ${fmt(a.ask)} for ${a.name}`); toast(`Recommended ${fmt(a.ask)} · pool now ${fmt(poolRemaining())}`); }
       renderTop(); renderLeft(); break; }
@@ -1574,6 +1542,7 @@ document.addEventListener('change', e=>{
 window.addEventListener('resize', ()=>{ if(S.pop) showPop(S.pop); if(S.menu) renderMenu(); });
 
 render();
+loadApplicantsFromDB();
 })();
 </script>
 
